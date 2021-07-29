@@ -18,15 +18,14 @@ button:active {
     transform: scale(0.95);
 }
 
-header {
+#header {
     font-family: 'Montserrat', sans-serif;
+    padding-top: 60px;
 }
 
 .header-bar {
-    padding: 10px;
     font-size: 18px;
     letter-spacing: 1px;
-
 }
 
 .text-center {
@@ -34,7 +33,6 @@ header {
 }
 
 .search-container {
-    /*position: relative;*/
     padding: 20px 50px;
     position: absolute;
     top: 50%;
@@ -47,7 +45,7 @@ header {
     width: 440px;
     height: 55px;
     border: 3px solid #000000;
-    background: transparent;
+    background-color: transparent;
     padding: 15px 30px;
     border-radius: 50px;
     color: #000000;
@@ -67,7 +65,7 @@ header {
     cursor: pointer;
     width: 120px;
     height: 55px;
-    background: #000000;
+    background-color: #000000;
     color: #fff;
     border: 0;
     border-radius: 50px;
@@ -75,13 +73,101 @@ header {
     text-transform: uppercase;
 }
 
-/*.horizontal {*/
-/*    border-bottom: 2px solid rgba(0, 0, 0, 0.22);*/
-/*}*/
+/*--------------------------------------------------*/
 
+.main-content {
+    padding: 30px 0 30px;
+}
 
-/*.vertical {*/
-/*    border-right: 2px solid darkgray;*/
-/*    height: auto;*/
-/*}*/
+.filters-panel-labels {
+    display: flex;
+    font-family: "Montserrat", sans-serif;
+    align-items: center;
+    padding: 8px 0 8px;
+    overflow-x: auto;
+    /*margin-bottom: 0;*/
+}
 
+.filter-item {
+    padding-top: 8px;
+    /*margin: 0 auto;*/
+    margin-right: 12px;
+}
+
+.filter-item-label {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background-color: #f6f6f6;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+/*--------------------------------------------------*/
+
+.services .icon-box {
+    text-align: center;
+    /*border: 1px solid #ededed;*/
+    padding: 50px 15px;
+    transition: all ease-in-out 0.3s;
+}
+
+.services .icon-box .icon {
+    width: 64px;
+    height: 64px;
+    background-color: #d9683e;
+    border-radius: 5px;
+    transition: all .3s ease-out 0s;
+    display: flex;
+    margin: 0 auto 20px;
+    transform-style: preserve-3d;
+}
+
+.services .icon-box .icon i {
+    color: #fff;
+    font-size: 28px;
+}
+
+.services .icon-box .icon::before {
+    position: absolute;
+    content: '';
+    left: -8px;
+    top: -8px;
+    height: 100%;
+    width: 100%;
+    background-color: #eacec7;
+    border-radius: 5px;
+    transition: all .3s ease-out 0s;
+    transform: translateZ(-1px);
+}
+
+.services .icon-box h4 {
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.services .icon-box h4 a {
+    color: #000000;
+}
+
+.services .icon-box p {
+    line-height: 24px;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.services .icon-box:hover {
+    background-color: rgba(236, 138, 100, 0.89);
+    border-color: #d9683e;
+}
+
+.services .icon-box:hover .icon {
+    background-color: #fff;
+}
+
+.services .icon-box:hover .icon::before {
+    background-color: rgb(217, 104, 62);
+}
