@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/pages/libs/css/all.css">
+  <link rel="stylesheet" href="../css/login-registration.css">
+  <title>Title</title>
+</head>
+<body>
+<div class="container" id="container">
+  <div class="form-container sign-up-container">
+    <form action="#">
+      <a href="main-page.html"> <i style="color: #199990" class="fas fa-bicycle fa-3x"></i></a>
+      <h1>Create Account</h1>
+      <input type="text" placeholder="Username"/>
+      <input type="email" placeholder="Email"/>
+      <input type="password" placeholder="Password"/>
+      <button class="sign-up" style="margin-top: 7px">SIGN UP</button>
+    </form>
+  </div>
+  <div class="form-container sign-in-container">
+    <form action="#">
+      <a href="main-page.html"> <i style="color: #179f86" class="fas fa-bicycle fa-3x"></i></a>
+      <h1>Sign in</h1>
+      <input type="email" placeholder="Email"/>
+      <input type="password" placeholder="Password"/>
+      <a href="#" style="text-decoration: none; font-size: 14px; margin: 15px 0; color:#000000">Forgot your
+        password?</a>
+      <button class="sign-in">SIGN IN</button>
+    </form>
+  </div>
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <h1>Welcome Back!</h1>
+        <p class="container-details">To keep connected with us please login with your personal info</p>
+        <button class="ghost" id="signIn">SIGN IN</button>
+      </div>
+      <div style="right: 0" class="overlay-panel overlay-right">
+        <h1>Hello, Friend!</h1>
+        <p class="container-details">Enter your personal details and start journey with us</p>
+        <button class="ghost" id="signUp">SIGN UP</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../js/login-registration.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
+        integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ"
+        crossorigin="anonymous"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
+        integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
+        crossorigin="anonymous"></script>
+</body>
+</html>
