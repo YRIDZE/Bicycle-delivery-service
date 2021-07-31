@@ -172,6 +172,34 @@ button:active {
     background-color: rgb(217, 104, 62);
 }
 
+/*--------------------------------------------------*/
+
+.back-to-top {
+    position: fixed;
+    right: 50px;
+    bottom: -50px;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: #e96b56;
+    border: 2px solid #d2e3f1;
+    opacity: .6;
+    cursor: pointer;
+    transition: 0.4s linear;
+}
+
+.back-to-top:hover,
+.back-to-top:focus {
+    filter: brightness(1.15);
+    opacity: 1;
+}
+
+.back-to-top.active {
+    bottom: 50px;
+}
 
 /*--------------------------------------------------*/
 
