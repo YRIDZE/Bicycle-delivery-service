@@ -49,7 +49,8 @@ button:active {
 
 ::-webkit-input-placeholder {
     color: #000000;
-    font-family: 'Montserrat', sans-serif;}
+    font-family: 'Montserrat', sans-serif;
+}
 
 .close-btn {
     position: absolute;
@@ -99,7 +100,7 @@ button:active {
 }
 
 /*--------------------------------------------------*/
-
+/*
 .services .icon-box {
     text-align: center;
     padding: 50px 15px;
@@ -163,6 +164,61 @@ button:active {
 .services .icon-box:hover .icon::before {
     background-color: rgb(217, 104, 62);
 }
+*/
+/*--------------------------------------------------*/
+.product-preview .link:hover {
+    background-color: rgba(178, 180, 183, 0.47);
+    cursor: pointer;
+}
+
+.restaurant-item {
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(194, 184, 184, 0.26);
+
+    margin-bottom: 10px;
+}
+
+.product-preview-first .item {
+    height: 200px;
+}
+
+.product-preview .item {
+    position: relative;
+}
+
+.product-preview .item .image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    overflow: hidden;
+}
+
+.product-preview .item .link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.rest-content {
+    color: rgb(207, 51, 1);
+    font-family: 'Montserrat', sans-serif;
+    margin-left: 10px;
+}
+
+.product-preview .item .image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
 
 /*--------------------------------------------------*/
 
@@ -200,7 +256,8 @@ button:active {
     padding: 0 0 15px 0;
     color: #fff;
     font-size: 14px;
-    font-family: 'Antic Slab', sans-serif;}
+    font-family: 'Antic Slab', sans-serif;
+}
 
 #footer .footer-top {
     background-color: #3b3b3b;
