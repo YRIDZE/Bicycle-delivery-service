@@ -1,9 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
-
 button {
     border-radius: 20px;
-    border: 1px solid #000000;
     font-size: 12px;
     font-weight: bold;
     padding: 12px 45px;
@@ -80,6 +78,8 @@ button:active {
     align-items: center;
     padding: 8px 0 8px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
 }
 
 .filter-item {
@@ -91,7 +91,7 @@ button:active {
     display: flex;
     align-items: center;
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 20px;
     background-color: #f6f6f6;
     cursor: pointer;
     font-size: 18px;
@@ -303,4 +303,22 @@ button:active {
 #footer .footer-top .social-links a:hover {
     background-color: #e96b56;
     color: #fff;
+}
+
+/*--------------------------------------------------*/
+
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
+    padding: 1rem 1rem 0 !important;
+}
+
+.login-input {
+    background-color: #FFFFFF;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
 }
