@@ -2,7 +2,7 @@
 
 .custom-table {
     font-family: 'Montserrat', sans-serif;
-    min-width: 900px;
+    min-width: 800px;
 }
 
 .custom-table thead th {
@@ -15,8 +15,7 @@
     letter-spacing: .1rem;
 }
 
- .custom-table tbody td {
-    color: #777;
+.custom-table tbody td {
     padding-bottom: 20px;
     padding-top: 20px;
     font-weight: 300;
@@ -34,3 +33,14 @@
 .custom-table tbody tr:hover td .details {
     color: #199990;
 }
+
+.cart-col-12 {
+    margin-top: 0;
+}
+
+.cart-btn {
+    background-color: transparent !important;
+    border-color:rgba(117, 190, 218, 0.0);
+    text-transform: uppercase;
+}
+
