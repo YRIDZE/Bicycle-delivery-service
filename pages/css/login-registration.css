@@ -31,14 +31,14 @@
 }
 
 button.sign-up {
-    border: 1px solid #199990;
-    background-color: #199990;
+    border: 1px solid #545454;
+    background-color: #545454;
     color: #FFFFFF;
 }
 
 button.sign-in {
-    border: 1px solid #179f86;
-    background-color: #179f86;
+    border: 1px solid #e96b56;
+    background-color: #e96b56;
     color: #FFFFFF;
 }
 
@@ -101,9 +101,8 @@ button.ghost {
 }
 
 .overlay {
-    background: #05dc1a;
-    background: -webkit-linear-gradient(to right, #2b59ff, #05dc1a);
-    background: linear-gradient(to right, #2b59ff, #05dc1a);
+    background: #f57d56;
+    background: linear-gradient(to right, #545454, #e97d56);
     color: #FFFFFF;
     position: relative;
     left: -100%;
