@@ -38,7 +38,7 @@ button:active {
 .input {
     width: 440px;
     height: 55px;
-    border: 3px solid #000000;
+    border: 3px solid #e96b56;
     background-color: transparent;
     padding: 15px 30px;
     border-radius: 50px;
@@ -54,11 +54,12 @@ button:active {
     cursor: pointer;
     width: 120px;
     height: 55px;
-    background-color: #000000;
-    color: #fff;
+    background-color: rgb(84, 84, 84);
+    color: #e96b56;
     border: 0;
     border-radius: 50px;
     outline: none;
+    font-weight: bold;
     text-transform: uppercase;
 }
 
@@ -75,28 +76,31 @@ button:active {
 /*--------------------------------------------------*/
 
 .main-content {
-    padding: 30px 0 30px;
+    padding: 10px 0 10px;
 }
 
 .filters-panel-labels {
     display: flex;
     font-family: 'Montserrat', sans-serif;
     align-items: center;
-    padding: 8px 0 8px;
+    padding: 8px 8px 8px;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-
 }
 
 .filter-item {
-    padding-top: 8px;
     margin-right: 12px;
+}
+
+.filter-item-label:hover {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e96b56;
 }
 
 .filter-item-label {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 12px 15px;
     border-radius: 20px;
     background-color: #f6f6f6;
     cursor: pointer;
@@ -105,41 +109,17 @@ button:active {
 }
 
 /*--------------------------------------------------*/
-/*
+
 .services .icon-box {
     text-align: center;
-    padding: 50px 15px;
     transition: all ease-in-out 0.3s;
+    border-radius: 10px;
 }
 
-.services .icon-box .icon {
-    width: 64px;
-    height: 64px;
-    background-color: #d9683e;
-    border-radius: 5px;
-    transition: all .3s ease-out 0s;
-    display: flex;
-    margin: 0 auto 20px;
-    transform-style: preserve-3d;
+.img-fluid {
+    border-radius: 10px;
 }
 
-.services .icon-box .icon i {
-    color: #fff;
-    font-size: 28px;
-}
-
-.services .icon-box .icon::before {
-    position: absolute;
-    content: '';
-    left: -8px;
-    top: -8px;
-    height: 100%;
-    width: 100%;
-    background-color: #eacec7;
-    border-radius: 5px;
-    transition: all .3s ease-out 0s;
-    transform: translateZ(-1px);
-}
 
 .services .icon-box h4 {
     font-weight: 700;
@@ -147,82 +127,21 @@ button:active {
     font-size: 24px;
 }
 
-.services .icon-box h4 a {
+.services .icon-box a {
     color: #000000;
 }
 
 .services .icon-box p {
     line-height: 24px;
     font-size: 14px;
-    margin-bottom: 0;
+    margin-bottom: 5px;
+
 }
 
-.services .icon-box:hover {
+.services .icon-box:hover,
+.services .icon:hover {
     background-color: rgba(236, 138, 100, 0.89);
     border-color: #d9683e;
-}
-
-.services .icon-box:hover .icon {
-    background-color: #fff;
-}
-
-.services .icon-box:hover .icon::before {
-    background-color: rgb(217, 104, 62);
-}
-*/
-/*--------------------------------------------------*/
-.product-preview .link:hover {
-    background-color: rgba(178, 180, 183, 0.47);
-    cursor: pointer;
-}
-
-.restaurant-item {
-    border-radius: 5px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgba(194, 184, 184, 0.26);
-
-    margin-bottom: 10px;
-}
-
-.product-preview-first .item {
-    height: 200px;
-}
-
-.product-preview .item {
-    position: relative;
-}
-
-.product-preview .item .image {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto;
-    overflow: hidden;
-}
-
-.product-preview .item .link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.rest-content {
-    color: rgb(207, 51, 1);
-    font-family: 'Montserrat', sans-serif;
-    margin-left: 10px;
-}
-
-.product-preview .item .image img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    -o-object-fit: cover;
-    object-fit: cover;
 }
 
 /*--------------------------------------------------*/
@@ -366,7 +285,6 @@ button:active {
     background-color: #e96b56;
     color: #fff;
 }
-
 /*--------------------------------------------------*/
 
 ::-webkit-scrollbar {
