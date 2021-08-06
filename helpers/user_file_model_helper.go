@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/model"
-	"io"
 	"io/ioutil"
 	"os"
 	"time"
@@ -14,7 +13,7 @@ import (
 
 var formattingCharacters = []byte{',', '\n'}
 
-func CreateModel(modelName string, v interface{}) error {
+func Create(modelName string, v interface{}) error {
 
 	bytes, err := json.Marshal(v)
 	if err != nil {
@@ -40,7 +39,7 @@ func CreateModel(modelName string, v interface{}) error {
 
 }
 
-func GetModel(modelName string, email *string) (*model.User, error) {
+func Get(modelName string, email *string) (*model.User, error) {
 	users, err := GetAll(modelName)
 	if err != nil {
 		return nil, err
@@ -55,21 +54,25 @@ func GetModel(modelName string, email *string) (*model.User, error) {
 	return nil, err
 }
 
-func GetAllModels(modelName string, email *string, usersSearched *[]model.User) error {
-	users, err := GetAll(modelName)
+func GetAll(modelName string) ([]model.User, error) {
+	var users []model.User
+
+	data, err := ioutil.ReadFile(fmt.Sprintf("./datastore/%s.txt", modelName))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, u := range users {
-		if u.Email == *email {
-			*usersSearched = append(*usersSearched, u)
-		}
+	JsonMarkup(&data)
+
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	return users, nil
 }
 
-func UpdateModel(modelName string, user *model.User) error {
+func Update(modelName string, user *model.User) error {
 	dataUpdate := false
 	users, err := GetAll(modelName)
 	if err != nil {
@@ -129,36 +132,6 @@ func Save(modelName string, users *[]model.User) error {
 		return err
 	}
 	return nil
-}
-func GetAll(modelName string) ([]model.User, error) {
-	var allUsers []model.User
-
-	file, err := os.Open(fmt.Sprintf("./datastore/%s.txt", modelName))
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	JsonMarkup(&data)
-
-	err = json.Unmarshal(data, &allUsers)
-	if err != nil {
-		return nil, err
-	}
-
-	//existingUsers := allUsers[:0]
-	//for _, u := range allUsers {
-	//	if u.Delete == "" {
-	//		existingUsers = append(existingUsers, u)
-	//	}
-	//}
-
-	return allUsers, nil
 }
 func JsonMarkup(data *[]byte) {
 	*data = bytes.TrimSuffix(*data, []byte(","))

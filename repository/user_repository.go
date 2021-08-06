@@ -9,14 +9,31 @@ import (
 	"sync"
 )
 
-var idSequence int32
-
 type UserRepositoryI interface {
-	Create(u *model.User) (*model.User, error)
+	Create(user *model.User) (*model.User, error)
 	Get(email *string) (*model.User, error)
-	GetAll(email *string, id *int32) (*[]model.User, error)
+	GetAll() (*[]model.User, error)
 	Update(user *model.User) (*model.User, error)
 	Delete(id int) error
+}
+
+type UserDBRepository struct {
+}
+
+func (u2 UserDBRepository) Create(u *model.User) (*model.User, error) {
+	panic("implement me")
+}
+func (u2 UserDBRepository) Get(email *string) (*model.User, error) {
+	panic("implement me")
+}
+func (u2 UserDBRepository) GetAll() (*[]model.User, error) {
+	panic("implement me")
+}
+func (u2 UserDBRepository) Update(user *model.User) (*model.User, error) {
+	panic("implement me")
+}
+func (u2 UserDBRepository) Delete(id int) error {
+	panic("implement me")
 }
 
 type UserFileRepository struct {
@@ -32,7 +49,7 @@ func NewUserFileRepository() *UserFileRepository {
 func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
 	user.ID = ufr.GetNextID()
 
-	err := helpers.CreateModel("users", user)
+	err := helpers.Create("users", user)
 	if err != nil {
 		return nil, err
 	}
@@ -40,16 +57,15 @@ func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
 }
 
 func (ufr *UserFileRepository) Get(email *string) (*model.User, error) {
-	user, err := helpers.GetModel("users", email)
+	user, err := helpers.Get("users", email)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (ufr *UserFileRepository) GetAll(email *string, id *int32) (*[]model.User, error) {
-	var usersSearched []model.User
-	err := helpers.GetAllModels("users", email, &usersSearched)
+func (ufr *UserFileRepository) GetAll() (*[]model.User, error) {
+	usersSearched, err := helpers.GetAll("users")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +73,7 @@ func (ufr *UserFileRepository) GetAll(email *string, id *int32) (*[]model.User, 
 }
 
 func (ufr *UserFileRepository) Update(user *model.User) (*model.User, error) {
-	err := helpers.UpdateModel("users", user)
+	err := helpers.Update("users", user)
 	if err != nil {
 		return nil, err
 	}
