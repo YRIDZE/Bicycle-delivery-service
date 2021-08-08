@@ -37,7 +37,8 @@
 
 <!--------->
 
-<div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true"
+     style="    font-family: 'Montserrat', sans-serif;">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content"
          style="margin: 0 auto !important;
@@ -90,13 +91,15 @@
           </table>
         </div>
       </div>
-      <button class="cart-btn" data-bs-target="#order-data-model" data-bs-toggle="modal"
-              data-bs-dismiss="modal">Order
-      </button>
+      <div class="d-flex flex-row-reverse">
+        <button class="cart-btn" data-bs-target="#order-data-model" data-bs-toggle="modal"
+                data-bs-dismiss="modal">Order
+        </button>
+        <p style="margin-top: 15px !important;">Total <strong>$1200.00</strong></p>
+      </div>
     </div>
   </div>
 </div>
-
 <div class="modal fade" id="order-data-model" aria-hidden="true" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content"
