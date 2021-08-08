@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
 .services .icon-box {
-    font-family: 'Montserrat', sans-serif;
     text-align: center;
     transition: all ease-in-out 0.3s;
     border-radius: 10px;
@@ -32,4 +31,7 @@
 .services .icon:hover {
     background-color: rgba(236, 138, 100, 0.89);
     border-color: #d9683e;
+    border-radius: 10px;
+    box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.5);
+    transform: translateY(-10px);
 }
