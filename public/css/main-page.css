@@ -8,12 +8,7 @@ button {
     letter-spacing: 1px;
 }
 
-button:active {
-    transform: scale(0.95);
-}
-
 #header {
-    font-family: 'Montserrat', sans-serif;
     padding-top: 60px;
 }
 
@@ -29,38 +24,41 @@ button:active {
 .search-container {
     padding: 20px 50px;
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
     margin-bottom: 10px;
 }
 
 .input {
-    width: 440px;
-    height: 55px;
+    width: 450px;
+    height: 65px;
     border: 3px solid #e96b56;
     background-color: transparent;
     padding: 15px 30px;
-    border-radius: 20px;
+    border-radius: 30px;
     color: #000000;
     font-size: 18px;
-    outline: none;
+}
+
+.close-btn:active {
+    transform: scale(0.95);
 }
 
 .close-btn {
     position: absolute;
     top: 20px;
-    right: 50px;
-    cursor: pointer;
+    right: 48px;
     width: 120px;
-    height: 55px;
+    height: 65px;
     background-color: rgb(84, 84, 84);
     color: #FFFFFF;
     border: 0;
-    border-radius: 20px;
+    border-radius: 30px;
+    cursor: pointer;
     outline: none;
-    font-weight: bold;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .navbar-dark .navbar-nav .nav-link,
@@ -74,36 +72,32 @@ button:active {
 }
 
 /*--------------------------------------------------*/
-
-.main-content {
-    padding: 10px 0 10px;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.filters-panel-labels {
-    display: flex;
-    font-family: 'Montserrat', sans-serif;
-    align-items: center;
-    padding: 8px 8px 8px;
-}
-
-.filters-panel-labels .dropdown-menu {
-    background-color: #c0c4c8;
-}
-
-.filters-panel-labels button {
-    margin-right: 12px;
+.card {
+    min-width: 275px !important;
+    margin: 24px 15px 10px 0;
     border-radius: 10px;
+    overflow: auto;
 }
 
-.filters-panel-labels button:hover,
-.filters-panel-labels .dropdown-item:hover {
-    background-color: rgb(233, 107, 86);
-    color: #3b3b3b;
+.accordion-button:not(.collapsed) {
+    color: #000000 !important;
+    background-color: rgba(217, 104, 62, 0.61) !important;
 }
 
-.filters-panel-labels .dropdown-menu.show{
-    margin-bottom: 7px !important;
+.form-check-input:checked {
+    background-color: #c95646 !important;
+    border-color: #e96b56 !important;
+}
+
+.form-check-input:focus,
+.accordion-button:focus,
+.form-control:focus {
+    border-color: #e96b56 !important;
+    box-shadow: 0 0 0 0.25rem rgba(233, 107, 86, 0.43) !important;
+}
+
+.accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }
 
 /*--------------------------------------------------*/
@@ -112,7 +106,6 @@ button:active {
     text-align: center;
     transition: all ease-in-out 0.3s;
     border-radius: 10px;
-    font-family: 'Montserrat', sans-serif;
 }
 
 .img-fluid {
@@ -133,20 +126,22 @@ button:active {
     line-height: 24px;
     font-size: 16px;
     margin-bottom: 5px;
-
 }
 
 .services .icon-box:hover,
 .services .icon:hover {
     background-color: rgba(236, 138, 100, 0.89);
     border-color: #d9683e;
+    border-radius: 10px;
+    box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.5);
+    transform: translateY(-10px);
 }
 
 /*--------------------------------------------------*/
 
 .back-to-top {
     position: fixed;
-    right: 50px;
+    right: 10px;
     bottom: -50px;
     width: 40px;
     height: 40px;
@@ -178,7 +173,7 @@ button:active {
     padding: 0 0 15px 0;
     color: #fff;
     font-size: 14px;
-    font-family: 'Antic Slab', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 #footer .footer-top {
@@ -319,10 +314,12 @@ button:active {
     padding: 1rem 1rem 0 !important;
 }
 
-.login-input {
-    background-color: #FFFFFF;
-    border: none;
-    padding: 12px 15px;
-    margin: 8px 0;
-    width: 100%;
-}
+/*.login-input {*/
+/*    background-color: #FFFFFF;*/
+/*    border: none;*/
+/*    padding: 12px 15px;*/
+/*    margin: 8px 0;*/
+/*    width: 100%;*/
+/*}*/
+
+/*--------------------------------------------------*/
