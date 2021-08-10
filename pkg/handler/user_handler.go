@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"github.com/YRIDZE/Bicycle-delivery-service/model"
-	"github.com/YRIDZE/Bicycle-delivery-service/repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model/repository"
 )
 
 type UserHandler struct {

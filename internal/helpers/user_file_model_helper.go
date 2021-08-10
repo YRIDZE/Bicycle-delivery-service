@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/YRIDZE/Bicycle-delivery-service/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
 	"io/ioutil"
 	"os"
 	"time"

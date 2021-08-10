@@ -1,6 +1,8 @@
 package repository
 
-import "github.com/YRIDZE/Bicycle-delivery-service/model"
+import (
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+)
 
 type SupplierRepositoryI interface {
 	Create(supplier *model.Supplier) (*model.Supplier, error)

@@ -1,6 +1,8 @@
 package repository
 
-import "github.com/YRIDZE/Bicycle-delivery-service/model"
+import (
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+)
 
 type OrderRepositoryI interface {
 	Create(order *model.Order) (*model.Order, error)

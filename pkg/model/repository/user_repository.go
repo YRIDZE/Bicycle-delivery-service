@@ -2,8 +2,8 @@ package repository
 
 import (
 	"encoding/json"
-	"github.com/YRIDZE/Bicycle-delivery-service/helpers"
-	"github.com/YRIDZE/Bicycle-delivery-service/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal/helpers"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
 	"os"
 	"strconv"
 	"sync"

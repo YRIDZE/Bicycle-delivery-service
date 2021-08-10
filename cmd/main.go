@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/YRIDZE/Bicycle-delivery-service/handler"
-	"github.com/YRIDZE/Bicycle-delivery-service/repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handler"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model/repository"
 )
 
 func main() {
@@ -15,4 +15,5 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
 }

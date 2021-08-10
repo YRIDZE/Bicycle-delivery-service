@@ -1,6 +1,8 @@
 package repository
 
-import "github.com/YRIDZE/Bicycle-delivery-service/model"
+import (
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+)
 
 type ProductRepositoryI interface {
 	Create(product *model.Product) (*model.Product, error)
