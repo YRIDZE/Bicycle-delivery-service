@@ -1,6 +1,9 @@
 const App = {
     data() {
         return {
+            showLogin: false,
+            showCart: false,
+
             restaurants: [
                 {
                     id: 1,
@@ -58,12 +61,201 @@ const App = {
     computed: {
         level() {
             return this.currentLevel
-        }
+        },
     }
 }
 
 const app = Vue.createApp(App)
 
+app.component('login', {
+    data() {
+        return {
+            signUpMode: false
+        }
+    },
+    template: `
+      <div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content"
+             style="
+             background-color: rgba(117, 190, 218, 0.0);
+             border-color:rgba(117, 190, 218, 0.0);">
+          <div class="modal-body">
+            <div class="login-container" 
+                :class="{ 'right-panel-active': signUpMode }" id="login-container">
+              <div class="form-container sign-up-container">
+                <form class="l-r-form" action="#">
+                  <a href="main-page.html"> <i style="color: #545454" class="fas fa-bicycle fa-3x"></i></a>
+                  <h1><b>Create Account</b></h1>
+                  <input class="login-input" type="text" placeholder="Username"/>
+                  <input class="login-input" type="email" placeholder="Email"/>
+                  <input class="login-input" type="password" placeholder="Password"/>
+                  <button class="sign-up bt" style="margin-top: 7px">SIGN UP</button>
+                </form>
+              </div>
+              <div class="form-container  sign-in-container">
+                <form class="l-r-form" action="#">
+                  <a href="main-page.html"> <i style="color: #e97d56" class="fas fa-bicycle fa-3x"></i></a>
+                  <h1><b>Sign in</b></h1>
+                  <input class="login-input" type="email" placeholder="Email"/>
+                  <input class="login-input" type="password" placeholder="Password"/>
+                  <a href="#" style="text-decoration: none; font-size: 14px; margin: 15px 0; color:#000000">Forgot your
+                    password?</a>
+                  <button class="sign-in bt">SIGN IN</button>
+                </form>
+              </div>
+              <div class="overlay-container">
+                <div id="close" class="close" :class="{ 'left': signUpMode }">
+                  <a href="#" data-bs-dismiss="modal"><i style="color: #ffffff;" class="fas fa-times"></i></a>
+                </div>
+                <div class="overlay">
+                  <div class="overlay-panel overlay-left">
+                    <h1><b>Welcome Back!</b></h1>
+                    <p class="container-details">To keep connected with us please login with your personal info</p>
+                    <button class="ghost bt" id="signIn"  @click="signUpMode = false">SIGN IN</button>
+                  </div>
+                  <div style="right: 0" class="overlay-panel overlay-right">
+                    <h1><b>Hello, Friend!</b></h1>
+                    <p class="container-details">Enter your personal details and start journey with us</p>
+                    <button class="ghost bt" id="signUp" @click="signUpMode = true">SIGN UP</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  `,
+})
+
+app.component('cart', {
+    template: `
+      <div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true"
+           style="    font-family: 'Montserrat', sans-serif;">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content"
+             style="margin: 0 auto !important;
+         border-radius: 20px !important;
+         border-color:rgba(117, 190, 218, 0.0);
+         width: auto;">
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-striped custom-table">
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Name</th>
+                  <th>From</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                  <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td> 1</td>
+                  <td>Niam-Niam Food</td>
+                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
+                  <td>$200.00</td>
+                  <td>2</td>
+                  <td>$400.00</td>
+                  <td><a href="#" class="details">Details</a></td>
+                </tr>
+                <tr>
+                  <td> 1</td>
+                  <td>Niam-Niam Food</td>
+                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
+                  <td>$200.00</td>
+                  <td>2</td>
+                  <td>$400.00</td>
+                  <td><a href="#" class="details">Details</a></td>
+                </tr>
+                <tr>
+                  <td> 1</td>
+                  <td>Niam-Niam Food</td>
+                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
+                  <td>$200.00</td>
+                  <td>2</td>
+                  <td>$400.00</td>
+                  <td><a href="#" class="details">Details</a></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="d-flex flex-row-reverse">
+            <button class="cart-btn" data-bs-target="#order-data-model" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Order
+            </button>
+            <p style="margin-top: 15px !important;">Total <strong>$1200.00</strong></p>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="modal fade" id="order-data-model" aria-hidden="true" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+             style="border-radius:20px !important;
+         border-color:rgba(117, 190, 218, 0.0);">
+          <div class="modal-body">
+            <div class="row g-3">
+
+              <div class="col-sm-6">
+                <input type="text" class="login-input" placeholder="Name" value="" required="">
+              </div>
+
+              <div class="col-sm-6">
+                <input type="text" class="login-input" autocomplete='off' placeholder="Surname" value="" required="">
+              </div>
+
+              <div class="cart-col-12">
+                <input type="text" id="phone" class="login-input" autocomplete='off' placeholder="Phone number"
+                       required/>
+
+                <script>jQuery(function ($) {
+                  $("#phone").mask("+38(999) 999-99-99");
+                });</script>
+              </div>
+
+              <div class="cart-col-12">
+                <input type="text" class="login-input" autocomplete='off'
+                       placeholder="Kharkiv, st. Academician Pavlova 154, apt. 12"
+                       required="">
+                <div class="invalid-feedback">
+                  Please enter your address.
+                </div>
+              </div>
+
+              <div class="col-md-7">
+                <form>
+                  <select class="login-input" autocomplete='off' required="">
+                    <option value="" disabled selected hidden>Payment method</option>
+                    <option>Credit Card</option>
+                    <option>Cash</option>
+                  </select>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="cart-btn" style="width:50%"
+                    data-bs-target="#cart-modal"
+                    data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Back
+            </button>
+            <button class="cart-btn" style="width:50%"
+                    data-bs-target="#cart-modal"
+                    data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
+    `
+})
 
 app.component('pizza-container', {
     props: ['id', 'title', 'logo'],
@@ -113,9 +305,9 @@ app.component("rest-menu-item", {
             <h4><a href="#">{{ title }}</a></h4>
             <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
           </div>
+      
       </div> `
 })
-
 
 app.component('pizza-filter', {
     template: `
@@ -130,12 +322,12 @@ app.component('pizza-filter', {
                     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" 
                         aria-labelledby="panelsStayOpen-headingOne">
                         <div class="accordion-body">
-                            <div class="form-row">
-                              <div class="form-group col-md-6">
+                            <div class="d-flex flex-row form-row">
+                              <div class="form-group m-1">
                                 <label>Min</label>
                                 <input class="form-control" placeholder="$0" type="number">
                               </div>
-                              <div class="form-group text-right col-md-6">
+                              <div class="form-group text-right m-1">
                                 <label>Max</label>
                                 <input class="form-control" placeholder="$1,0000" type="number">
                               </div>
@@ -145,11 +337,11 @@ app.component('pizza-filter', {
                 </div>
             <div class="accordion-item">
                 <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="true" aria-controls="panelsStayOpen-collapseTwo">
                       Accordion Item #2
                     </button>
                 </h2>
-                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" 
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" 
                     aria-labelledby="panelsStayOpen-headingTwo">
                     <div class="accordion-body">
                         <div class="filter-content">
@@ -166,6 +358,7 @@ app.component('pizza-filter', {
         </div>
     </div> `
 })
+
 app.component('check', {
     props: ['name'],
     template: `
