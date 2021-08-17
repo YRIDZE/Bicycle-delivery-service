@@ -19,7 +19,7 @@ func Create(modelName string, v interface{}) error {
 		return err
 	}
 
-	file, err := os.OpenFile(fmt.Sprintf("./datastore/%s.txt", modelName), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	file, err := os.OpenFile(fmt.Sprintf("pkg/model/repository/datastore/%s.txt", modelName), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func Get(modelName string, email *string) (*models.User, error) {
 func GetAll(modelName string) ([]models.User, error) {
 	var users []models.User
 
-	data, err := ioutil.ReadFile(fmt.Sprintf("./datastore/%s.txt", modelName))
+	data, err := ioutil.ReadFile(fmt.Sprintf("pkg/model/repository/datastore/%s.txt", modelName))
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func Save(modelName string, users *[]models.User) error {
 		}
 	}
 
-	err := ioutil.WriteFile(fmt.Sprintf("./datastore/%s.txt", modelName), bytes, 0600)
+	err := ioutil.WriteFile(fmt.Sprintf("pkg/model/repository/datastore/%s.txt", modelName), bytes, 0600)
 	if err != nil {
 		return err
 	}

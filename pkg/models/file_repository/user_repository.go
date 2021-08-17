@@ -63,7 +63,7 @@ func (ufr *UserFileRepository) Update(user *models.User) (*models.User, error) {
 func (ufr *UserFileRepository) GetNextID() (idSequence int32) {
 	ufr.idMutex.Lock()
 
-	bytes, err := os.ReadFile("./datastore/users_id_sequence.txt")
+	bytes, err := os.ReadFile("pkg/model/repository/datastore/users_id_sequence.txt")
 	if err != nil {
 		return 0
 	}
@@ -75,7 +75,7 @@ func (ufr *UserFileRepository) GetNextID() (idSequence int32) {
 	if err != nil {
 		return 0
 	}
-	err = os.WriteFile("./datastore/users_id_sequence.txt", newBytes, 0600)
+	err = os.WriteFile("pkg/model/repository/datastore/users_id_sequence.txt", newBytes, 0600)
 	if err != nil {
 		return 0
 	}

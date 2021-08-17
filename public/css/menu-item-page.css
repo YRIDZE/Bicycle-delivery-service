@@ -15,7 +15,7 @@
     height: auto;
 }
 
-.overlay-container {
+.item-overlay-container {
     position: absolute;
     top: 0;
     left: 70%;
@@ -23,7 +23,6 @@
     height: 100%;
     overflow: hidden;
     z-index: 5;
-
     background: linear-gradient(to right, #545454, #e97d56);
 }
 
@@ -39,25 +38,20 @@
     min-height: 600px;
 }
 
-.form-container {
+.item-form-container {
     position: absolute;
     top: 0;
     height: 100%;
     transition: all 0.6s ease-in-out;
 }
 
-.product-container {
+.item-product-container {
     left: 0;
     width: 70%;
     z-index: 1;
 }
 
-.form-container {
-    top: 0;
-    height: 100%;
-}
-
-.overlay-panel {
+.item-overlay-panel {
     position: absolute;
     display: flex;
     align-items: center;

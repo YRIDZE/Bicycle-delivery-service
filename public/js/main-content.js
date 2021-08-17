@@ -7,11 +7,47 @@ const App = {
             restaurants: [
                 {
                     id: 1,
+                    items: [
+                        {
+                            id: 1,
+                            title: 'My journey with Vue',
+                            description: "auf",
+                            price: 122,
+                            logo: '../img/pizza-menu-item.jpg'
+                        },
+                        {
+                            id: 2,
+                            title: 'My journey with Vue',
+                            logo: '../img/pizza-menu-item.jpg'
+                        },
+                        {
+                            id: 3,
+                            title: 'My journey with Vue',
+                            logo: '../img/pizza-menu-item.jpg'
+                        }
+                    ],
                     title: 'My journey with Vue',
                     logo: 'https://images.unsplash.com/photo-1490717064594-3bd2c4081693?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
                 },
                 {
                     id: 2,
+                    items: [
+                        {
+                            id: 1,
+                            title: '2',
+                            logo: '../img/pizza-menu-item.jpg'
+                        },
+                        {
+                            id: 2,
+                            title: '2',
+                            logo: '../img/pizza-menu-item.jpg'
+                        },
+                        {
+                            id: 3,
+                            title: '2',
+                            logo: '../img/pizza-menu-item.jpg'
+                        }
+                    ],
                     title: 'Blogging with Vue',
                     logo: 'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
                 },
@@ -36,38 +72,14 @@ const App = {
                     logo: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80'
                 }
             ],
-            restMenuItems: [
-                {
-                    id: 1,
-                    title: 'My journey with Vue',
-                    logo: '../img/pizza-menu-item.jpg'
-                },
-                {
-                    id: 2,
-                    title: 'My journey with Vue',
-                    logo: '../img/pizza-menu-item.jpg'
-                },
-                {
-                    id: 3,
-                    title: 'My journey with Vue',
-                    logo: '../img/pizza-menu-item.jpg'
-                }
-            ],
-
-            levels: ["pizza-menu", "restaurant-menu"],
-            currentLevel: "pizza-menu"
         }
     },
-    computed: {
-        level() {
-            return this.currentLevel
-        },
-    }
+
 }
 
 const app = Vue.createApp(App)
 
-app.component('login', {
+const Login = {
     data() {
         return {
             signUpMode: false
@@ -81,13 +93,14 @@ app.component('login', {
              background-color: rgba(117, 190, 218, 0.0);
              border-color:rgba(117, 190, 218, 0.0);">
           <div class="modal-body">
-            <div class="login-container" 
-                :class="{ 'right-panel-active': signUpMode }" id="login-container">
+            <div class="login-container"
+                 :class="{ 'right-panel-active': signUpMode }" id="login-container">
               <div class="form-container sign-up-container">
                 <form class="l-r-form" action="#">
                   <a href="main-page.html"> <i style="color: #545454" class="fas fa-bicycle fa-3x"></i></a>
                   <h1><b>Create Account</b></h1>
-                  <input class="login-input" type="text" placeholder="Username"/>
+                  <input class="login-input" type="text" placeholder="Firstname"/>
+                  <input class="login-input" type="text" placeholder="Lastname"/>
                   <input class="login-input" type="email" placeholder="Email"/>
                   <input class="login-input" type="password" placeholder="Password"/>
                   <button class="sign-up bt" style="margin-top: 7px">SIGN UP</button>
@@ -112,7 +125,7 @@ app.component('login', {
                   <div class="overlay-panel overlay-left">
                     <h1><b>Welcome Back!</b></h1>
                     <p class="container-details">To keep connected with us please login with your personal info</p>
-                    <button class="ghost bt" id="signIn"  @click="signUpMode = false">SIGN IN</button>
+                    <button class="ghost bt" id="signIn" @click="signUpMode = false">SIGN IN</button>
                   </div>
                   <div style="right: 0" class="overlay-panel overlay-right">
                     <h1><b>Hello, Friend!</b></h1>
@@ -125,11 +138,11 @@ app.component('login', {
           </div>
         </div>
       </div>
-  </div>
-  `,
-})
+      </div>
+    `,
+}
 
-app.component('cart', {
+const Cart = {
     template: `
       <div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true"
            style="    font-family: 'Montserrat', sans-serif;">
@@ -255,61 +268,9 @@ app.component('cart', {
       </div>
       </div>
     `
-})
+}
 
-app.component('pizza-container', {
-    props: ['id', 'title', 'logo'],
-    template: `
-      <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
-           style="border-radius: 10px; max-height: 700px; max-width: 760px">
-          <div class="icon-box"
-               style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
-            <a class="icon" type="button" @click="this.$root.currentLevel='restaurant-menu'"><img :src="logo"
-                                                                                                  class="img-fluid"
-                                                                                                  alt="Pizza picture"></a>
-            <h4><a href="#">{{ title }}</a></h4>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
-          </div>
-      </div> `
-})
-
-app.component("pizza-menu", {
-    template: `
-    <pizza-container
-            v-for="restaurant in this.$root.restaurants"
-            :key="restaurant.id"
-            :title="restaurant.title"
-            :logo="restaurant.logo"
-    ></pizza-container> `
-})
-
-app.component("restaurant-menu", {
-    template: `
-    <rest-menu-item
-            v-for="item in this.$root.restMenuItems"
-            :key="item.id"
-            :title="item.title"
-            :logo="item.logo"
-    ></rest-menu-item> `
-})
-
-app.component("rest-menu-item", {
-    props: ['id', 'title', 'logo'],
-    template: `
-      <div className="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
-           style="border-radius: 10px; max-height: 700px; max-width: 760px">
-          <div className="icon-box"
-               style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
-            <a className="icon" href="#" data-bs-toggle="modal"
-               data-bs-target="#item-modal"><img :src="logo" className="img-fluid" alt="menu-item"></a>
-            <h4><a href="#">{{ title }}</a></h4>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
-          </div>
-      
-      </div> `
-})
-
-app.component('pizza-filter', {
+const FiltersPanel = {
     template: `
         <div class="card">
             <div class="accordion accordion-flush" id="accordionFlushExample">
@@ -357,16 +318,139 @@ app.component('pizza-filter', {
             </div>
         </div>
     </div> `
-})
+}
 
-app.component('check', {
+const Check = {
     props: ['name'],
     template: `
       <label class="form-check">
       <input class="form-check-input" type="checkbox" value="">
       <span class="form-check-label">{{ name }}</span>
       </label> `
+}
+
+const Supplier = {
+    props: ['id', 'title', 'logo'],
+    template: `
+      <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
+           style="border-radius: 10px; max-height: 700px; max-width: 760px">
+      <div class="icon-box"
+           style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
+        <router-link :to="{ path : title }"><img :src="logo" class="img-fluid" alt="Pizza picture"></router-link>
+        <h4><a href="#">{{ title }}</a></h4>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
+      </div>
+      </div> `
+}
+
+const Product = {
+    props: ['id', 'title', 'logo'],
+    template: `
+      <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
+           style="border-radius: 10px; max-height: 700px; max-width: 760px">
+      <div class="icon-box"
+           style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
+        <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#item-modal"><img :src="logo" class="img-fluid" alt="menu-item"></a>
+        <h4><a href="#">{{ title }}</a></h4>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
+
+        <router-view></router-view>
+
+      </div>
+      </div> `
+}
+
+const ProductPopUp = {
+    props: ["title", "itemName"],
+    template: `
+      <div class="modal fade" id="item-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content"
+             style="
+             background-color: rgba(117, 190, 218, 0.0);
+             border-color:rgba(117, 190, 218, 0.0);">
+          <div class="modal-body">
+            <div class="item-container">
+              <div class="item-form-container item-product-container">
+                <div class="img-part">
+                  <img :src="item.logo" class="img-f" alt="item">
+                </div>
+                <div class="img-desc">
+                  <b style="font-size: 36px">{{ item.title }}</b>
+                  <p> {{ item.description }}</p>
+                  <p> {{ item.price }}</p>
+                </div>
+              </div>
+              <div class="item-overlay-container">
+                <div class="item-overlay-panel">
+                  <h1><b>Welcome Back!</b></h1>
+                  <button class="ghost bt">ADD TO CART</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    `,
+    computed: {
+        item() {
+            return this.$root.restaurants.find(x => x.title === title).items.find(y => y.title === itemName)
+        }
+
+    }
+}
+
+const SuppliersList = {
+    template: `
+    <supplier
+            v-for="restaurant in this.$root.restaurants"
+            :key="restaurant.id"
+            :title="restaurant.title"
+            :logo="restaurant.logo"
+    ></supplier> `
+}
+
+const ProductsList = {
+    props: ["title"],
+    template: `
+      <product
+          v-for="item in this.$root.restaurants.find(x => x.title === title).items"
+          :key="item.id"
+          :title="item.title"
+          :logo="item.logo"
+      ></product> `
+}
+
+
+const routes = [
+    {path: '/', component: SuppliersList},
+    {
+        path: '/:title',
+        component: ProductsList,
+        props: true,
+        children: [
+            {
+                path: ':itemName',
+                components: ProductPopUp,
+                props: true
+            },
+        ]
+    },
+
+]
+
+const router = VueRouter.createRouter({
+    history: VueRouter.createWebHashHistory(),
+    routes,
 })
 
+app.component("check", Check)
+app.component("filter-panel", FiltersPanel)
+app.component("product", Product)
+app.component("supplier", Supplier)
+app.component("login", Login)
+app.component("cart", Cart)
+app.use(router)
 
 app.mount('#main-content')
