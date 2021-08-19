@@ -1,4 +1,4 @@
-package repository
+package db_repository
 
 import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
@@ -6,9 +6,9 @@ import (
 
 type ProductRepositoryI interface {
 	Create(product *model.Product) (*model.Product, error)
-	Get(id *int32) (*model.Product, error)
+	GetByID(id *int32) (*model.Product, error)
 	GetAll() (*[]model.Product, error)
-	Update(product *model.Product) (*model.Product, error)
+	Update(product *model.Product) error
 	Delete(id int) error
 }
 
@@ -23,7 +23,7 @@ func (p ProductDBRepository) Create(product *model.Product) (*model.Product, err
 	panic("implement me")
 }
 
-func (p ProductDBRepository) Get(id *int32) (*model.Product, error) {
+func (p ProductDBRepository) GetByID(id *int32) (*model.Product, error) {
 	panic("implement me")
 }
 
@@ -31,7 +31,7 @@ func (p ProductDBRepository) GetAll() (*[]model.Product, error) {
 	panic("implement me")
 }
 
-func (p ProductDBRepository) Update(product *model.Product) (*model.Product, error) {
+func (p ProductDBRepository) Update(product *model.Product) error {
 	panic("implement me")
 }
 

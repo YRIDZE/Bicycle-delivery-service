@@ -1,4 +1,4 @@
-package repository
+package file_repository
 
 import (
 	"encoding/json"
@@ -10,30 +10,11 @@ import (
 )
 
 type UserRepositoryI interface {
-	Create(user *model.User) (*model.User, error)
-	Get(email *string) (*model.User, error)
+	Create(user *model.User) (int32, error)
+	GetByEmail(email *string) (*model.User, error)
 	GetAll() (*[]model.User, error)
 	Update(user *model.User) (*model.User, error)
 	Delete(id int) error
-}
-
-type UserDBRepository struct {
-}
-
-func (u2 UserDBRepository) Create(u *model.User) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Get(email *string) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) GetAll() (*[]model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Update(user *model.User) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Delete(id int) error {
-	panic("implement me")
 }
 
 type UserFileRepository struct {

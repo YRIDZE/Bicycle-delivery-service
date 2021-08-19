@@ -1,4 +1,4 @@
-package repository
+package db_repository
 
 import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
@@ -6,9 +6,9 @@ import (
 
 type OrderRepositoryI interface {
 	Create(order *model.Order) (*model.Order, error)
-	Get(id *int32) (*model.Order, error)
+	GetByID(id *int32) (*model.Order, error)
 	GetAll() (*[]model.Order, error)
-	Update(order *model.Order) (*model.Order, error)
+	Update(order *model.Order) error
 	Delete(id int) error
 }
 
@@ -23,7 +23,7 @@ func (o OrderDBRepository) Create(order *model.Order) (*model.Order, error) {
 	panic("implement me")
 }
 
-func (o OrderDBRepository) Get(id *int32) (*model.Order, error) {
+func (o OrderDBRepository) GetByID(id *int32) (*model.Order, error) {
 	panic("implement me")
 }
 
@@ -31,7 +31,7 @@ func (o OrderDBRepository) GetAll() (*[]model.Order, error) {
 	panic("implement me")
 }
 
-func (o OrderDBRepository) Update(order *model.Order) (*model.Order, error) {
+func (o OrderDBRepository) Update(order *model.Order) error {
 	panic("implement me")
 }
 

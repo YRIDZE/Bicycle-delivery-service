@@ -1,67 +1,46 @@
 package handler
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model/repository"
+	"net/http"
 )
 
-type UserHandler struct {
-	userRepository repository.UserRepositoryI
+func (h Handler) Create(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "POST":
+		r := new(model.User)
+		if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		_, err := h.services.Create(r)
+		if err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("User created"))
+
+	default:
+		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
+	}
 }
 
-func NewUserHandler(repo repository.UserRepositoryI) *UserHandler {
-	return &UserHandler{userRepository: repo}
+func (h Handler) GetByEmail(w http.ResponseWriter, req *http.Request) {
+
 }
 
-func (uch UserHandler) UserOptions() error {
+func (h Handler) GetAll(w http.ResponseWriter, req *http.Request) {
 
-	user := model.User{
-		FirstName: "Ira",
-		LastName:  "Laktionova",
-		Username:  "Yridze",
-		Email:     "Email@com",
-		Password:  "123456",
-	}
+}
 
-	userUpdate := model.User{
-		ID:        34,
-		FirstName: "Iya",
-		LastName:  "Pupsia",
-		Username:  "Yridze",
-		Email:     "Email@com",
-		Password:  "123456",
-	}
+func (h Handler) Update(w http.ResponseWriter, req *http.Request) {
 
-	storedUser, err := uch.userRepository.Create(&user)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Added user: \"%v\"\n", storedUser)
+}
 
-	searchVal := "Email2@com"
-	searchedUser, err := uch.userRepository.Get(&searchVal)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Searched user: \"%v\"\n", searchedUser)
+func (h Handler) Delete(w http.ResponseWriter, req *http.Request) {
 
-	searchedUsers, err := uch.userRepository.GetAll()
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Searched users: \"%v\"\n", searchedUsers)
-
-	updatedUser, err := uch.userRepository.Update(&userUpdate)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Updated users: \"%v\"\n", updatedUser)
-
-	err = uch.userRepository.Delete(3)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
