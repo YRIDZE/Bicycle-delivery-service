@@ -4,9 +4,9 @@ import (
 	"context"
 	app "github.com/YRIDZE/Bicycle-delivery-service"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handler"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model/db_repository"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/service"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -24,12 +24,12 @@ func main() {
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
-		Password: conf.DB_PASSWORD,
+		Password: conf.DbPassword,
 	})
 
 	r := db_repository.NewRepository(db)
-	s := service.NewService(r)
-	h := handler.NewHandler(s)
+	s := services.NewService(r)
+	h := handlers.NewHandler(s)
 
 	srv := new(app.Server)
 	go func() {

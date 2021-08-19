@@ -3,17 +3,17 @@ package file_repository
 import (
 	"encoding/json"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal/helpers"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"os"
 	"strconv"
 	"sync"
 )
 
 type UserRepositoryI interface {
-	Create(user *model.User) (int32, error)
-	GetByEmail(email *string) (*model.User, error)
-	GetAll() (*[]model.User, error)
-	Update(user *model.User) (*model.User, error)
+	Create(user *models.User) (int32, error)
+	GetByEmail(email *string) (*models.User, error)
+	GetAll() (*[]models.User, error)
+	Update(user *models.User) (*models.User, error)
 	Delete(id int) error
 }
 
@@ -27,7 +27,7 @@ func NewUserFileRepository() *UserFileRepository {
 	}
 }
 
-func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
+func (ufr *UserFileRepository) Create(user *models.User) (*models.User, error) {
 	user.ID = ufr.GetNextID()
 
 	err := helpers.Create("users", user)
@@ -37,7 +37,7 @@ func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (ufr *UserFileRepository) Get(email *string) (*model.User, error) {
+func (ufr *UserFileRepository) Get(email *string) (*models.User, error) {
 	user, err := helpers.Get("users", email)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (ufr *UserFileRepository) Get(email *string) (*model.User, error) {
 	return user, nil
 }
 
-func (ufr *UserFileRepository) GetAll() (*[]model.User, error) {
+func (ufr *UserFileRepository) GetAll() (*[]models.User, error) {
 	usersSearched, err := helpers.GetAll("users")
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (ufr *UserFileRepository) GetAll() (*[]model.User, error) {
 	return &usersSearched, nil
 }
 
-func (ufr *UserFileRepository) Update(user *model.User) (*model.User, error) {
+func (ufr *UserFileRepository) Update(user *models.User) (*models.User, error) {
 	err := helpers.Update("users", user)
 	if err != nil {
 		return nil, err

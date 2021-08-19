@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"io/ioutil"
 	"os"
 	"time"
@@ -39,7 +39,7 @@ func Create(modelName string, v interface{}) error {
 
 }
 
-func Get(modelName string, email *string) (*model.User, error) {
+func Get(modelName string, email *string) (*models.User, error) {
 	users, err := GetAll(modelName)
 	if err != nil {
 		return nil, err
@@ -54,8 +54,8 @@ func Get(modelName string, email *string) (*model.User, error) {
 	return nil, err
 }
 
-func GetAll(modelName string) ([]model.User, error) {
-	var users []model.User
+func GetAll(modelName string) ([]models.User, error) {
+	var users []models.User
 
 	data, err := ioutil.ReadFile(fmt.Sprintf("./datastore/%s.txt", modelName))
 	if err != nil {
@@ -72,7 +72,7 @@ func GetAll(modelName string) ([]model.User, error) {
 	return users, nil
 }
 
-func Update(modelName string, user *model.User) error {
+func Update(modelName string, user *models.User) error {
 	dataUpdate := false
 	users, err := GetAll(modelName)
 	if err != nil {
@@ -116,7 +116,7 @@ func Delete(modelName string, id int) error {
 	return errors.New("user not found")
 }
 
-func Save(modelName string, users *[]model.User) error {
+func Save(modelName string, users *[]models.User) error {
 	var bytes []byte
 	for j, i := range *users {
 		data, _ := json.Marshal(i)

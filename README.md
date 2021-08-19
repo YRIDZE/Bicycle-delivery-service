@@ -18,5 +18,5 @@ $ go get github.com/YRIDZE/Bicycle-delivery-service
 **Use the project:**
 
 ```go
-import "github.com/YRIDZE/Bicycle-delivery-service"
+import "github.com/YRIDZE/Bicycle-delivery-services"
 ```
