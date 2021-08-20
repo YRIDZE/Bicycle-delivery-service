@@ -15,3 +15,8 @@ type UserResponse struct {
 type TokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
+
+type CachedTokens struct {
+	AccessUID  string `json:"access"`
+	RefreshUID string `json:"refresh"`
+}

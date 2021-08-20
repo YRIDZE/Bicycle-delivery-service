@@ -23,9 +23,14 @@ type OrderServiceI interface {
 }
 
 type AuthorizationI interface {
-	GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, error)
-	ValidateToken(tokenString, secretString string) (int32, error)
+	GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error)
+	ValidateToken(tokenString, secretString string) (*JwtCustomClaims, error)
 	GetTokenFromBearerString(input string) string
+
+	AddUid(userID int32, uid models.CachedTokens) error
+	GetUidByID(userID int32) (*models.CachedTokens, error)
+	UpdateUid(userID int32, uid models.CachedTokens) error
+	DeleteUid(userID int32) error
 }
 
 type Service struct {
@@ -36,8 +41,8 @@ type Service struct {
 
 func NewService(repo *db_repository.Repository) *Service {
 	return &Service{
-		&UserService{NewUserService(repo)},
-		&OrderService{NewOrderService(repo)},
-		&AuthService{NewAuthService(repo)},
+		UserServiceI:   NewUserService(repo.UserRepositoryI),
+		OrderServiceI:  NewOrderService(repo.OrderRepositoryI),
+		AuthorizationI: NewAuthService(repo.AuthorizationI),
 	}
 }

@@ -13,6 +13,10 @@ func (h *Handler) Logout(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		delete(internal.WhiteList, req.Context().Value("user").(*models.User).ID)
+		err := h.services.DeleteUid(req.Context().Value("user").(*models.User).ID)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		}
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "refresh-token",
@@ -40,31 +44,35 @@ func (h *Handler) Refresh(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		userID, err := h.services.ValidateToken(c.Value, conf.RefreshSecret)
+		claims, err := h.services.ValidateToken(c.Value, conf.RefreshSecret)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 
-		accessString, err := h.services.GenerateToken(userID, conf.AccessLifetimeMinutes, conf.AccessSecret)
+		accessUID, accessString, err := h.services.GenerateToken(claims.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
 
-		refreshString, err := h.services.GenerateToken(userID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
+		refreshUID, refreshString, err := h.services.GenerateToken(claims.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
+
+		cachedTokens := models.CachedTokens{
+			AccessUID:  accessUID,
+			RefreshUID: refreshUID,
+		}
+		err = h.services.UpdateUid(claims.ID, cachedTokens)
 
 		resp := models.LoginResponse{
 			AccessToken:  accessString,
 			RefreshToken: refreshString,
 		}
 		respJ, _ := json.Marshal(resp)
-
-		internal.WhiteList[userID] = resp
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "refresh-token",
@@ -73,6 +81,7 @@ func (h *Handler) Refresh(w http.ResponseWriter, req *http.Request) {
 			HttpOnly: true,
 		})
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(respJ)
 
@@ -123,13 +132,23 @@ func (h *Handler) Login(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		accessString, err := h.services.GenerateToken(user.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
+		accessUID, accessString, err := h.services.GenerateToken(user.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
 
-		refreshString, err := h.services.GenerateToken(user.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
+		refreshUID, refreshString, err := h.services.GenerateToken(user.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+
+		cachedTokens := models.CachedTokens{
+			AccessUID:  accessUID,
+			RefreshUID: refreshUID,
+		}
+		err = h.services.AddUid(user.ID, cachedTokens)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
@@ -141,15 +160,13 @@ func (h *Handler) Login(w http.ResponseWriter, req *http.Request) {
 		}
 		respJ, _ := json.Marshal(resp)
 
-		internal.WhiteList[user.ID] = resp
-
 		http.SetCookie(w, &http.Cookie{
 			Name:     "refresh-token",
 			Value:    refreshString,
 			Path:     "/refresh",
 			HttpOnly: true,
 		})
-
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(respJ)
 

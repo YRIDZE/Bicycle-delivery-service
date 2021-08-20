@@ -9,8 +9,8 @@ type OrderService struct {
 	repo db_repository.OrderRepositoryI
 }
 
-func NewOrderService(repo *db_repository.Repository) *OrderService {
-	return &OrderService{repo: repo.OrderRepositoryI}
+func NewOrderService(repo db_repository.OrderRepositoryI) *OrderService {
+	return &OrderService{repo: repo}
 }
 
 func (o OrderService) CreateOrder(order *models.Order) (int, error) {

@@ -14,7 +14,12 @@ type UserRepositoryI interface {
 	DeleteUser(id int32) error
 }
 
-type AuthorizationI interface{}
+type AuthorizationI interface {
+	AddUid(userID int32, uid models.CachedTokens) error
+	GetUidByID(userID int32) (*models.CachedTokens, error)
+	UpdateUid(userID int32, uid models.CachedTokens) error
+	DeleteUid(userID int32) error
+}
 
 type OrderRepositoryI interface {
 	CreateOrder(order *models.Order) (int, error)
@@ -34,5 +39,6 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		UserRepositoryI:  NewUserDBRepository(db),
 		OrderRepositoryI: NewOrderDBRepository(db),
+		AuthorizationI:   NewTokenCacheRepository(db),
 	}
 }
