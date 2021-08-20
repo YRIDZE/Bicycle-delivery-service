@@ -5,36 +5,35 @@ import (
 )
 
 type ProductRepositoryI interface {
-	Create(product *models.Product) (*models.Product, error)
-	GetByID(id *int32) (*models.Product, error)
-	GetAll() (*[]models.Product, error)
-	Update(product *models.Product) error
-	Delete(id int) error
+	CreateProduct(product *models.Product) (int, error)
+	GetProductByID(id int) (*models.Product, error)
+	GetAllProducts() (*[]models.Product, error)
+	UpdateProduct(product *models.Product) error
+	DeleteProduct(id int) error
 }
 
-type ProductDBRepository struct {
-}
+type ProductDBRepository struct{}
 
 func NewProductDBRepository() *ProductDBRepository {
 	return &ProductDBRepository{}
 }
 
-func (p ProductDBRepository) Create(product *models.Product) (*models.Product, error) {
+func (p ProductDBRepository) CreateProduct(product *models.Product) (int, error) {
 	panic("implement me")
 }
 
-func (p ProductDBRepository) GetByID(id *int32) (*models.Product, error) {
+func (p ProductDBRepository) GetProductByID(id int) (*models.Product, error) {
 	panic("implement me")
 }
 
-func (p ProductDBRepository) GetAll() (*[]models.Product, error) {
+func (p ProductDBRepository) GetAllProducts() (*[]models.Product, error) {
 	panic("implement me")
 }
 
-func (p ProductDBRepository) Update(product *models.Product) error {
+func (p ProductDBRepository) UpdateProduct(product *models.Product) error {
 	panic("implement me")
 }
 
-func (p ProductDBRepository) Delete(id int) error {
+func (p ProductDBRepository) DeleteProduct(id int) error {
 	panic("implement me")
 }

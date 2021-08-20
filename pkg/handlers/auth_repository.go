@@ -112,7 +112,7 @@ func (h *Handler) Login(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		user, err := h.services.GetByEmail(r.Email)
+		user, err := h.services.GetUserByEmail(r.Email)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return

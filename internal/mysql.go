@@ -1,4 +1,4 @@
-package db_repository
+package internal
 
 import (
 	"database/sql"
@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	usersTable = "users"
+	UsersTable  = "users"
+	OrdersTable = "orders"
+	OPTable     = "order_products"
 )
 
 type Config struct {

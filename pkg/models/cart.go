@@ -1,6 +1,6 @@
 package models
 
 type Cart struct {
-	ID    int32     `json:"id"`
-	Items []Product `json:"items"`
+	ID      int32     `json:"id"`
+	Product []Product `json:"product"`
 }

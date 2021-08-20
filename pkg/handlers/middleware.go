@@ -22,7 +22,7 @@ func (h *Handler) AuthMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		user, err := h.services.GetByID(userID)
+		user, err := h.services.GetUserByID(userID)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusBadRequest)
 			return
@@ -30,7 +30,5 @@ func (h *Handler) AuthMiddleware(handler http.Handler) http.Handler {
 
 		req = req.WithContext(context.WithValue(req.Context(), "accessToken", tokenString))
 		handler.ServeHTTP(w, req.WithContext(context.WithValue(req.Context(), "user", user)))
-
 	})
-
 }

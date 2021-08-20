@@ -14,11 +14,11 @@ type JwtCustomClaims struct {
 }
 
 type AuthService struct {
-	repo db_repository.Authorization
+	repo db_repository.AuthorizationI
 }
 
-func NewAuthService(repo db_repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo *db_repository.Repository) *AuthService {
+	return &AuthService{repo: repo.AuthorizationI}
 }
 
 func (h *AuthService) GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, error) {

@@ -3,6 +3,7 @@ package db_repository
 import (
 	"database/sql"
 	"fmt"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -16,8 +17,8 @@ func NewUserDBRepository(db *sql.DB) *UserDBRepository {
 	return &UserDBRepository{db: db}
 }
 
-func (u UserDBRepository) Create(user *models.User) (int32, error) {
-	createUserQuery := fmt.Sprintf("insert into %s (firstname, lastname, email, password) value (?, ?, ?, ?)", usersTable)
+func (u UserDBRepository) CreateUser(user *models.User) (int32, error) {
+	createUserQuery := fmt.Sprintf("insert into %s (firstname, lastname, email, password) value (?, ?, ?, ?)", internal.UsersTable)
 	us, err := u.db.Prepare(createUserQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -37,9 +38,9 @@ func (u UserDBRepository) Create(user *models.User) (int32, error) {
 	return int32(lastId), nil
 }
 
-func (u UserDBRepository) GetByID(id int32) (*models.User, error) {
+func (u UserDBRepository) GetUserByID(id int32) (*models.User, error) {
 	user := new(models.User)
-	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where id = ?", usersTable)
+	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where id = ?", internal.UsersTable)
 
 	err := u.db.QueryRow(query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password)
 	if err != nil {
@@ -48,9 +49,9 @@ func (u UserDBRepository) GetByID(id int32) (*models.User, error) {
 	return user, nil
 }
 
-func (u UserDBRepository) GetByEmail(email string) (*models.User, error) {
+func (u UserDBRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := new(models.User)
-	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where email = ?", usersTable)
+	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where email = ?", internal.UsersTable)
 
 	err := u.db.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password)
 	if err != nil {
@@ -59,10 +60,10 @@ func (u UserDBRepository) GetByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func (u UserDBRepository) GetAll() (*[]models.User, error) {
+func (u UserDBRepository) GetAllUsers() (*[]models.User, error) {
 	var users []models.User
 	var user models.User
-	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s", usersTable)
+	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s", internal.UsersTable)
 
 	rows, err := u.db.Query(query)
 	if err != nil {
@@ -85,8 +86,9 @@ func (u UserDBRepository) GetAll() (*[]models.User, error) {
 	return &users, nil
 }
 
-func (u UserDBRepository) Update(user *models.User) error {
-	query := fmt.Sprintf("update %s set firstname = ?, lastname = ?, email = ?, password = ? where id = ?", usersTable)
+func (u UserDBRepository) UpdateUser(user *models.User) error {
+	query := fmt.Sprintf("update %s set firstname = ?, lastname = ?, email = ?, password = ? where id = ?", internal.UsersTable)
+	user.Password = generatePasswordHash(user.Password)
 	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, user.ID)
 	if err != nil {
 		return err
@@ -94,8 +96,8 @@ func (u UserDBRepository) Update(user *models.User) error {
 	return nil
 }
 
-func (u UserDBRepository) Delete(id int) error {
-	query := fmt.Sprintf("delete from %s where id = ?", usersTable)
+func (u UserDBRepository) DeleteUser(id int32) error {
+	query := fmt.Sprintf("delete from %s where id = ?", internal.UsersTable)
 	_, err := u.db.Exec(query, id)
 	if err != nil {
 		return err

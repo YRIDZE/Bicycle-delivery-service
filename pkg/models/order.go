@@ -10,5 +10,6 @@ type Order struct {
 	ID       int32           `json:"id"`
 	UserID   int32           `json:"user_id"`
 	Address  string          `json:"address"`
-	Products []OrderProducts `json:"items"`
+	Status   string          `json:"status"`
+	Products []OrderProducts `json:"products"`
 }

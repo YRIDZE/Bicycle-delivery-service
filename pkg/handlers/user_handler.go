@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -16,7 +17,7 @@ func (h *Handler) Create(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		_, err := h.services.Create(r)
+		_, err := h.services.CreateUser(r)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
@@ -33,9 +34,10 @@ func (h *Handler) Create(w http.ResponseWriter, req *http.Request) {
 func (h *Handler) GetByEmail(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		user, err := h.services.GetByEmail(mux.Vars(req)["email"])
+		user, err := h.services.GetUserByEmail(mux.Vars(req)["email"])
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
 		}
 
 		resp := &models.UserResponse{
@@ -58,9 +60,10 @@ func (h *Handler) GetByEmail(w http.ResponseWriter, req *http.Request) {
 func (h *Handler) GetAll(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		users, err := h.services.GetAll()
+		users, err := h.services.GetAllUsers()
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
 		}
 		respJ, _ := json.Marshal(users)
 
@@ -83,9 +86,10 @@ func (h *Handler) Update(w http.ResponseWriter, req *http.Request) {
 		}
 
 		user.ID = req.Context().Value("user").(*models.User).ID
-		err := h.services.Update(user)
+		err := h.services.UpdateUser(user)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -100,9 +104,11 @@ func (h *Handler) Update(w http.ResponseWriter, req *http.Request) {
 func (h *Handler) Delete(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "DELETE":
-		err := h.services.Delete(int(req.Context().Value("user").(*models.User).ID))
+		err := h.services.DeleteUser(req.Context().Value("user").(*models.User).ID)
+		fmt.Println()
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")

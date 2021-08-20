@@ -4,6 +4,7 @@ import (
 	"context"
 	app "github.com/YRIDZE/Bicycle-delivery-service"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
@@ -20,7 +21,7 @@ func main() {
 		log.Print("error initializing configs")
 	}
 
-	db, _ := db_repository.NewDB(db_repository.Config{
+	db, _ := internal.NewDB(internal.Config{
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
@@ -47,7 +48,7 @@ func main() {
 	log.Print("App Shutting Down")
 
 	if err := srv.Shutdown(context.Background()); err != nil {
-		log.Fatalf("error occured on server shutting down: %s", err.Error())
+		log.Printf("error occured on server shutting down: %s", err.Error())
 	}
 
 	if err := db.Close(); err != nil {

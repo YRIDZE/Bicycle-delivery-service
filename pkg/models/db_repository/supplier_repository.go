@@ -5,36 +5,35 @@ import (
 )
 
 type SupplierRepositoryI interface {
-	Create(supplier *models.Supplier) (*models.Supplier, error)
-	GetByID(id *int32) (*models.Supplier, error)
-	GetAll() (*[]models.Supplier, error)
-	Update(supplier *models.Supplier) error
-	Delete(id int) error
+	CreateSupplier(supplier *models.Supplier) (int, error)
+	GetSupplierByID(id int) (*models.Supplier, error)
+	GetAllSuppliers() (*[]models.Supplier, error)
+	UpdateSupplier(supplier *models.Supplier) error
+	DeleteSupplier(id int) error
 }
 
-type SupplierDBRepository struct {
-}
+type SupplierDBRepository struct{}
 
 func NewSupplierDBRepository() *SupplierDBRepository {
 	return &SupplierDBRepository{}
 }
 
-func (s SupplierDBRepository) Create(supplier *models.Supplier) (*models.Supplier, error) {
+func (s SupplierDBRepository) CreateSupplier(supplier *models.Supplier) (int, error) {
 	panic("implement me")
 }
 
-func (s SupplierDBRepository) GetByID(id *int32) (*models.Supplier, error) {
+func (s SupplierDBRepository) GetSupplierByID(id int) (*models.Supplier, error) {
 	panic("implement me")
 }
 
-func (s SupplierDBRepository) GetAll() (*[]models.Supplier, error) {
+func (s SupplierDBRepository) GetAllSuppliers() (*[]models.Supplier, error) {
 	panic("implement me")
 }
 
-func (s SupplierDBRepository) Update(supplier *models.Supplier) error {
+func (s SupplierDBRepository) UpdateSupplier(supplier *models.Supplier) error {
 	panic("implement me")
 }
 
-func (s SupplierDBRepository) Delete(id int) error {
+func (s SupplierDBRepository) DeleteSupplier(id int) error {
 	panic("implement me")
 }
