@@ -1,10 +1,9 @@
-package db_repository
+package mysql
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
-	"log"
 )
 
 type TokenCacheRepository struct {
@@ -26,15 +25,18 @@ func (t *TokenCacheRepository) AddUid(userID int32, uid models.CachedTokens) err
 		query2 := fmt.Sprintf("insert into %s (user_id, access_uid, refresh_uid) value (?, ?, ?)", CacheTokenTable)
 		us, err := t.db.Prepare(query2)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		_, err = us.Exec(userID, uid.AccessUID, uid.RefreshUID)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	} else {
 		err = t.UpdateUid(userID, uid)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -45,7 +47,6 @@ func (t *TokenCacheRepository) UpdateUid(userID int32, uid models.CachedTokens) 
 		return err
 	}
 	return nil
-
 }
 
 func (t *TokenCacheRepository) DeleteUid(userID int32) error {

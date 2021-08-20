@@ -3,7 +3,7 @@ package models
 type OrderProducts struct {
 	OrderID   int32 `json:"order_id"`
 	ProductID int32 `json:"product_id"`
-	Count     int   `json:"count"`
+	Quantity  int   `json:"quantity"`
 }
 
 type Order struct {

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) Create(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		r := new(models.User)
@@ -31,7 +31,7 @@ func (h *Handler) Create(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) GetByEmail(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetUserByEmail(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		user, err := h.services.GetUserByEmail(mux.Vars(req)["email"])
@@ -57,7 +57,7 @@ func (h *Handler) GetByEmail(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) GetAll(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetAllUsers(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		users, err := h.services.GetAllUsers()
@@ -76,7 +76,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) Update(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "PUT":
 		user := new(models.User)
@@ -101,7 +101,7 @@ func (h *Handler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) Delete(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) DeleteUser(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "DELETE":
 		err := h.services.DeleteUser(req.Context().Value("user").(*models.User).ID)

@@ -1,4 +1,4 @@
-package db_repository
+package mysql
 
 import (
 	"context"
@@ -17,11 +17,10 @@ func NewOrderDBRepository(db *sql.DB) *OrderDBRepository {
 }
 
 func (o OrderDBRepository) CreateOrder(order *models.Order) (int, error) {
-
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	query := fmt.Sprintf("insert into %s (address, user_id) values (?, ?)", OrdersTable)
@@ -33,12 +32,12 @@ func (o OrderDBRepository) CreateOrder(order *models.Order) (int, error) {
 
 	lastId, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
-	query2 := fmt.Sprintf("insert into %s (order_id, product_id, count) values (?, ?, ?)", OPTable)
+	query2 := fmt.Sprintf("insert into %s (order_id, product_id, quantity) values (?, ?, ?)", OPTable)
 	for _, x := range order.Products {
-		_, err := tx.ExecContext(ctx, query2, lastId, x.ProductID, x.Count)
+		_, err := tx.ExecContext(ctx, query2, lastId, x.ProductID, x.Quantity)
 		if err != nil {
 			_ = tx.Rollback()
 			return 0, err
@@ -46,7 +45,7 @@ func (o OrderDBRepository) CreateOrder(order *models.Order) (int, error) {
 	}
 	err = tx.Commit()
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	return int(lastId), nil
@@ -60,7 +59,7 @@ func (o OrderDBRepository) GetOrderByID(id int) (*models.Order, error) {
 		return nil, err
 	}
 
-	query2 := fmt.Sprintf("select order_id, product_id, count from %s where order_id = ?", OPTable)
+	query2 := fmt.Sprintf("select order_id, product_id, quantity from %s where order_id = ?", OPTable)
 	rows, err := o.db.Query(query2, order.ID)
 	if err != nil {
 		return nil, err
@@ -69,7 +68,7 @@ func (o OrderDBRepository) GetOrderByID(id int) (*models.Order, error) {
 
 	for rows.Next() {
 		orderProduct := new(models.OrderProducts)
-		err := rows.Scan(&orderProduct.OrderID, &orderProduct.ProductID, &orderProduct.Count)
+		err := rows.Scan(&orderProduct.OrderID, &orderProduct.ProductID, &orderProduct.Quantity)
 		if err != nil {
 			return nil, err
 		}
@@ -86,18 +85,17 @@ func (o OrderDBRepository) GetOrderByID(id int) (*models.Order, error) {
 func (o OrderDBRepository) GetAllOrders(userID int32) (*[]models.Order, error) {
 	var orders []models.Order
 	query := fmt.Sprintf("select orders.id, orders.user_id, orders.address, orders.status, order_products.order_id,  "+
-		"order_products.product_id, order_products.count from %s join %s on orders.id = order_products.order_id where orders.user_id = ?", OrdersTable, OPTable)
+		"order_products.product_id, order_products.quantity from %s join %s on orders.id = order_products.order_id where orders.user_id = ?", OrdersTable, OPTable)
 	rows, err := o.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
+	or := new(models.Order)
+	orP := new(models.OrderProducts)
 	for rows.Next() {
-		or := new(models.Order)
-		orP := new(models.OrderProducts)
-		err := rows.Scan(&or.ID, &or.UserID, &or.Address, &or.Status, &orP.OrderID, &orP.ProductID, &orP.Count)
+		err := rows.Scan(&or.ID, &or.UserID, &or.Address, &or.Status, &orP.OrderID, &orP.ProductID, &orP.Quantity)
 		if err != nil {
 			return nil, err
 		}
@@ -118,6 +116,10 @@ func (o OrderDBRepository) GetAllOrders(userID int32) (*[]models.Order, error) {
 			orders = append(orders, *or)
 		}
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 	return &orders, nil
 }
 
@@ -125,8 +127,9 @@ func (o OrderDBRepository) UpdateOrder(order *models.Order) error {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
 	query := fmt.Sprintf("update %s set address = ?, status = ? where id = ?", OrdersTable)
 	_, err = tx.ExecContext(ctx, query, order.Address, order.Status, order.ID)
 	if err != nil {
@@ -135,8 +138,8 @@ func (o OrderDBRepository) UpdateOrder(order *models.Order) error {
 	}
 
 	for _, x := range order.Products {
-		query2 := fmt.Sprintf("update %s set count = ? where order_id = ? and product_id = ?", OPTable)
-		_, err = tx.ExecContext(ctx, query2, x.Count, x.OrderID, x.ProductID)
+		query := fmt.Sprintf("update %s set quantity = ? where order_id = ? and product_id = ?", OPTable)
+		_, err = tx.ExecContext(ctx, query, x.Quantity, x.OrderID, x.ProductID)
 		if err != nil {
 			_ = tx.Rollback()
 			return err
@@ -144,7 +147,7 @@ func (o OrderDBRepository) UpdateOrder(order *models.Order) error {
 	}
 	err = tx.Commit()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
@@ -174,7 +177,7 @@ func (o OrderDBRepository) DeleteOrder(id int) error {
 
 	err = tx.Commit()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil

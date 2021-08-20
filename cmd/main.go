@@ -6,6 +6,7 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository/mysql"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	"github.com/spf13/viper"
 	"log"
@@ -20,7 +21,7 @@ func main() {
 		log.Print("error initializing configs")
 	}
 
-	db, _ := db_repository.NewDB(db_repository.Config{
+	db, _ := mysql.NewDB(mysql.Config{
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),

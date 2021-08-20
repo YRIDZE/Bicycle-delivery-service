@@ -17,24 +17,25 @@ func NewHandler(services *services.Service) *Handler {
 func (h Handler) InitRoutes() http.Handler {
 
 	router := mux.NewRouter()
+
 	router.HandleFunc("/login", h.Login)
 	router.HandleFunc("/refresh", h.Refresh)
 
 	//user
 	router.Handle("/logout", h.AuthMiddleware(http.HandlerFunc(h.Logout)))
-	router.Handle("/profile", h.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
-	router.Handle("/update", h.AuthMiddleware(http.HandlerFunc(h.Update)))
-	router.Handle("/delete", h.AuthMiddleware(http.HandlerFunc(h.Delete)))
-	router.HandleFunc("/create", h.Create)
-	router.HandleFunc("/getByEmail/{email}", h.GetByEmail)
-	router.HandleFunc("/", h.GetAll)
+	router.Handle("/user", h.AuthMiddleware(http.HandlerFunc(h.GetUserProfile)))
+	router.Handle("/userU", h.AuthMiddleware(http.HandlerFunc(h.UpdateUser)))
+	router.Handle("/userD", h.AuthMiddleware(http.HandlerFunc(h.DeleteUser)))
+	router.HandleFunc("/userC", h.CreateUser)
+	router.HandleFunc("/user/{email}", h.GetUserByEmail)
+	router.HandleFunc("/users", h.GetAllUsers)
 
 	//orders
-	router.Handle("/createOrder", h.AuthMiddleware(http.HandlerFunc(h.CreateOrder)))
-	router.Handle("/getOrder/{id}", h.AuthMiddleware(http.HandlerFunc(h.GetOrderByID)))
-	router.Handle("/getOrders", h.AuthMiddleware(http.HandlerFunc(h.GetAllOrders)))
-	router.Handle("/updateOrder", h.AuthMiddleware(http.HandlerFunc(h.UpdateOrders)))
-	router.Handle("/deleteOrder/{id}", h.AuthMiddleware(http.HandlerFunc(h.DeleteOrder)))
+	router.Handle("/orderC", h.AuthMiddleware(http.HandlerFunc(h.CreateOrder)))
+	router.Handle("/order/{id}", h.AuthMiddleware(http.HandlerFunc(h.GetOrderByID)))
+	router.Handle("/orders", h.AuthMiddleware(http.HandlerFunc(h.GetAllOrders)))
+	router.Handle("/orderU", h.AuthMiddleware(http.HandlerFunc(h.UpdateOrders)))
+	router.Handle("/orderD/{id}", h.AuthMiddleware(http.HandlerFunc(h.DeleteOrder)))
 
 	return router
 }

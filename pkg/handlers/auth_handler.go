@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 func (h *Handler) Logout(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
-		delete(internal.WhiteList, req.Context().Value("user").(*models.User).ID)
 		err := h.services.DeleteUid(req.Context().Value("user").(*models.User).ID)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -90,7 +88,7 @@ func (h *Handler) Refresh(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) GetProfile(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetUserProfile(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		user := req.Context().Value("user").(*models.User)

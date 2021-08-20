@@ -3,6 +3,7 @@ package db_repository
 import (
 	"database/sql"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository/mysql"
 )
 
 type UserRepositoryI interface {
@@ -37,8 +38,8 @@ type Repository struct {
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		UserRepositoryI:  NewUserDBRepository(db),
-		OrderRepositoryI: NewOrderDBRepository(db),
-		AuthorizationI:   NewTokenCacheRepository(db),
+		UserRepositoryI:  mysql.NewUserDBRepository(db),
+		OrderRepositoryI: mysql.NewOrderDBRepository(db),
+		AuthorizationI:   mysql.NewTokenCacheRepository(db),
 	}
 }

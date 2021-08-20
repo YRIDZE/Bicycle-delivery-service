@@ -1,10 +1,9 @@
-package db_repository
+package mysql
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
-	"log"
 )
 
 type UserDBRepository struct {
@@ -20,16 +19,17 @@ func (u UserDBRepository) CreateUser(user *models.User) (int32, error) {
 	createUserQuery := fmt.Sprintf("insert into %s (firstname, lastname, email, password) value (?, ?, ?, ?)", UsersTable)
 	us, err := u.db.Prepare(createUserQuery)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	res, err := us.Exec(user.FirstName, user.LastName, user.Email, user.Password)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
+
 	lastId, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	return int32(lastId), nil
