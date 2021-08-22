@@ -62,10 +62,10 @@ func (ufr *UserFileRepository) Update(user *models.User) (*models.User, error) {
 }
 
 func (ufr *UserFileRepository) Delete(id int) error {
-	err := helpers.Delete("users", id)
-	if err != nil {
-		return err
-	}
+	//err := helpers.Delete("users", id)
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }
 

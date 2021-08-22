@@ -96,15 +96,15 @@ func Update(modelName string, user *models.User) error {
 	return errors.New("user not found")
 }
 
-//func DeleteUser(modelName string, id int) error {
-//	users, err := GetAllUsers(modelName)
+//func Delete(modelName string, id int) error {
+//	users, err := GetAll(modelName)
 //	if err != nil {
 //		return err
 //	}
 //
 //	for i, t := range users {
 //		if t.ID == int32(id) {
-//			users[i].DeleteUser = time.Now().String()
+//			users[i].Delete = time.Now().String()
 //			err = Save(modelName, &users)
 //			if err != nil {
 //				return err

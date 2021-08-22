@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"strings"
@@ -16,15 +15,7 @@ type JwtCustomClaims struct {
 	UID string `json:"uid"`
 }
 
-type AuthService struct {
-	repo db_repository.AuthorizationI
-}
-
-func NewAuthService(repo db_repository.AuthorizationI) *AuthService {
-	return &AuthService{repo: repo}
-}
-
-func (h *AuthService) GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
+func (u *UserService) GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
 	uid := uuid.New().String()
 	claims := &JwtCustomClaims{
 		StandardClaims: jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Minute * time.Duration(lifetimeMinutes)).Unix()},
@@ -36,7 +27,7 @@ func (h *AuthService) GenerateToken(userID int32, lifetimeMinutes int, secret st
 	return uid, token, err
 }
 
-func (h *AuthService) ValidateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
+func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretString), nil
 	})
@@ -53,7 +44,7 @@ func (h *AuthService) ValidateToken(tokenString, secretString string) (*JwtCusto
 
 }
 
-func (h *AuthService) GetTokenFromBearerString(input string) string {
+func (u *UserService) GetTokenFromBearerString(input string) string {
 	if input == "" {
 		return ""
 	}
@@ -71,17 +62,17 @@ func (h *AuthService) GetTokenFromBearerString(input string) string {
 	return token
 }
 
-func (h *AuthService) AddUid(userID int32, uid models.CachedTokens) error {
-	return h.repo.AddUid(userID, uid)
+func (u *UserService) CreateUid(userID int32, uid models.CachedTokens) error {
+	return u.tokenRepo.CreateUid(userID, uid)
 }
 
-func (h *AuthService) UpdateUid(userID int32, uid models.CachedTokens) error {
-	return h.repo.UpdateUid(userID, uid)
+func (u *UserService) UpdateUid(userID int32, uid models.CachedTokens) error {
+	return u.tokenRepo.UpdateUid(userID, uid)
 }
 
-func (h *AuthService) DeleteUid(userID int32) error {
-	return h.repo.DeleteUid(userID)
+func (u *UserService) DeleteUid(userID int32) error {
+	return u.tokenRepo.DeleteUid(userID)
 }
-func (h *AuthService) GetUidByID(userID int32) (*models.CachedTokens, error) {
-	return h.repo.GetUidByID(userID)
+func (u *UserService) GetUidByID(userID int32) (*models.CachedTokens, error) {
+	return u.tokenRepo.GetUidByID(userID)
 }

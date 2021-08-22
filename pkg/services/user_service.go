@@ -7,40 +7,41 @@ import (
 )
 
 type UserService struct {
-	repo db_repository.UserRepositoryI
+	userRepo  db_repository.UserRepositoryI
+	tokenRepo db_repository.TokensRepositoryI
 }
 
-func NewUserService(repo db_repository.UserRepositoryI) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(userRepo *db_repository.UserRepositoryI, tokenRepo *db_repository.TokensRepositoryI) *UserService {
+	return &UserService{
+		userRepo:  *userRepo,
+		tokenRepo: *tokenRepo,
+	}
 }
 
-func (u UserService) CreateUser(user *models.User) (int32, error) {
+func (u UserService) Create(user *models.User) (int32, error) {
 	user.Password = generatePasswordHash(user.Password)
-	return u.repo.CreateUser(user)
+	return u.userRepo.Create(user)
 }
 
-func (u UserService) GetUserByEmail(email string) (*models.User, error) {
-	return u.repo.GetUserByEmail(email)
+func (u UserService) GetByEmail(email string) (*models.User, error) {
+	return u.userRepo.GetByEmail(email)
 }
 
-func (u UserService) GetUserByID(id int32) (*models.User, error) {
-	return u.repo.GetUserByID(id)
+func (u UserService) GetByID(id int32) (*models.User, error) {
+	return u.userRepo.GetByID(id)
 }
 
-func (u UserService) GetAllUsers() (*[]models.User, error) {
-	return u.repo.GetAllUsers()
+func (u UserService) GetAll() (*[]models.User, error) {
+	return u.userRepo.GetAll()
 }
 
-func (u UserService) UpdateUser(user *models.User) error {
+func (u UserService) Update(user *models.User) error {
 	user.Password = generatePasswordHash(user.Password)
-	return u.repo.UpdateUser(user)
+	return u.userRepo.Update(user)
 }
 
-func (u UserService) DeleteUser(id int32) error {
-	return u.repo.DeleteUser(id)
-}
-func (u UserService) GetByID(id int32) error {
-	return u.repo.DeleteUser(id)
+func (u UserService) Delete(id int32) error {
+	return u.userRepo.Delete(id)
 }
 
 func generatePasswordHash(password string) string {

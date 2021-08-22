@@ -1,4 +1,4 @@
-package mysql
+package db_repository
 
 import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"

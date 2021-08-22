@@ -6,8 +6,6 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository/mysql"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -21,16 +19,20 @@ func main() {
 		log.Print("error initializing configs")
 	}
 
-	db, _ := mysql.NewDB(mysql.Config{
+	db, _ := db_repository.NewDB(db_repository.Config{
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
 		Password: conf.DbPassword,
 	})
+	userRepository := db_repository.NewUserDBRepository(db)
+	tokenRepository := db_repository.NewTokensDBRepository(db)
+	orderRepository := db_repository.NewOrderDBRepository(db)
 
-	r := db_repository.NewRepository(db)
-	s := services.NewService(r)
-	h := handlers.NewHandler(s)
+	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
+	orderHandler := handlers.NewOrderHandler(orderRepository)
+
+	h := handlers.NewAppHandlers(userHandler, orderHandler)
 
 	srv := new(app.Server)
 	go func() {

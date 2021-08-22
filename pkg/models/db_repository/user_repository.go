@@ -1,10 +1,19 @@
-package mysql
+package db_repository
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
+
+type UserRepositoryI interface {
+	Create(user *models.User) (int32, error)
+	GetByEmail(email string) (*models.User, error)
+	GetByID(id int32) (*models.User, error)
+	GetAll() (*[]models.User, error)
+	Update(user *models.User) error
+	Delete(id int32) error
+}
 
 type UserDBRepository struct {
 	db *sql.DB
@@ -14,15 +23,10 @@ func NewUserDBRepository(db *sql.DB) *UserDBRepository {
 	return &UserDBRepository{db: db}
 }
 
-func (u UserDBRepository) CreateUser(user *models.User) (int32, error) {
-	fmt.Println(user.Password)
+func (u *UserDBRepository) Create(user *models.User) (int32, error) {
 	createUserQuery := fmt.Sprintf("insert into %s (firstname, lastname, email, password) value (?, ?, ?, ?)", UsersTable)
-	us, err := u.db.Prepare(createUserQuery)
-	if err != nil {
-		return 0, err
-	}
 
-	res, err := us.Exec(user.FirstName, user.LastName, user.Email, user.Password)
+	res, err := u.db.Exec(createUserQuery, user.FirstName, user.LastName, user.Email, user.Password)
 	if err != nil {
 		return 0, err
 	}
@@ -35,7 +39,7 @@ func (u UserDBRepository) CreateUser(user *models.User) (int32, error) {
 	return int32(lastId), nil
 }
 
-func (u UserDBRepository) GetUserByID(id int32) (*models.User, error) {
+func (u *UserDBRepository) GetByID(id int32) (*models.User, error) {
 	user := new(models.User)
 	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where id = ?", UsersTable)
 
@@ -46,7 +50,7 @@ func (u UserDBRepository) GetUserByID(id int32) (*models.User, error) {
 	return user, nil
 }
 
-func (u UserDBRepository) GetUserByEmail(email string) (*models.User, error) {
+func (u *UserDBRepository) GetByEmail(email string) (*models.User, error) {
 	user := new(models.User)
 	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where email = ?", UsersTable)
 
@@ -57,12 +61,16 @@ func (u UserDBRepository) GetUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-func (u UserDBRepository) GetAllUsers() (*[]models.User, error) {
+func (u *UserDBRepository) GetAll() (*[]models.User, error) {
 	var users []models.User
 	var user models.User
 	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s", UsersTable)
+	pr, err := u.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
 
-	rows, err := u.db.Query(query)
+	rows, err := pr.Query()
 	if err != nil {
 		return nil, err
 	}
@@ -75,15 +83,14 @@ func (u UserDBRepository) GetAllUsers() (*[]models.User, error) {
 		}
 		users = append(users, user)
 	}
-	err = rows.Err()
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return &users, nil
 }
 
-func (u UserDBRepository) UpdateUser(user *models.User) error {
+func (u *UserDBRepository) Update(user *models.User) error {
 	query := fmt.Sprintf("update %s set firstname = ?, lastname = ?, email = ?, password = ? where id = ?", UsersTable)
 	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, user.ID)
 	if err != nil {
@@ -92,7 +99,7 @@ func (u UserDBRepository) UpdateUser(user *models.User) error {
 	return nil
 }
 
-func (u UserDBRepository) DeleteUser(id int32) error {
+func (u *UserDBRepository) Delete(id int32) error {
 	query := fmt.Sprintf("delete from %s where id = ?", UsersTable)
 	_, err := u.db.Exec(query, id)
 	if err != nil {
