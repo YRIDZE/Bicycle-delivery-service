@@ -66,7 +66,8 @@ func (ufr *UserFileRepository) Delete(id int) error {
 	//if err != nil {
 	//	return err
 	//}
-	return nil
+	//return nil
+	panic("implement me")
 }
 
 func (ufr *UserFileRepository) GetNextID() (idSequence int32) {

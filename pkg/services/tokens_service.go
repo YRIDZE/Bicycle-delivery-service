@@ -44,22 +44,22 @@ func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCusto
 
 }
 
-func (u *UserService) GetTokenFromBearerString(input string) string {
+func (u *UserService) GetTokenFromBearerString(input string) (string, error) {
 	if input == "" {
-		return ""
+		return "", errors.New("no token received")
 	}
 
 	parts := strings.Split(input, "Bearer")
 	if len(parts) != 2 {
-		return ""
+		return "", errors.New("bearer token not in proper format")
 	}
 
 	token := strings.TrimSpace(parts[1])
 	if len(token) < 1 {
-		return ""
+		return "", errors.New("token string is empty")
 	}
 
-	return token
+	return token, nil
 }
 
 func (u *UserService) CreateUid(userID int32, uid models.CachedTokens) error {

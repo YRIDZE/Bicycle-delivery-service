@@ -97,51 +97,6 @@ func (o OrderDBRepository) GetByID(id int) (*models.Order, error) {
 
 func (o OrderDBRepository) GetAll(userID int32) (*[]models.Order, error) {
 	var orders []models.Order
-
-	//query := fmt.Sprintf("select orders.id, orders.user_id, orders.address, orders.status, order_products.order_id,  "+
-	//	"order_products.product_id, order_products.quantity from %s join %s on orders.id = order_products.order_id where orders.user_id = ?", OrdersTable, OPTable)
-	//pr, err := o.db.Prepare(query)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//rows, err := pr.Query(userID)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//defer rows.Close()
-	//
-	//for rows.Next() {
-	//	or := new(models.Order)
-	//	orP := new(models.OrderProducts)
-	//	err := rows.Scan(&or.ID, &or.UserID, &or.Address, &or.Status, &orP.OrderID, &orP.ProductID, &orP.Quantity)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	if len(orders) != 0 {
-	//		for i := range orders {
-	//			if orders[i].ID == orP.OrderID {
-	//				orders[i].Products = append(orders[i].Products, *orP)
-	//				break
-	//			}
-	//			if i == len(orders)-1 {
-	//				or.Products = append(or.Products, *orP)
-	//				orders = append(orders, *or)
-	//			}
-	//		}
-	//	} else {
-	//		or.Products = append(or.Products, *orP)
-	//		orders = append(orders, *or)
-	//	}
-	//}
-	//if len(orders) == 0 {
-	//	return nil, errors.New("empty set")
-	//}
-	//if err = rows.Err(); err != nil {
-	//	return nil, err
-	//}
-
 	query := fmt.Sprintf("select id, user_id, address, status from %s where user_id=?", OrdersTable)
 	pr, err := o.db.Prepare(query)
 	if err != nil {

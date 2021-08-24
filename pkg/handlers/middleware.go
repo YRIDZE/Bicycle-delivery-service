@@ -9,7 +9,12 @@ import (
 func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		bearerString := req.Header.Get("Authorization")
-		tokenString := h.service.GetTokenFromBearerString(bearerString)
+		tokenString, err := h.service.GetTokenFromBearerString(bearerString)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		claims, err := h.service.ValidateToken(tokenString, conf.AccessSecret)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
