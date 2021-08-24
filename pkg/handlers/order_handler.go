@@ -30,13 +30,13 @@ func (h *OrderHandler) RegisterRoutes(r *mux.Router, appH *AppHandlers) {
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 	order := new(models.Order)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
 	_, err := h.services.Create(order)
 	if err != nil {
-		http.Error(w, "Invalid data", http.StatusUnauthorized)
+		models.ErrorResponse(w, "Invalid data", http.StatusUnauthorized)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(req)["id"])
 	order, err := h.services.GetByID(id)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	order, err := h.services.GetAll(req.Context().Value("user").(*models.User).ID)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -76,13 +76,13 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 	order := new(models.Order)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
 	err := h.services.Update(order)
 	if err != nil {
-		http.Error(w, "Invalid data", http.StatusUnauthorized)
+		models.ErrorResponse(w, "Invalid data", http.StatusUnauthorized)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(req)["id"])
 	err := h.services.Delete(id)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 

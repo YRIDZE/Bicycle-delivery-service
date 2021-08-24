@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
-	"log"
 )
 
 type OrderRepositoryI interface {
@@ -194,7 +193,7 @@ func (o OrderDBRepository) Delete(id int) error {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	query := fmt.Sprintf("delete from %s where order_id = ?", OPTable)

@@ -2,7 +2,7 @@ package conf
 
 import (
 	"github.com/joho/godotenv"
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 )
@@ -17,7 +17,7 @@ var RefreshLifetimeMinutes int
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
+		logrus.Print("No .env file found")
 	}
 
 	DbPassword = os.Getenv("DB_PASSWORD")

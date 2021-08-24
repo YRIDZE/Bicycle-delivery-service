@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"net/http"
 )
 
@@ -11,24 +12,24 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 		bearerString := req.Header.Get("Authorization")
 		tokenString, err := h.service.GetTokenFromBearerString(bearerString)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			models.ErrorResponse(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 
 		claims, err := h.service.ValidateToken(tokenString, conf.AccessSecret)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			models.ErrorResponse(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 
 		if cachedTokens, ok := h.service.GetUidByID(claims.ID); ok != nil || cachedTokens.AccessUID != claims.UID {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			models.ErrorResponse(w, "Invalid token", http.StatusUnauthorized)
 			return
 		}
 
 		user, err := h.service.GetByID(claims.ID)
 		if err != nil {
-			http.Error(w, "Invalid credentials", http.StatusBadRequest)
+			models.ErrorResponse(w, "Invalid credentials", http.StatusBadRequest)
 			return
 		}
 
