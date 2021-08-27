@@ -1,8 +1,8 @@
 package conf
 
 import (
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 )
@@ -17,7 +17,8 @@ var RefreshLifetimeMinutes int
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		logrus.Print("No .env file found")
+		internal.Log.Fatalf("Could not load .env file. Returned error was: ", err.Error())
+		panic(err.Error())
 	}
 
 	DbPassword = os.Getenv("DB_PASSWORD")

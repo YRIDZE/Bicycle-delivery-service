@@ -13,7 +13,9 @@ func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 	err := h.service.DeleteUid(userID)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -32,25 +34,29 @@ func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("refresh-token")
 	if err != nil {
-		models.ErrorResponse(w, "Invalid credentials", http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
 		return
 	}
 
 	claims, err := h.service.ValidateToken(c.Value, conf.RefreshSecret)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusUnauthorized)
 		return
 	}
 
 	accessUID, accessString, err := h.service.GenerateToken(claims.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	refreshUID, refreshString, err := h.service.GenerateToken(claims.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -84,30 +90,34 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	r := new(models.LoginRequest)
 	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.service.GetByEmail(r.Email)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid credentials", http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(r.Password)); err != nil {
-		models.ErrorResponse(w, "Invalid credentials", http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	accessUID, accessString, err := h.service.GenerateToken(user.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	refreshUID, refreshString, err := h.service.GenerateToken(user.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -117,7 +127,8 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 	err = h.service.CreateUid(user.ID, cachedTokens)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid token", http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid token", http.StatusInternalServerError)
 		return
 	}
 

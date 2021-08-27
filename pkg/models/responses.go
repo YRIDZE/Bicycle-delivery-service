@@ -1,10 +1,5 @@
 package models
 
-import (
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
-	"net/http"
-)
-
 type LoginResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -24,9 +19,4 @@ type TokenResponse struct {
 type CachedTokens struct {
 	AccessUID  string `json:"access"`
 	RefreshUID string `json:"refresh"`
-}
-
-func ErrorResponse(w http.ResponseWriter, message string, statusCode int) {
-	internal.Log.Error(message)
-	http.Error(w, message, statusCode)
 }

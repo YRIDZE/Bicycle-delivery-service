@@ -29,6 +29,7 @@ func NewDB(cfg Config) (*sql.DB, error) {
 	)
 	if err != nil {
 		internal.Log.Fatalf("Database error: %v", err)
+		return nil, err
 	}
 
 	err = db.Ping()

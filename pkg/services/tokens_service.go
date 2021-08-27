@@ -35,9 +35,6 @@ func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCusto
 		return nil, err
 	}
 
-	if err != nil {
-		return nil, err
-	}
 	claims, ok := token.Claims.(*JwtCustomClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("failed to parse token claims")

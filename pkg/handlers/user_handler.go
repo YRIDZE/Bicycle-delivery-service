@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
@@ -35,13 +34,15 @@ func (h *UserHandler) RegisterRoutes(r *mux.Router, appH *AppHandlers) {
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 	r := new(models.User)
 	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	userID, err := h.service.Create(r)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid credentials", http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
@@ -54,7 +55,8 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	users, err := h.service.GetAll()
 	if err != nil {
-		models.ErrorResponse(w, fmt.Sprint("DB error: ", err.Error()), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 	var resp []models.UserResponse
@@ -78,28 +80,30 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	user := new(models.User)
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	user.ID = req.Context().Value("user").(*models.User).ID
 	err := h.service.Update(user)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid data", http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User successfully updated"))
 	internal.Log.Infof("User %d successfully updated", user.ID)
-
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 	err := h.service.Delete(userID)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -122,4 +126,6 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
+	internal.Log.Infof("User %d successfully fetched profile", user.ID)
+
 }

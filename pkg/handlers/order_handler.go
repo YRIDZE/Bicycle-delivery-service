@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
@@ -32,13 +31,15 @@ func (h *OrderHandler) RegisterRoutes(r *mux.Router, appH *AppHandlers) {
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 	order := new(models.Order)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
 	orderID, err := h.services.Create(order)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid data", http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid data", http.StatusUnauthorized)
 		return
 	}
 
@@ -52,7 +53,8 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
 	order, err := h.services.GetByID(orderID)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -61,7 +63,7 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("User %d get order %d: %+v", order.UserID, orderID, order)
+	internal.Log.Infof("User %d fetched order %d", order.UserID, orderID)
 
 }
 
@@ -69,7 +71,8 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 	order, err := h.services.GetAll(userID)
 	if err != nil {
-		models.ErrorResponse(w, fmt.Sprint("DB error: ", err.Error()), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -78,20 +81,22 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("User %d get orders: %+v", userID, order)
+	internal.Log.Infof("User %d fetched orders", userID)
 
 }
 
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 	order := new(models.Order)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
 	err := h.services.Update(order)
 	if err != nil {
-		models.ErrorResponse(w, "Invalid data", http.StatusUnauthorized)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Invalid data", http.StatusUnauthorized)
 		return
 	}
 
@@ -104,7 +109,8 @@ func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
 	err := h.services.Delete(orderID)
 	if err != nil {
-		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		internal.Log.Error(err.Error())
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 

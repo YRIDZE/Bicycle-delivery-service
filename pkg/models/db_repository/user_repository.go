@@ -86,7 +86,6 @@ func (u *UserDBRepository) GetAll() (*[]models.User, error) {
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return &users, nil
 }
 

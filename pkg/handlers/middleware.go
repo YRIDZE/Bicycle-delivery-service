@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"net/http"
 )
 
@@ -13,24 +13,28 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 		bearerString := req.Header.Get("Authorization")
 		tokenString, err := h.service.GetTokenFromBearerString(bearerString)
 		if err != nil {
-			models.ErrorResponse(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
+			internal.Log.Error(err.Error())
+			http.Error(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
 			return
 		}
 
 		claims, err := h.service.ValidateToken(tokenString, conf.AccessSecret)
 		if err != nil {
-			models.ErrorResponse(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
+			internal.Log.Error(err.Error())
+			http.Error(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
 			return
 		}
 
 		if cachedTokens, ok := h.service.GetUidByID(claims.ID); ok != nil || cachedTokens.AccessUID != claims.UID {
-			models.ErrorResponse(w, "Invalid token", http.StatusUnauthorized)
+			internal.Log.Error(err.Error())
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
 			return
 		}
 
 		user, err := h.service.GetByID(claims.ID)
 		if err != nil {
-			models.ErrorResponse(w, "Invalid credentials", http.StatusBadRequest)
+			internal.Log.Error(err.Error())
+			http.Error(w, "Invalid credentials", http.StatusBadRequest)
 			return
 		}
 

@@ -14,7 +14,6 @@ type UserRepositoryI interface {
 	GetByEmail(email *string) (*models.User, error)
 	GetAll() (*[]models.User, error)
 	Update(user *models.User) (*models.User, error)
-	Delete(id int) error
 }
 
 type UserFileRepository struct {
@@ -59,15 +58,6 @@ func (ufr *UserFileRepository) Update(user *models.User) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
-}
-
-func (ufr *UserFileRepository) Delete(id int) error {
-	//err := helpers.Delete("users", id)
-	//if err != nil {
-	//	return err
-	//}
-	//return nil
-	panic("implement me")
 }
 
 func (ufr *UserFileRepository) GetNextID() (idSequence int32) {

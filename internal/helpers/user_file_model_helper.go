@@ -96,25 +96,6 @@ func Update(modelName string, user *models.User) error {
 	return errors.New("user not found")
 }
 
-//func Delete(modelName string, id int) error {
-//	users, err := GetAll(modelName)
-//	if err != nil {
-//		return err
-//	}
-//
-//	for i, t := range users {
-//		if t.ID == int32(id) {
-//			users[i].Delete = time.Now().String()
-//			err = Save(modelName, &users)
-//			if err != nil {
-//				return err
-//			}
-//			return nil
-//		}
-//	}
-//	return errors.New("user not found")
-//}
-
 func Save(modelName string, users *[]models.User) error {
 	var bytes []byte
 	for j, i := range *users {
@@ -132,6 +113,7 @@ func Save(modelName string, users *[]models.User) error {
 	}
 	return nil
 }
+
 func JsonMarkup(data *[]byte) {
 	*data = bytes.TrimSuffix(*data, []byte(","))
 

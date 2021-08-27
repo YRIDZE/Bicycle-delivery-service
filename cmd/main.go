@@ -24,7 +24,7 @@ func main() {
 		FileLogLevel:        log.DEBUG,
 	})
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
 	if err := initConfig(); err != nil {
@@ -38,7 +38,8 @@ func main() {
 		Password: conf.DbPassword,
 	})
 	if err != nil {
-		return
+		internal.Log.Fatal("Could not connected to database. Panic!")
+		panic(err.Error())
 	}
 
 	userRepository := db_repository.NewUserDBRepository(db)
