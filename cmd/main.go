@@ -6,8 +6,8 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/logging"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
 	"os"
 	"os/signal"
@@ -16,18 +16,31 @@ import (
 )
 
 func main() {
-	internal.Log = logging.GetLogger()
+	var err error
+	internal.Log, err = log.NewLogger(log.LoggerParams{
+		ConsoleOutputStream: os.Stdout,
+		ConsoleLogLevel:     log.INFO,
+		LogFileName:         "logs/all.log",
+		FileLogLevel:        log.DEBUG,
+	})
+	if err != nil {
+		panic(err)
+	}
 
 	if err := initConfig(); err != nil {
 		internal.Log.Error("error initializing configs")
 	}
 
-	db, _ := db_repository.NewDB(db_repository.Config{
+	db, err := db_repository.NewDB(db_repository.Config{
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
 		Password: conf.DbPassword,
 	})
+	if err != nil {
+		return
+	}
+
 	userRepository := db_repository.NewUserDBRepository(db)
 	tokenRepository := db_repository.NewTokensDBRepository(db)
 	orderRepository := db_repository.NewOrderDBRepository(db)
@@ -40,7 +53,8 @@ func main() {
 	srv := new(app.Server)
 	go func() {
 		if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
-			internal.Log.Fatalf("error occured while running http server: %s", err.Error())
+			internal.Log.Fatalf("error occurred while running http server: %s", err.Error())
+			return
 		}
 	}()
 
@@ -56,11 +70,11 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		internal.Log.Errorf("error occured on server shutting down: %s", err.Error())
+		internal.Log.Errorf("error occurred on server shutting down: %s", err.Error())
 	}
 
 	if err := db.Close(); err != nil {
-		internal.Log.Errorf("error occured on db connection close: %s", err.Error())
+		internal.Log.Errorf("error occurred on db connection close: %s", err.Error())
 	}
 }
 

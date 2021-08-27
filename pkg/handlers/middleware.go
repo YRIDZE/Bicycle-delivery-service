@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"net/http"
@@ -12,13 +13,13 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 		bearerString := req.Header.Get("Authorization")
 		tokenString, err := h.service.GetTokenFromBearerString(bearerString)
 		if err != nil {
-			models.ErrorResponse(w, err.Error(), http.StatusUnauthorized)
+			models.ErrorResponse(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
 			return
 		}
 
 		claims, err := h.service.ValidateToken(tokenString, conf.AccessSecret)
 		if err != nil {
-			models.ErrorResponse(w, err.Error(), http.StatusUnauthorized)
+			models.ErrorResponse(w, fmt.Sprint("Bad token: ", err.Error()), http.StatusUnauthorized)
 			return
 		}
 

@@ -3,15 +3,17 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
 func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
-	err := h.service.DeleteUid(req.Context().Value("user").(*models.User).ID)
+	userID := req.Context().Value("user").(*models.User).ID
+	err := h.service.DeleteUid(userID)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -23,6 +25,8 @@ func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
 	})
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Successfully logged out"))
+	internal.Log.Infof("User %d successfully logged out", userID)
+
 }
 
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
@@ -40,13 +44,13 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	accessUID, accessString, err := h.service.GenerateToken(claims.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	refreshUID, refreshString, err := h.service.GenerateToken(claims.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -72,6 +76,8 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
+	internal.Log.Infof("User %d token successfully refreshed", claims.ID)
+
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
@@ -95,13 +101,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 
 	accessUID, accessString, err := h.service.GenerateToken(user.ID, conf.AccessLifetimeMinutes, conf.AccessSecret)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	refreshUID, refreshString, err := h.service.GenerateToken(user.ID, conf.RefreshLifetimeMinutes, conf.RefreshSecret)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -111,7 +117,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 	err = h.service.CreateUid(user.ID, cachedTokens)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, "Invalid token", http.StatusInternalServerError)
 		return
 	}
 
@@ -130,5 +136,5 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-
+	internal.Log.Infof("User %d successfully logged in", user.ID)
 }

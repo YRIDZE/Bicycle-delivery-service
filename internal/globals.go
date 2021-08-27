@@ -1,5 +1,5 @@
 package internal
 
-import "github.com/YRIDZE/Bicycle-delivery-service/pkg/logging"
+import log "github.com/YRIDZE/yolo-log"
 
-var Log logging.Logger
+var Log *log.Logger

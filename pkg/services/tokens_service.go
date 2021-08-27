@@ -31,6 +31,9 @@ func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCusto
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretString), nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	if err != nil {
 		return nil, err
@@ -45,6 +48,7 @@ func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCusto
 }
 
 func (u *UserService) GetTokenFromBearerString(input string) (string, error) {
+
 	if input == "" {
 		return "", errors.New("no token received")
 	}

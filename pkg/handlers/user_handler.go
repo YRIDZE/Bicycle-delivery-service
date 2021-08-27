@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
@@ -37,7 +39,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err := h.service.Create(r)
+	userID, err := h.service.Create(r)
 	if err != nil {
 		models.ErrorResponse(w, "Invalid credentials", http.StatusUnauthorized)
 		return
@@ -45,12 +47,14 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User created"))
+	internal.Log.Infof("User %d successfully created", userID)
+
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	users, err := h.service.GetAll()
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, fmt.Sprint("DB error: ", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	var resp []models.UserResponse
@@ -68,6 +72,7 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
+	internal.Log.Infof("Users successfully extracted")
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
@@ -80,23 +85,28 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	user.ID = req.Context().Value("user").(*models.User).ID
 	err := h.service.Update(user)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User updated"))
+	w.Write([]byte("User successfully updated"))
+	internal.Log.Infof("User %d successfully updated", user.ID)
+
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	err := h.service.Delete(req.Context().Value("user").(*models.User).ID)
+	userID := req.Context().Value("user").(*models.User).ID
+	err := h.service.Delete(userID)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User successfully deleted"))
+	internal.Log.Infof("User %d successfully deleted", userID)
+
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {

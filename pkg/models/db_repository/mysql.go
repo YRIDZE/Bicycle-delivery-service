@@ -28,11 +28,12 @@ func NewDB(cfg Config) (*sql.DB, error) {
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName),
 	)
 	if err != nil {
-		internal.Log.Fatal(err)
+		internal.Log.Fatalf("Database error: %v", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
+		internal.Log.Fatalf("Database error: %v", err)
 		return nil, err
 	}
 

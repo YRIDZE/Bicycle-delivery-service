@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
@@ -34,7 +36,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
-	_, err := h.services.Create(order)
+	orderID, err := h.services.Create(order)
 	if err != nil {
 		models.ErrorResponse(w, "Invalid data", http.StatusUnauthorized)
 		return
@@ -42,13 +44,15 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Order created"))
+	internal.Log.Infof("Order %d successfully created by User %d", orderID, order.UserID)
+
 }
 
 func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	id, _ := strconv.Atoi(mux.Vars(req)["id"])
-	order, err := h.services.GetByID(id)
+	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
+	order, err := h.services.GetByID(orderID)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -57,12 +61,15 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
+	internal.Log.Infof("User %d get order %d: %+v", order.UserID, orderID, order)
+
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	order, err := h.services.GetAll(req.Context().Value("user").(*models.User).ID)
+	userID := req.Context().Value("user").(*models.User).ID
+	order, err := h.services.GetAll(userID)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, fmt.Sprint("DB error: ", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
@@ -71,6 +78,8 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
+	internal.Log.Infof("User %d get orders: %+v", userID, order)
+
 }
 
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
@@ -88,16 +97,18 @@ func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Order updated"))
+	internal.Log.Infof("Order %d successfully updated", order.ID)
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	id, _ := strconv.Atoi(mux.Vars(req)["id"])
-	err := h.services.Delete(id)
+	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
+	err := h.services.Delete(orderID)
 	if err != nil {
-		models.ErrorResponse(w, "Something went wrong", http.StatusInternalServerError)
+		models.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Order successfully deleted"))
+	internal.Log.Infof("Order %d successfully deleted", orderID)
 }
