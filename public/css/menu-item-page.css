@@ -1,29 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
 .img-part {
-    height: 70%;
+    height: 100%;
     overflow: hidden;
-}
-
-.img-desc {
-    font-family: 'Montserrat', sans-serif;
-    margin: 3px 10px 3px;
+    opacity: 0.5;
 }
 
 .img-f {
     max-width: 100%;
     height: auto;
-}
-
-.item-overlay-container {
-    position: absolute;
-    top: 0;
-    left: 70%;
-    width: 40%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 5;
-    background: linear-gradient(to right, #545454, #e97d56);
 }
 
 .item-container {
@@ -33,52 +18,111 @@
     0 10px 10px rgba(0, 0, 0, 0.22);
     position: relative;
     overflow: hidden;
-    width: 950px;
-    max-width: 100%;
-    min-height: 600px;
+    width: 800px;
+    height: 475px;
 }
 
-.item-form-container {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    transition: all 0.6s ease-in-out;
-}
-
-.item-product-container {
+.product-container {
     left: 0;
-    width: 70%;
     z-index: 1;
+    overflow: hidden;
+}
+
+.product-from {
+    justify-content: center;
+}
+
+.product-data {
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 730px;
+    height: 350px;
+    margin: 0 35px;
+    position: absolute;
+    z-index: 10;
+}
+.data {
+    margin: 15px 15px;
+    text-align: center;
+    font-size: 18px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.price {
+    border-radius: 20px;
+    height: 32px;
+    outline: none;
+    width: 100px;
 }
 
 .item-overlay-panel {
-    position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     text-align: center;
-    top: 0;
-    height: 100%;
-    width: 75%;
 }
 
-button.ghost {
-    background-color: transparent;
-    border-color: #FFFFFF;
-}
 
-button:active {
+button:active,
+.number-minus:active, .number-plus:active {
     transform: scale(0.95);
 }
 
-.bt {
+.add-to-cart-btn {
     border-radius: 20px;
-    border: 1px solid #000000;
+    border: 0;
+    background-color: #545454;
     color: #FFFFFF;
     font-size: 12px;
     font-weight: bold;
-    padding: 12px 45px;
+    padding: 7px 25px;
     letter-spacing: 1px;
     transition: transform 80ms ease-in;
+}
+
+.number {
+    user-select: none;
+    position: relative;
+    text-align: left;
+    width: 140px;
+    display: inline-block;
+}
+
+.number-minus, .number-plus {
+    position: absolute;
+    width: 40px;
+    line-height: 32px;
+    background-color: #545454;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.number-minus {
+    left: 0;
+    border-right: 1px solid #ddd;
+    border-radius: 20px 0 0 20px;
+}
+
+.number-plus {
+    right: 0;
+    border-left: 1px solid #ddd;
+    border-radius: 0 20px 20px 0;
+}
+
+.number-minus:hover, .number-plus:hover,
+.number-minus:active, .number-plus:active {
+    background-color: rgba(84, 84, 84, 0.45);
+    color: #000000;
+}
+
+
+.number-text {
+    border: 1px solid #ddd;
+    height: 32px;
+    margin: 0 0 0 42px;
+    outline: none;
+    width: 57px;
+    text-align: center;
 }

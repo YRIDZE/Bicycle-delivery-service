@@ -74,7 +74,6 @@ const App = {
             ],
         }
     },
-
 }
 
 const app = Vue.createApp(App)
@@ -143,6 +142,34 @@ const Login = {
 }
 
 const Cart = {
+    data() {
+        return {
+            cartList: [
+                {
+                    id: 1,
+                    name: 'Iphone xs',
+                    from: "IRA",
+                    price: 10000,
+                    count: 1
+                },
+                {
+                    id: 2,
+                    name: 'Ipad Pro',
+                    from: "IRA",
+                    price: 6666,
+                    count: 1
+                },
+                {
+                    id: 3,
+                    name: 'MacBook Pro',
+                    from: "IRA",
+                    price: 25000,
+                    count: 1
+                },
+            ]
+
+        }
+    },
     template: `
       <div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true"
            style="    font-family: 'Montserrat', sans-serif;">
@@ -162,37 +189,24 @@ const Cart = {
                   <th>From</th>
                   <th>Price</th>
                   <th>Quantity</th>
-                  <th>Total</th>
-                  <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                  <td> 1</td>
-                  <td>Niam-Niam Food</td>
-                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
-                  <td>$200.00</td>
-                  <td>2</td>
-                  <td>$400.00</td>
-                  <td><a href="#" class="details">Details</a></td>
-                </tr>
-                <tr>
-                  <td> 1</td>
-                  <td>Niam-Niam Food</td>
-                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
-                  <td>$200.00</td>
-                  <td>2</td>
-                  <td>$400.00</td>
-                  <td><a href="#" class="details">Details</a></td>
-                </tr>
-                <tr>
-                  <td> 1</td>
-                  <td>Niam-Niam Food</td>
-                  <td> Grill Bar <small class="d-block">Far far away, grill bar grill bar grill bar</small></td>
-                  <td>$200.00</td>
-                  <td>2</td>
-                  <td>$400.00</td>
-                  <td><a href="#" class="details">Details</a></td>
+                <tr v-for="(item, index) in cartList">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.from }}</td>
+                  <td>{{ item.price }}</td>
+                  <td>
+                    <a style="color: #3b3b3b" @click="reduce(index)" :disable="item.count === 1"><i
+                        class="fas fa-minus-circle"></i></a>
+                    {{ item.count }}
+                    <a style="color: #3b3b3b" @click="add(index)"><i class="fas fa-plus-circle"></i></a>
+                  </td>
+                  <td></td>
+                  <td>
+                    <a @click="del(index)"><i class="far fa-trash-alt"></i></a>
+                  </td>
                 </tr>
                 </tbody>
               </table>
@@ -202,7 +216,7 @@ const Cart = {
             <button class="cart-btn" data-bs-target="#order-data-model" data-bs-toggle="modal"
                     data-bs-dismiss="modal">Order
             </button>
-            <p style="margin-top: 15px !important;">Total <strong>$1200.00</strong></p>
+            <p style="margin-top: 15px !important;">Total <strong>{{ total }}</strong></p>
           </div>
         </div>
       </div>
@@ -230,6 +244,8 @@ const Cart = {
                 <script>jQuery(function ($) {
                   $("#phone").mask("+38(999) 999-99-99");
                 });</script>
+
+
               </div>
 
               <div class="cart-col-12">
@@ -267,7 +283,28 @@ const Cart = {
         </div>
       </div>
       </div>
-    `
+    `,
+    methods: {
+        reduce: function (index) {
+            if (this.cartList[index].count === 1) return;
+            this.cartList[index].count--;
+        },
+        add: function (index) {
+            this.cartList[index].count++;
+        },
+        del: function (index) {
+            this.cartList.splice(index, 1);
+        }
+    },
+    computed: {
+        total: function () {
+            let total = 0;
+            for (let i = 0; i < this.cartList.length; i++) {
+                total += this.cartList[i].price * this.cartList[i].count;
+            }
+            return total.toString().replace(/\B(?=(\d{3})+$)/g, ',');
+        }
+    }
 }
 
 const FiltersPanel = {
@@ -350,7 +387,8 @@ const Product = {
            style="border-radius: 10px; max-height: 700px; max-width: 760px">
       <div class="icon-box"
            style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
-        <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#item-modal"><img :src="logo" class="img-fluid" alt="menu-item"></a>
+        <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#item-modal"><img :src="logo" class="img-fluid"
+                                                                                          alt="menu-item"></a>
         <h4><a href="#">{{ title }}</a></h4>
         <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
 
@@ -364,27 +402,39 @@ const ProductPopUp = {
     props: ["title", "itemName"],
     template: `
       <div class="modal fade" id="item-modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content"
              style="
-             background-color: rgba(117, 190, 218, 0.0);
-             border-color:rgba(117, 190, 218, 0.0);">
+         background-color: rgba(117, 190, 218, 0.0);
+         border-color:rgba(117, 190, 218, 0.0);">
           <div class="modal-body">
-            <div class="item-container">
-              <div class="item-form-container item-product-container">
-                <div class="img-part">
-                  <img :src="item.logo" class="img-f" alt="item">
-                </div>
-                <div class="img-desc">
-                  <b style="font-size: 36px">{{ item.title }}</b>
-                  <p> {{ item.description }}</p>
-                  <p> {{ item.price }}</p>
+            <div class="d-flex flex-column item-container product-from">
+              <div class="img-part">
+                <img :src="item.logo" class="img-f" alt="item">
+              </div>
+              <div class="product-data">
+                <div class="data">
+                  <h1>{{ item.title }}</h1>
+                  <p>{{ item.description }}</p>
                 </div>
               </div>
-              <div class="item-overlay-container">
-                <div class="item-overlay-panel">
-                  <h1><b>Welcome Back!</b></h1>
-                  <button class="ghost bt">ADD TO CART</button>
+              <div class="d-flex bd-highlight item-overlay-panel">
+                <div class="me-auto p-2 bd-highlight">
+                  <div style="padding: 0 10px ">
+                    <div class="number" data-step="1" data-min="1" data-max="100">
+                      <input class="number-text" type="text" name="count" value="1" readonly>
+                      <a href="#" class="number-minus">−</a>
+                      <a href="#" class="number-plus">+</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-2 bd-highlight">
+                  <input class="price" type="text" name="price" v-bind:value=item.price readonly>
+                </div>
+                <div class="p-2 bd-highlight">
+                  <div style="padding: 0 10px ">
+                    <button class="add-to-cart-btn">ADD TO CART</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -421,7 +471,6 @@ const ProductsList = {
           :logo="item.logo"
       ></product> `
 }
-
 
 const routes = [
     {path: '/', component: SuppliersList},
