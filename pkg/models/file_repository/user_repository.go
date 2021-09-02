@@ -1,39 +1,19 @@
-package repository
+package file_repository
 
 import (
 	"encoding/json"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal/helpers"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/model"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"os"
 	"strconv"
 	"sync"
 )
 
 type UserRepositoryI interface {
-	Create(user *model.User) (*model.User, error)
-	Get(email *string) (*model.User, error)
-	GetAll() (*[]model.User, error)
-	Update(user *model.User) (*model.User, error)
-	Delete(id int) error
-}
-
-type UserDBRepository struct {
-}
-
-func (u2 UserDBRepository) Create(u *model.User) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Get(email *string) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) GetAll() (*[]model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Update(user *model.User) (*model.User, error) {
-	panic("implement me")
-}
-func (u2 UserDBRepository) Delete(id int) error {
-	panic("implement me")
+	Create(user *models.User) (int32, error)
+	GetByEmail(email *string) (*models.User, error)
+	GetAll() (*[]models.User, error)
+	Update(user *models.User) (*models.User, error)
 }
 
 type UserFileRepository struct {
@@ -46,7 +26,7 @@ func NewUserFileRepository() *UserFileRepository {
 	}
 }
 
-func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
+func (ufr *UserFileRepository) Create(user *models.User) (*models.User, error) {
 	user.ID = ufr.GetNextID()
 
 	err := helpers.Create("users", user)
@@ -56,7 +36,7 @@ func (ufr *UserFileRepository) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (ufr *UserFileRepository) Get(email *string) (*model.User, error) {
+func (ufr *UserFileRepository) Get(email *string) (*models.User, error) {
 	user, err := helpers.Get("users", email)
 	if err != nil {
 		return nil, err
@@ -64,7 +44,7 @@ func (ufr *UserFileRepository) Get(email *string) (*model.User, error) {
 	return user, nil
 }
 
-func (ufr *UserFileRepository) GetAll() (*[]model.User, error) {
+func (ufr *UserFileRepository) GetAll() (*[]models.User, error) {
 	usersSearched, err := helpers.GetAll("users")
 	if err != nil {
 		return nil, err
@@ -72,20 +52,12 @@ func (ufr *UserFileRepository) GetAll() (*[]model.User, error) {
 	return &usersSearched, nil
 }
 
-func (ufr *UserFileRepository) Update(user *model.User) (*model.User, error) {
+func (ufr *UserFileRepository) Update(user *models.User) (*models.User, error) {
 	err := helpers.Update("users", user)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
-}
-
-func (ufr *UserFileRepository) Delete(id int) error {
-	err := helpers.Delete("users", id)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (ufr *UserFileRepository) GetNextID() (idSequence int32) {
