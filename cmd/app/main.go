@@ -2,41 +2,43 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	app "github.com/YRIDZE/Bicycle-delivery-service"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func main() {
 	var err error
-	internal.Log, err = log.NewLogger(log.LoggerParams{
-		ConsoleOutputStream: os.Stdout,
-		ConsoleLogLevel:     log.INFO,
-		LogFileName:         "logs/all.log",
-		FileLogLevel:        log.DEBUG,
-	})
+	internal.Log, err = log.NewLogger(
+		log.LoggerParams{
+			ConsoleOutputStream: os.Stdout,
+			ConsoleLogLevel:     log.INFO,
+			LogFileName:         "logs/all.log",
+			FileLogLevel:        log.DEBUG,
+		},
+	)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	if err := initConfig(); err != nil {
-		internal.Log.Error("error initializing configs")
-	}
-
-	db, err := db_repository.NewDB(db_repository.Config{
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		DBName:   viper.GetString("db.dbname"),
-		Password: conf.DbPassword,
-	})
+	db, err := db_repository.NewDB(
+		db_repository.Config{
+			Port:     viper.GetString("db.port"),
+			Username: viper.GetString("db.username"),
+			DBName:   viper.GetString("db.dbname"),
+			Password: conf.DbPassword,
+		},
+	)
 	if err != nil {
 		internal.Log.Fatal("Could not connected to database. Panic!")
 		panic(err.Error())
@@ -45,6 +47,11 @@ func main() {
 	userRepository := db_repository.NewUserDBRepository(db)
 	tokenRepository := db_repository.NewTokensDBRepository(db)
 	orderRepository := db_repository.NewOrderDBRepository(db)
+	supplierRepository := db_repository.NewSupplierDBRepository(db)
+	productRepository := db_repository.NewProductDBRepository(db)
+
+	parser := services.NewParser(supplierRepository, productRepository)
+	go parser.Parser()
 
 	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
 	orderHandler := handlers.NewOrderHandler(orderRepository)
@@ -77,10 +84,4 @@ func main() {
 	if err := db.Close(); err != nil {
 		internal.Log.Errorf("error occurred on db connection close: %s", err.Error())
 	}
-}
-
-func initConfig() error {
-	viper.AddConfigPath("conf")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }

@@ -20,3 +20,11 @@ type CachedTokens struct {
 	AccessUID  string `json:"access"`
 	RefreshUID string `json:"refresh"`
 }
+
+type SuppliersResponse struct {
+	Restaurants []Supplier `json:"restaurants"`
+}
+
+type MenuResponse struct {
+	Menu []Product `json:"menu"`
+}
