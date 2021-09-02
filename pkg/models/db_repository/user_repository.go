@@ -3,6 +3,7 @@ package db_repository
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
 

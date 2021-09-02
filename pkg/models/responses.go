@@ -22,9 +22,9 @@ type CachedTokens struct {
 }
 
 type SuppliersResponse struct {
-	Restaurants []Supplier `json:"restaurants"`
+	Suppliers []Supplier `json:"restaurants"`
 }
 
-type MenuResponse struct {
-	Menu []Product `json:"menu"`
+type ProductsResponse struct {
+	Products []Product `json:"menu"`
 }

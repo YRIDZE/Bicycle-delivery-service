@@ -68,8 +68,7 @@ func (p ProductDBRepository) GetByID(id int) (*models.Product, error) {
 
 	query := fmt.Sprintf(
 		"select p.id, p.name, p.price, p.ingredients, p.logo, pt.id, pt.name as type from %s as p inner join %s as pt on p.id = pt.product_id and p.id = ?",
-		ProductsTable,
-		ProductTypeTable,
+		ProductsTable, ProductTypeTable,
 	)
 	var ingredientsJson string
 	err := p.db.QueryRow(query, id).Scan(

@@ -13,12 +13,12 @@ import (
 var URL = "http://foodapi.true-tech.php.nixdev.co/restaurants"
 
 func GetSuppliers() ([]models.Supplier, error) {
-	response, err := http.Get(fmt.Sprintf("%s", URL))
+	resp, err := http.Get(fmt.Sprintf("%s", URL))
 	if err != nil {
 		return nil, err
 	}
 
-	jsonBytes, err := io.ReadAll(response.Body)
+	jsonBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		internal.Log.Errorf("error close body", err)
 	}
@@ -28,10 +28,11 @@ func GetSuppliers() ([]models.Supplier, error) {
 	if err != nil {
 		return nil, err
 	}
-	return suppliersList.Restaurants, nil
+
+	return suppliersList.Suppliers, nil
 }
 
-func GetSupplierMenuByID(id int) ([]models.Product, error) {
+func GetSupplierProductsByID(id int) ([]models.Product, error) {
 	response, err := http.Get(fmt.Sprintf("%s/%d/%s", URL, id, "menu"))
 	if err != nil {
 		internal.Log.Error(err.Error())
@@ -44,11 +45,12 @@ func GetSupplierMenuByID(id int) ([]models.Product, error) {
 		internal.Log.Errorf("error close body", err)
 	}
 
-	supplierMenu := new(models.MenuResponse)
-	err = json.Unmarshal(jsonBytes, &supplierMenu)
+	supplierProducts := new(models.ProductsResponse)
+	err = json.Unmarshal(jsonBytes, &supplierProducts)
 	if err != nil {
 		internal.Log.Error(err)
 		return nil, err
 	}
-	return supplierMenu.Menu, nil
+
+	return supplierProducts.Products, nil
 }
