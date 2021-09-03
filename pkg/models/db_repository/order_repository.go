@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
 
@@ -17,15 +19,15 @@ type OrderRepositoryI interface {
 	Delete(id int) error
 }
 
-type OrderDBRepository struct {
+type OrderRepository struct {
 	db *sql.DB
 }
 
-func NewOrderDBRepository(db *sql.DB) *OrderDBRepository {
-	return &OrderDBRepository{db: db}
+func NewOrderRepository(db *sql.DB) *OrderRepository {
+	return &OrderRepository{db: db}
 }
 
-func (o OrderDBRepository) Create(order *models.Order) (int, error) {
+func (o OrderRepository) Create(order *models.Order) (int, error) {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -60,7 +62,7 @@ func (o OrderDBRepository) Create(order *models.Order) (int, error) {
 	return int(lastId), nil
 }
 
-func (o OrderDBRepository) GetByID(id int) (*models.Order, error) {
+func (o OrderRepository) GetByID(id int) (*models.Order, error) {
 	order := new(models.Order)
 	query := fmt.Sprintf("select id, user_id, address, status from %s where id = ?", OrdersTable)
 	err := o.db.QueryRow(query, id).Scan(&order.ID, &order.UserID, &order.Address, &order.Status)
@@ -95,9 +97,9 @@ func (o OrderDBRepository) GetByID(id int) (*models.Order, error) {
 	return order, nil
 }
 
-func (o OrderDBRepository) GetAll(userID int32) (*[]models.Order, error) {
+func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 	var orders []models.Order
-	query := fmt.Sprintf("select id, user_id, address, status from %s where user_id=?", OrdersTable)
+	query := fmt.Sprintf("select id, user_id, address, status from %s where user_id=? and deleted is null", OrdersTable)
 	pr, err := o.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -135,7 +137,7 @@ func (o OrderDBRepository) GetAll(userID int32) (*[]models.Order, error) {
 	return &orders, nil
 }
 
-func (o OrderDBRepository) GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error) {
+func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error) {
 	query := fmt.Sprintf("select order_id, product_id, quantity from %s where order_id = ?", OPTable)
 	pr, err := o.db.Prepare(query)
 	if err != nil {
@@ -163,7 +165,7 @@ func (o OrderDBRepository) GetOrderProductsByID(id int32) (orderProducts []model
 	return
 }
 
-func (o OrderDBRepository) Update(order *models.Order) error {
+func (o OrderRepository) Update(order *models.Order) error {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -193,7 +195,7 @@ func (o OrderDBRepository) Update(order *models.Order) error {
 	return nil
 }
 
-func (o OrderDBRepository) Delete(id int) error {
+func (o OrderRepository) Delete(id int) error {
 
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
@@ -201,15 +203,15 @@ func (o OrderDBRepository) Delete(id int) error {
 		return err
 	}
 
-	query := fmt.Sprintf("delete from %s where order_id = ?", OPTable)
-	_, err = tx.ExecContext(ctx, query, id)
+	query := fmt.Sprintf("update %s set deleted = ? where order_id = ?", OPTable)
+	_, err = tx.ExecContext(ctx, query, time.Now(), id)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
 	}
 
-	query2 := fmt.Sprintf("delete from %s where id = ?", OrdersTable)
-	_, err = tx.ExecContext(ctx, query2, id)
+	query2 := fmt.Sprintf("update %s set deleted = ? where id = ?", OrdersTable)
+	_, err = tx.ExecContext(ctx, query2, time.Now(), id)
 	if err != nil {
 		_ = tx.Rollback()
 		return err

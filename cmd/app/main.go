@@ -44,14 +44,14 @@ func main() {
 		panic(err.Error())
 	}
 
-	userRepository := db_repository.NewUserDBRepository(db)
-	tokenRepository := db_repository.NewTokensDBRepository(db)
-	orderRepository := db_repository.NewOrderDBRepository(db)
-	supplierRepository := db_repository.NewSupplierDBRepository(db)
-	productRepository := db_repository.NewProductDBRepository(db)
+	userRepository := db_repository.NewUserRepository(db)
+	tokenRepository := db_repository.NewTokensRepository(db)
+	orderRepository := db_repository.NewOrderRepository(db)
+	supplierRepository := db_repository.NewSupplierRepository(db)
+	productRepository := db_repository.NewProductRepository(db)
 
 	parser := services.NewParser(supplierRepository, productRepository)
-	go parser.Parser()
+	go parser.Parse()
 
 	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
 	orderHandler := handlers.NewOrderHandler(orderRepository)

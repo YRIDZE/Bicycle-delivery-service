@@ -9,13 +9,12 @@ import (
 )
 
 const (
-	UsersTable       = "users"
-	OrdersTable      = "orders"
-	OPTable          = "order_products"
-	SuppliersTable   = "suppliers"
-	ProductsTable    = "products"
-	ProductTypeTable = "product_types"
-	CacheTokenTable  = "uid_token"
+	UsersTable      = "users"
+	OrdersTable     = "orders"
+	OPTable         = "order_products"
+	SuppliersTable  = "suppliers"
+	ProductsTable   = "products"
+	CacheTokenTable = "uid_token"
 )
 
 type Config struct {

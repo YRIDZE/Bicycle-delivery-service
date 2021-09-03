@@ -13,11 +13,11 @@ import (
 var wg sync.WaitGroup
 
 type SupplierProductsParser struct {
-	supplierRepo db_repository.SupplierDBRepository
-	productsRepo db_repository.ProductDBRepository
+	supplierRepo db_repository.SupplierRepository
+	productsRepo db_repository.ProductRepository
 }
 
-func NewParser(supplierRepo *db_repository.SupplierDBRepository, productsRepo *db_repository.ProductDBRepository) *SupplierProductsParser {
+func NewParser(supplierRepo *db_repository.SupplierRepository, productsRepo *db_repository.ProductRepository) *SupplierProductsParser {
 	return &SupplierProductsParser{
 		supplierRepo: *supplierRepo,
 		productsRepo: *productsRepo,
@@ -25,46 +25,51 @@ func NewParser(supplierRepo *db_repository.SupplierDBRepository, productsRepo *d
 }
 
 type MenuParserI interface {
-	Parser(<-chan time.Time) error
-	DBsave(suppliersList *[]models.Supplier)
+	Parse()
+	Save(suppliersList *[]models.Supplier)
 }
 
-func (mp *SupplierProductsParser) SaveParsedDataToDb(suppliersList *[]models.Supplier) {
+func (mp *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 	for _, s := range *suppliersList {
-		pick, err := mp.supplierRepo.SearchByID(s.ID)
-		if err != nil {
-			internal.Log.Errorf("supplier %d search error: %v", s.ID, err.Error())
-			return
-		}
-		if pick {
-			err := mp.supplierRepo.Delete(s.ID)
+		oldSupplierID, _ := mp.supplierRepo.GetByName(s.Name)
+
+		if oldSupplierID != 0 {
+			err := mp.supplierRepo.Delete(oldSupplierID)
 			if err != nil {
-				internal.Log.Errorf("supplier %d and supplier-menu didn't removed: %s", s.ID, err.Error())
+				internal.Log.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
 				return
 			}
-			internal.Log.Debugf("supplier %d and supplier-menu removed", s.ID)
+			internal.Log.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
 		}
 		supplierID, err := mp.supplierRepo.Create(&s)
 		if err != nil {
-			internal.Log.Errorf("supplier %d didn't created: %s", s.ID, err.Error())
+			internal.Log.Errorf("supplier %d didn't created: %s", supplierID, err.Error())
 			return
 		}
-		internal.Log.Debugf("supplier %d created", s.ID)
+		internal.Log.Debugf("supplier %d created", supplierID)
 
 		for _, m := range s.Menu {
 			m.SupplierID = supplierID
-			_, err := mp.productsRepo.Create(&m)
+
+			oldProductID, _ := mp.productsRepo.GetByName(m.Name)
+			if oldProductID != 0 {
+				err := mp.productsRepo.Delete(int(oldProductID))
+				if err != nil {
+					return
+				}
+			}
+			_, err = mp.productsRepo.Create(&m)
 			if err != nil {
-				internal.Log.Errorf("supplier %d menu didn't created: %s", s.ID, err.Error())
+				internal.Log.Errorf("supplier %d menu didn't created: %s", supplierID, err.Error())
 				return
 			}
-			internal.Log.Debugf("supplier %d menu created", s.ID)
+			internal.Log.Debugf("supplier %d menu created", supplierID)
 		}
 	}
 	return
 }
 
-func (mp *SupplierProductsParser) Parser() {
+func (mp *SupplierProductsParser) Parse() {
 	for {
 		internal.Log.Debug("New parsing iteration...")
 		suppliersList, err := parser.GetSuppliers()
@@ -85,7 +90,7 @@ func (mp *SupplierProductsParser) Parser() {
 		}
 		wg.Wait()
 
-		mp.SaveParsedDataToDb(&suppliersList)
+		mp.Save(&suppliersList)
 		time.Sleep(time.Minute)
 	}
 }

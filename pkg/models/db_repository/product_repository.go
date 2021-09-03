@@ -1,10 +1,10 @@
 package db_repository
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
@@ -15,31 +15,27 @@ type ProductRepositoryI interface {
 	GetAll() (*[]models.Product, error)
 	Update(product *models.Product) error
 	Delete(id int) error
+	GetByName(name string) (int32, error)
 }
 
-type ProductDBRepository struct {
+type ProductRepository struct {
 	db *sql.DB
 }
 
-func NewProductDBRepository(db *sql.DB) *ProductDBRepository {
-	return &ProductDBRepository{db: db}
+func NewProductRepository(db *sql.DB) *ProductRepository {
+	return &ProductRepository{db: db}
 }
 
-func (p ProductDBRepository) Create(product *models.Product) (int, error) {
-
-	ctx := context.Background()
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return 0, err
-	}
+func (p ProductRepository) Create(product *models.Product) (int, error) {
 
 	productQuery := fmt.Sprintf(
-		"insert into %s (supplier_id, name, price, logo, ingredients) value (?, ?, ?, ?, ?)", ProductsTable,
+		"insert into %s (supplier_id, name, price, type, image, ingredients) value (?, ?, ?, ?, ?, ?)", ProductsTable,
 	)
 	ingredientsJson, _ := json.Marshal(product.Ingredients)
-	res, err := tx.ExecContext(ctx, productQuery, product.SupplierID, product.Name, product.Price, product.Logo, ingredientsJson)
+	res, err := p.db.Exec(
+		productQuery, product.SupplierID, product.Name, product.Price, product.Type, product.Image, ingredientsJson,
+	)
 	if err != nil {
-		_ = tx.Rollback()
 		return 0, err
 	}
 
@@ -48,31 +44,19 @@ func (p ProductDBRepository) Create(product *models.Product) (int, error) {
 		return 0, err
 	}
 
-	typeQuery := fmt.Sprintf("insert into %s (name, product_id) value (?, ?)", ProductTypeTable)
-	_, err = tx.ExecContext(ctx, typeQuery, product.Type, lastId)
-	if err != nil {
-		_ = tx.Rollback()
-		return 0, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return 0, err
-	}
-
 	return int(lastId), nil
 }
 
-func (p ProductDBRepository) GetByID(id int) (*models.Product, error) {
+func (p ProductRepository) GetByID(id int) (*models.Product, error) {
 	product := new(models.Product)
 
 	query := fmt.Sprintf(
-		"select p.id, p.name, p.price, p.ingredients, p.logo, pt.id, pt.name as type from %s as p inner join %s as pt on p.id = pt.product_id and p.id = ?",
-		ProductsTable, ProductTypeTable,
+		"select id, name, price, type, ingredients, image, supplier_id from %s where id = ? and deleted is null",
+		ProductsTable,
 	)
 	var ingredientsJson string
 	err := p.db.QueryRow(query, id).Scan(
-		&product.ID, &product.Name, &product.Price, &ingredientsJson, &product.Logo, &product.SupplierID, &product.Type,
+		&product.ID, &product.Name, &product.Price, &product.Type, &ingredientsJson, &product.Image, &product.SupplierID,
 	)
 	if err != nil {
 		return nil, err
@@ -83,15 +67,23 @@ func (p ProductDBRepository) GetByID(id int) (*models.Product, error) {
 	return product, nil
 }
 
-func (p ProductDBRepository) GetAll() (*[]models.Product, error) {
+func (p ProductRepository) GetByName(name string) (int32, error) {
+	var id int32
+	query := fmt.Sprintf("select id from %s where name = ? and deleted is null", ProductsTable)
+	err := p.db.QueryRow(query, name).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (p ProductRepository) GetAll() (*[]models.Product, error) {
 	var products []models.Product
 	var product models.Product
 	var ingredientsJson string
 
-	query := fmt.Sprintf(
-		"select p.id, p.name, p.price, p.ingredients, p.logo, pt.id, pt.name as type from %s as p inner join %s as pt on p.id = pt.product_id ",
-		ProductsTable, ProductTypeTable,
-	)
+	query := fmt.Sprintf("select id, name, price, type, ingredients, image from %s where p.deleted != 0 ", ProductsTable)
 	pr, err := p.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -105,7 +97,7 @@ func (p ProductDBRepository) GetAll() (*[]models.Product, error) {
 
 	for rows.Next() {
 		err := rows.Scan(
-			&product.ID, &product.Name, &product.Price, &ingredientsJson, &product.Logo, &product.SupplierID, &product.Type,
+			&product.ID, &product.Name, &product.Price, &ingredientsJson, &product.Image, &product.SupplierID, &product.Type,
 		)
 		if err != nil {
 			return nil, err
@@ -120,29 +112,13 @@ func (p ProductDBRepository) GetAll() (*[]models.Product, error) {
 	return &products, nil
 }
 
-func (p ProductDBRepository) Update(product *models.Product) error {
-	ctx := context.Background()
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	typeQuery := fmt.Sprintf("update %s set name = ? where product_id = ?", ProductTypeTable)
-	_, err = tx.ExecContext(ctx, typeQuery, product.Type, product.ID)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
+func (p ProductRepository) Update(product *models.Product) error {
 
 	ingredientsJson, _ := json.Marshal(product.Ingredients)
-	productQuery := fmt.Sprintf("update %s set name = ?, price = ?, ingredients = ?, logo = ? where id = ?", ProductsTable)
-	_, err = tx.ExecContext(ctx, productQuery, product.Name, product.Price, ingredientsJson, product.Logo, product.ID)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
+	productQuery := fmt.Sprintf(
+		"update %s set name = ?, price = ?, type = ?, ingredients = ?, image = ? where id = ?", ProductsTable,
+	)
+	_, err := p.db.Exec(productQuery, product.Name, product.Price, product.Type, ingredientsJson, product.Image, product.ID)
 	if err != nil {
 		return err
 	}
@@ -150,11 +126,12 @@ func (p ProductDBRepository) Update(product *models.Product) error {
 	return nil
 }
 
-func (p ProductDBRepository) Delete(id int) error {
-	query := fmt.Sprintf("delete from %s where id = ?", ProductsTable)
-	_, err := p.db.Exec(query, id)
+func (p ProductRepository) Delete(id int) error {
+	query := fmt.Sprintf("update %s set deleted = ? where id = ?", ProductsTable)
+	_, err := p.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), id)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
