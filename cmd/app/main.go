@@ -8,11 +8,11 @@ import (
 	"time"
 
 	app "github.com/YRIDZE/Bicycle-delivery-service"
+	"github.com/YRIDZE/Bicycle-delivery-service/cmd/parser"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
 )
@@ -50,8 +50,8 @@ func main() {
 	supplierRepository := db_repository.NewSupplierRepository(db)
 	productRepository := db_repository.NewProductRepository(db)
 
-	parser := services.NewParser(supplierRepository, productRepository)
-	go parser.Parse()
+	p := parser.NewParser(supplierRepository, productRepository)
+	go p.Parse()
 
 	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
 	orderHandler := handlers.NewOrderHandler(orderRepository)
