@@ -7,47 +7,11 @@ const App = {
             restaurants: [
                 {
                     id: 1,
-                    items: [
-                        {
-                            id: 1,
-                            title: 'My journey with Vue',
-                            description: "auf",
-                            price: 122,
-                            logo: '../img/pizza-menu-item.jpg'
-                        },
-                        {
-                            id: 2,
-                            title: 'My journey with Vue',
-                            logo: '../img/pizza-menu-item.jpg'
-                        },
-                        {
-                            id: 3,
-                            title: 'My journey with Vue',
-                            logo: '../img/pizza-menu-item.jpg'
-                        }
-                    ],
                     title: 'My journey with Vue',
                     logo: 'https://images.unsplash.com/photo-1490717064594-3bd2c4081693?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
                 },
                 {
                     id: 2,
-                    items: [
-                        {
-                            id: 1,
-                            title: '2',
-                            logo: '../img/pizza-menu-item.jpg'
-                        },
-                        {
-                            id: 2,
-                            title: '2',
-                            logo: '../img/pizza-menu-item.jpg'
-                        },
-                        {
-                            id: 3,
-                            title: '2',
-                            logo: '../img/pizza-menu-item.jpg'
-                        }
-                    ],
                     title: 'Blogging with Vue',
                     logo: 'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
                 },
@@ -72,6 +36,33 @@ const App = {
                     logo: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80'
                 }
             ],
+            items: [
+                {
+                    id: 1,
+                    restaurantId: 1,
+                    title: 'My journey with Vue',
+                    description: "auf",
+                    price: 122,
+                    logo: '../img/pizza-menu-item.jpg'
+                },
+                {
+                    id: 2,
+                    restaurantId: 1,
+                    title: 'My journey with Vue 2',
+                    description: "auf",
+                    price: 122,
+                    logo: '../img/pizza-menu-item.jpg'
+                },
+                {
+                    id: 3,
+                    restaurantId: 1,
+                    title: 'My journey with Vue 3',
+                    description: "auf",
+                    price: 122,
+                    logo: '../img/pizza-menu-item.jpg'
+                }
+            ],
+            cartList: []
         }
     },
 }
@@ -141,33 +132,53 @@ const Login = {
     `,
 }
 
+
+const CartTr = {
+    props: ['item', 'index'],
+    template: `
+      <tr>
+      <td>{{ index + 1 }}</td>
+      <td>{{ i.title }}</td>
+      <td>{{ f.title }}</td>
+      <td>{{ i.price }}</td>
+      <td>
+        <a style="color: #3b3b3b" @click="reduce()" :disable="item.count === 1"><i
+            class="fas fa-minus-circle"></i></a>
+        {{ item.count }}
+        <a style="color: #3b3b3b" @click="add()"><i class="fas fa-plus-circle"></i></a>
+      </td>
+      <td></td>
+      <td>
+        <a @click="del(index)"><i class="far fa-trash-alt"></i></a>
+      </td>
+      </tr>
+    `,
+    methods: {
+        reduce: function () {
+            if (this.item.count === 1) return;
+            this.item.count--;
+        },
+        add: function () {
+            this.item.count++;
+        },
+        del: function (index) {
+            this.$root.cartList.splice(index, 1);
+        }
+    },
+    computed: {
+        i: function () {
+            return this.$root.items.find(x => x.id == this.item.id)
+        },
+        f: function () {
+            return this.$root.restaurants.find(x => x.id == this.i.restaurantId)
+        }
+    }
+}
+
 const Cart = {
     data() {
         return {
-            cartList: [
-                {
-                    id: 1,
-                    name: 'Iphone xs',
-                    from: "IRA",
-                    price: 10000,
-                    count: 1
-                },
-                {
-                    id: 2,
-                    name: 'Ipad Pro',
-                    from: "IRA",
-                    price: 6666,
-                    count: 1
-                },
-                {
-                    id: 3,
-                    name: 'MacBook Pro',
-                    from: "IRA",
-                    price: 25000,
-                    count: 1
-                },
-            ]
-
+            productItem: []
         }
     },
     template: `
@@ -192,22 +203,10 @@ const Cart = {
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item, index) in cartList">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.from }}</td>
-                  <td>{{ item.price }}</td>
-                  <td>
-                    <a style="color: #3b3b3b" @click="reduce(index)" :disable="item.count === 1"><i
-                        class="fas fa-minus-circle"></i></a>
-                    {{ item.count }}
-                    <a style="color: #3b3b3b" @click="add(index)"><i class="fas fa-plus-circle"></i></a>
-                  </td>
-                  <td></td>
-                  <td>
-                    <a @click="del(index)"><i class="far fa-trash-alt"></i></a>
-                  </td>
-                </tr>
+                <cart-tr
+                    v-for="(item, index) in this.$root.cartList"
+                    :item="item" :index="index">
+                </cart-tr>
                 </tbody>
               </table>
             </div>
@@ -244,7 +243,6 @@ const Cart = {
                 <script>jQuery(function ($) {
                   $("#phone").mask("+38(999) 999-99-99");
                 });</script>
-
 
               </div>
 
@@ -284,26 +282,12 @@ const Cart = {
       </div>
       </div>
     `,
-    methods: {
-        reduce: function (index) {
-            if (this.cartList[index].count === 1) return;
-            this.cartList[index].count--;
-        },
-        add: function (index) {
-            this.cartList[index].count++;
-        },
-        del: function (index) {
-            this.cartList.splice(index, 1);
-        }
-    },
     computed: {
         total: function () {
             let total = 0;
-            for (let i = 0; i < this.cartList.length; i++) {
-                total += this.cartList[i].price * this.cartList[i].count;
-            }
+            this.$root.cartList.forEach(cartItem => total += this.$root.items.find(x => x.id == cartItem.id).price * cartItem.count)
             return total.toString().replace(/\B(?=(\d{3})+$)/g, ',');
-        }
+        },
     }
 }
 
@@ -373,7 +357,7 @@ const Supplier = {
            style="border-radius: 10px; max-height: 700px; max-width: 760px">
       <div class="icon-box"
            style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
-        <router-link :to="{ path : title }"><img :src="logo" class="img-fluid" alt="Pizza picture"></router-link>
+        <router-link :to="{ path : String(id) }"><img :src="logo" class="img-fluid" alt="Pizza picture"></router-link>
         <h4><a href="#">{{ title }}</a></h4>
         <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
       </div>
@@ -381,25 +365,36 @@ const Supplier = {
 }
 
 const Product = {
+    data() {
+        return {
+            showItem: false,
+        }
+    },
     props: ['id', 'title', 'logo'],
     template: `
       <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
            style="border-radius: 10px; max-height: 700px; max-width: 760px">
       <div class="icon-box"
            style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
-        <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#item-modal"><img :src="logo" class="img-fluid"
-                                                                                          alt="menu-item"></a>
-        <h4><a href="#">{{ title }}</a></h4>
+        <img :src="logo" class="img-fluid" data-bs-toggle="modal" data-bs-target="#item-modal"
+             @click="this.showItem = true" alt="menu-item"/>
+
+        <h4>{{ title }}</h4>
         <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
-
-        <router-view></router-view>
-
+        <Teleport to="#pop-portal">
+          <product-item :id="id" v-if="this.showItem" @close="this.showItem = false"></product-item>
+        </Teleport>
       </div>
       </div> `
 }
 
 const ProductPopUp = {
-    props: ["title", "itemName"],
+    data() {
+        return {
+            quantity: 1,
+        };
+    },
+    props: ["id"],
     template: `
       <div class="modal fade" id="item-modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -422,18 +417,20 @@ const ProductPopUp = {
                 <div class="me-auto p-2 bd-highlight">
                   <div style="padding: 0 10px ">
                     <div class="number" data-step="1" data-min="1" data-max="100">
-                      <input class="number-text" type="text" name="count" value="1" readonly>
-                      <a href="#" class="number-minus">−</a>
-                      <a href="#" class="number-plus">+</a>
+                      <input v-model="quantity" class="number-text" type="text" name="count" value="1" readonly>
+                      <a @click="reduce()" class="number-minus">−</a>
+                      <a @click="add()" class="number-plus">+</a>
                     </div>
                   </div>
                 </div>
                 <div class="p-2 bd-highlight">
-                  <input class="price" type="text" name="price" v-bind:value=item.price readonly>
+                  <p style="margin-top: 15px !important;">Total: <strong>{{ total }}$</strong></p>
                 </div>
                 <div class="p-2 bd-highlight">
                   <div style="padding: 0 10px ">
-                    <button class="add-to-cart-btn">ADD TO CART</button>
+                    <button @click="addToCart(id, this.quantity)" data-bs-dismiss="modal"
+                            class="add-to-cart-btn">ADD TO CART
+                    </button>
                   </div>
                 </div>
               </div>
@@ -444,10 +441,36 @@ const ProductPopUp = {
       </div>
     `,
     computed: {
-        item() {
-            return this.$root.restaurants.find(x => x.title === title).items.find(y => y.title === itemName)
+        item: function () {
+            return this.$root.items.find(x => x.id == this.id)
+        },
+        total: function () {
+            return this.item.price * parseInt(this.quantity, 10)
         }
+    },
+    methods: {
+        addToCart: function (id, count) {
+            let orderItem = {
+                id: id,
+                count: count
+            }
 
+            this.$root.cartList.push(orderItem)
+            console.log(this.$root.cartList)
+        },
+        reduce: function () {
+            if (parseInt(this.quantity, 10) === 1) return;
+            this.quantity--;
+        },
+        add: function () {
+            this.quantity++;
+        },
+        init: function () {
+            this.quantity = 1
+        }
+    },
+    mounted() {
+        this.init()
     }
 }
 
@@ -456,35 +479,33 @@ const SuppliersList = {
     <supplier
             v-for="restaurant in this.$root.restaurants"
             :key="restaurant.id"
+            :id="restaurant.id"
             :title="restaurant.title"
             :logo="restaurant.logo"
     ></supplier> `
 }
 
 const ProductsList = {
-    props: ["title"],
+    props: ["id"],
     template: `
       <product
-          v-for="item in this.$root.restaurants.find(x => x.title === title).items"
+          v-for="item in this.$root.items.filter(x => x.restaurantId == id)"
           :key="item.id"
+          :id="item.id"
           :title="item.title"
           :logo="item.logo"
       ></product> `
 }
 
 const routes = [
-    {path: '/', component: SuppliersList},
     {
-        path: '/:title',
+        path: '/',
+        component: SuppliersList
+    },
+    {
+        path: '/:id',
         component: ProductsList,
         props: true,
-        children: [
-            {
-                path: ':itemName',
-                components: ProductPopUp,
-                props: true
-            },
-        ]
     },
 
 ]
@@ -500,6 +521,8 @@ app.component("product", Product)
 app.component("supplier", Supplier)
 app.component("login", Login)
 app.component("cart", Cart)
+app.component("cart-tr", CartTr)
+app.component("product-item", ProductPopUp)
 app.use(router)
 
 app.mount('#main-content')
