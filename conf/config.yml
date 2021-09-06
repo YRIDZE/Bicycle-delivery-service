@@ -5,3 +5,7 @@ db:
   host: "localhost"
   port: "3306"
   dbname: "delivery_db"
+
+parser:
+  url: "http://foodapi.true-tech.php.nixdev.co/restaurants"
+  delay: 1

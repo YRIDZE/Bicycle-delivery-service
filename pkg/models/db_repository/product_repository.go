@@ -1,39 +1,137 @@
 package db_repository
 
 import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"time"
+
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
 
 type ProductRepositoryI interface {
-	CreateProduct(product *models.Product) (int, error)
-	GetProductByID(id int) (*models.Product, error)
-	GetAllProducts() (*[]models.Product, error)
-	UpdateProduct(product *models.Product) error
-	DeleteProduct(id int) error
+	Create(product *models.Product) (int, error)
+	GetByID(id int) (*models.Product, error)
+	GetAll() (*[]models.Product, error)
+	Update(product *models.Product) error
+	Delete(id int) error
+	GetByName(name string) (int32, error)
 }
 
-type ProductDBRepository struct{}
-
-func NewProductDBRepository() *ProductDBRepository {
-	return &ProductDBRepository{}
+type ProductRepository struct {
+	db *sql.DB
 }
 
-func (p ProductDBRepository) CreateProduct(product *models.Product) (int, error) {
-	panic("implement me")
+func NewProductRepository(db *sql.DB) *ProductRepository {
+	return &ProductRepository{db: db}
 }
 
-func (p ProductDBRepository) GetProductByID(id int) (*models.Product, error) {
-	panic("implement me")
+func (p ProductRepository) Create(product *models.Product) (int, error) {
+
+	productQuery := fmt.Sprintf(
+		"insert into %s (supplier_id, name, price, type, image, ingredients) value (?, ?, ?, ?, ?, ?)", ProductsTable,
+	)
+	ingredientsJson, _ := json.Marshal(product.Ingredients)
+	res, err := p.db.Exec(
+		productQuery, product.SupplierID, product.Name, product.Price, product.Type, product.Image, ingredientsJson,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(lastId), nil
 }
 
-func (p ProductDBRepository) GetAllProducts() (*[]models.Product, error) {
-	panic("implement me")
+func (p ProductRepository) GetByID(id int) (*models.Product, error) {
+	product := new(models.Product)
+
+	query := fmt.Sprintf(
+		"select id, name, price, type, ingredients, image, supplier_id from %s where id = ? and deleted is null",
+		ProductsTable,
+	)
+	var ingredientsJson string
+	err := p.db.QueryRow(query, id).Scan(
+		&product.ID, &product.Name, &product.Price, &product.Type, &ingredientsJson, &product.Image, &product.SupplierID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = json.Unmarshal([]byte(ingredientsJson), &product.Ingredients)
+
+	return product, nil
 }
 
-func (p ProductDBRepository) UpdateProduct(product *models.Product) error {
-	panic("implement me")
+func (p ProductRepository) GetByName(name string) (int32, error) {
+	var id int32
+	query := fmt.Sprintf("select id from %s where name = ? and deleted is null", ProductsTable)
+	err := p.db.QueryRow(query, name).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
-func (p ProductDBRepository) DeleteProduct(id int) error {
-	panic("implement me")
+func (p ProductRepository) GetAll() (*[]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+	var ingredientsJson string
+
+	query := fmt.Sprintf("select id, name, price, type, ingredients, image from %s where p.deleted != 0 ", ProductsTable)
+	pr, err := p.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := pr.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(
+			&product.ID, &product.Name, &product.Price, &ingredientsJson, &product.Image, &product.SupplierID, &product.Type,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		_ = json.Unmarshal([]byte(ingredientsJson), &product.Ingredients)
+		products = append(products, product)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return &products, nil
+}
+
+func (p ProductRepository) Update(product *models.Product) error {
+
+	ingredientsJson, _ := json.Marshal(product.Ingredients)
+	productQuery := fmt.Sprintf(
+		"update %s set name = ?, price = ?, type = ?, ingredients = ?, image = ? where id = ?", ProductsTable,
+	)
+	_, err := p.db.Exec(productQuery, product.Name, product.Price, product.Type, ingredientsJson, product.Image, product.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p ProductRepository) Delete(id int) error {
+	query := fmt.Sprintf("update %s set deleted = ? where id = ?", ProductsTable)
+	_, err := p.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -1,10 +1,12 @@
 package conf
 
 import (
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
-	"github.com/joho/godotenv"
 	"os"
 	"strconv"
+
+	"github.com/YRIDZE/Bicycle-delivery-service/internal"
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 var DbPassword string
@@ -28,4 +30,14 @@ func init() {
 
 	AccessLifetimeMinutes, _ = strconv.Atoi(os.Getenv("ACCESS_LIFETIME_MINUTES"))
 	RefreshLifetimeMinutes, _ = strconv.Atoi(os.Getenv("REFRESH_LIFETIME_MINUTES"))
+
+	if err := InitConfig(); err != nil {
+		internal.Log.Error("error initializing configs")
+	}
+}
+
+func InitConfig() error {
+	viper.AddConfigPath("conf")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
