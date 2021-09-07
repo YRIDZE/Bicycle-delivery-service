@@ -28,3 +28,10 @@ type SuppliersResponse struct {
 type ProductsResponse struct {
 	Products []Product `json:"menu"`
 }
+
+type SupplierResponse struct {
+	ID      int32  `json:"id"`
+	Name    string `json:"name"`
+	Image   string `json:"image"`
+	Deleted string `json:"deleted"`
+}

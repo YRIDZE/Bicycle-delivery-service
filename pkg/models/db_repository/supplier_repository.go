@@ -10,9 +10,9 @@ import (
 
 type SupplierRepositoryI interface {
 	Create(supplier *models.Supplier) (int32, error)
-	GetByID(id int) (*models.Supplier, error)
-	GetAll() (*[]models.Supplier, error)
-	Update(supplier *models.Supplier) error
+	GetByID(id int) (*models.SupplierResponse, error)
+	GetAll() (*[]models.SupplierResponse, error)
+	Update(supplier *models.SupplierResponse) error
 	Delete(id int32) error
 	GetByName(name string) (int32, error)
 }
@@ -41,15 +41,21 @@ func (s SupplierRepository) Create(supplier *models.Supplier) (int32, error) {
 	return int32(lastId), nil
 }
 
-func (s SupplierRepository) GetByID(id int) (*models.Supplier, error) {
-	supplier := new(models.Supplier)
+func (s SupplierRepository) GetByID(id int) (*models.SupplierResponse, error) {
+	var deletedV sql.NullString
+	supplier := new(models.SupplierResponse)
 
-	query := fmt.Sprintf("select id, name, image from %s where id = ?", SuppliersTable)
-	err := s.db.QueryRow(query, id).Scan(&supplier.ID, &supplier.Name, &supplier.Image)
+	query := fmt.Sprintf("select id, name, image, deleted from %s where id = ?", SuppliersTable)
+	err := s.db.QueryRow(query, id).Scan(&supplier.ID, &supplier.Name, &supplier.Image, &deletedV)
 	if err != nil {
 		return nil, err
 	}
 
+	if deletedV.Valid {
+		supplier.Deleted = deletedV.String
+	} else {
+		supplier.Deleted = ""
+	}
 	return supplier, nil
 }
 
@@ -64,10 +70,10 @@ func (s SupplierRepository) GetByName(name string) (int32, error) {
 	return id, nil
 }
 
-func (s SupplierRepository) GetAll() (*[]models.Supplier, error) {
-	var suppliers []models.Supplier
-	var supplier models.Supplier
-	query := fmt.Sprintf("select id, name, image from %s where deleted != 0", SuppliersTable)
+func (s SupplierRepository) GetAll() (*[]models.SupplierResponse, error) {
+	var suppliers []models.SupplierResponse
+	var supplier models.SupplierResponse
+	query := fmt.Sprintf("select id, name, image from %s where deleted is null", SuppliersTable)
 	pr, err := s.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -92,8 +98,8 @@ func (s SupplierRepository) GetAll() (*[]models.Supplier, error) {
 	return &suppliers, nil
 }
 
-func (s SupplierRepository) Update(supplier *models.Supplier) error {
-	query := fmt.Sprintf("update %s set name, image where id = ?", SuppliersTable)
+func (s SupplierRepository) Update(supplier *models.SupplierResponse) error {
+	query := fmt.Sprintf("update %s set name = ?, image = ? where id = ?", SuppliersTable)
 	_, err := s.db.Exec(query, &supplier.Name, &supplier.Image, supplier.ID)
 	if err != nil {
 		return err

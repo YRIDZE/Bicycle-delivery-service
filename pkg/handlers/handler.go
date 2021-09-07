@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -11,7 +10,7 @@ type AppHandlers struct {
 }
 
 type HandlerI interface {
-	RegisterRoutes(router *mux.Router, h *AppHandlers)
+	RegisterRoutes(router *http.ServeMux, h *AppHandlers)
 }
 
 func NewAppHandlers(userHandler *UserHandler, handlers ...HandlerI) *AppHandlers {
@@ -22,8 +21,7 @@ func NewAppHandlers(userHandler *UserHandler, handlers ...HandlerI) *AppHandlers
 }
 
 func (h *AppHandlers) InitRoutes() http.Handler {
-
-	router := mux.NewRouter()
+	router := http.NewServeMux()
 
 	for _, x := range h.handlers {
 		x.RegisterRoutes(router, h)

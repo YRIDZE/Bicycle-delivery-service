@@ -8,4 +8,4 @@ db:
 
 parser:
   url: "http://foodapi.true-tech.php.nixdev.co/restaurants"
-  delay: 1
+  delay: 10

@@ -55,8 +55,10 @@ func main() {
 
 	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
 	orderHandler := handlers.NewOrderHandler(orderRepository)
+	supplierHandler := handlers.NewSupplierHandler(supplierRepository)
+	productHandler := handlers.NewProductHandler(productRepository)
 
-	h := handlers.NewAppHandlers(userHandler, orderHandler)
+	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
 
 	srv := new(app.Server)
 	go func() {
@@ -74,7 +76,7 @@ func main() {
 
 	internal.Log.Info("App Shutting Down")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {

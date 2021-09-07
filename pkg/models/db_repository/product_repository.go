@@ -16,6 +16,7 @@ type ProductRepositoryI interface {
 	Update(product *models.Product) error
 	Delete(id int) error
 	GetByName(name string) (int32, error)
+	GetBySupplier(id int32) (*[]models.Product, error)
 }
 
 type ProductRepository struct {
@@ -67,6 +68,42 @@ func (p ProductRepository) GetByID(id int) (*models.Product, error) {
 	return product, nil
 }
 
+func (p ProductRepository) GetBySupplier(supplierID int32) (*[]models.Product, error) {
+	var products []models.Product
+	var product models.Product
+	var ingredientsJson string
+
+	query := fmt.Sprintf(
+		"select id, supplier_id, name, price, type, ingredients, image from %s where supplier_id = ? and deleted is null ", ProductsTable,
+	)
+	pr, err := p.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := pr.Query(supplierID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(
+			&product.ID, &product.SupplierID, &product.Name, &product.Price, &product.Type, &ingredientsJson, &product.Image,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		_ = json.Unmarshal([]byte(ingredientsJson), &product.Ingredients)
+		products = append(products, product)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return &products, nil
+}
+
 func (p ProductRepository) GetByName(name string) (int32, error) {
 	var id int32
 	query := fmt.Sprintf("select id from %s where name = ? and deleted is null", ProductsTable)
@@ -83,7 +120,7 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 	var product models.Product
 	var ingredientsJson string
 
-	query := fmt.Sprintf("select id, name, price, type, ingredients, image from %s where p.deleted != 0 ", ProductsTable)
+	query := fmt.Sprintf("select id, supplier_id, name, price, type, ingredients, image from %s where deleted is null ", ProductsTable)
 	pr, err := p.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -97,7 +134,7 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 
 	for rows.Next() {
 		err := rows.Scan(
-			&product.ID, &product.Name, &product.Price, &ingredientsJson, &product.Image, &product.SupplierID, &product.Type,
+			&product.ID, &product.SupplierID, &product.Name, &product.Price, &product.Type, &ingredientsJson, &product.Image,
 		)
 		if err != nil {
 			return nil, err
