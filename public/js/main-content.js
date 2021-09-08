@@ -8,32 +8,38 @@ const App = {
                 {
                     id: 1,
                     title: 'My journey with Vue',
-                    logo: 'https://images.unsplash.com/photo-1490717064594-3bd2c4081693?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+                    type: "type 1",
+                    logo: 'http://cdn.shopify.com/s/files/1/1578/1589/files/colorf-01_198x200.png'
                 },
                 {
                     id: 2,
                     title: 'Blogging with Vue',
-                    logo: 'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+                    type: "type 2",
+                    logo: 'https://1000logos.net/wp-content/uploads/2021/04/Target-logo.png'
                 },
                 {
                     id: 3,
                     title: 'Why Vue is so fun',
-                    logo: 'https://images.unsplash.com/photo-1590947132387-155cc02f3212?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTN8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80'
+                    type: "type 3",
+                    logo: 'https://eda.ua/images/506509-195-195-burger_club_harkov.jpg'
                 },
                 {
                     id: 4,
                     title: 'Blogging with Vue',
-                    logo: 'https://images.unsplash.com/photo-1617219474432-2e0b3ba569b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80'
+                    type: "type 1",
+                    logo: 'https://image.freepik.com/free-vector/sushi-restaurant-logo_8169-12.jpg'
                 },
                 {
                     id: 5,
                     title: 'Blogging with Vue',
-                    logo: 'https://images.unsplash.com/photo-1620374645466-dc3ff1558148?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+                    type: "type 4",
+                    logo: 'https://lineacaffe.com/wp-content/themes/lineacaffe/images/linea-logo.svg'
                 },
                 {
                     id: 6,
                     title: 'Blogging with Vue',
-                    logo: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80'
+                    type: "type 5",
+                    logo: 'https://play-lh.googleusercontent.com/qMewibe3u5Wvq3fBf3Ca3_QItjHCOKeGrOAzVXWxqzgRpMwxYlD5CA6M2M5L78SwNA'
                 }
             ],
             items: [
@@ -41,25 +47,25 @@ const App = {
                     id: 1,
                     restaurantId: 1,
                     title: 'My journey with Vue',
-                    description: "auf",
+                    ingredients: ["Salmon", "Nori", "Rice", "Cucumber", "Cream cheese", "Unagi sauce", "Japanese tamago"],
                     price: 122,
-                    logo: '../img/pizza-menu-item.jpg'
+                    logo: 'https://roll-club.kh.ua/wp-content/uploads/2021/04/okean-1.jpg.webp'
                 },
                 {
                     id: 2,
                     restaurantId: 1,
                     title: 'My journey with Vue 2',
-                    description: "auf",
+                    ingredients: ["Cheese", "Caramelized onions", "Tomatoes", "Original sauce"],
                     price: 122,
-                    logo: '../img/pizza-menu-item.jpg'
+                    logo: 'https://roll-club.kh.ua/wp-content/uploads/2015/09/4-syra.jpg.webp'
                 },
                 {
                     id: 3,
                     restaurantId: 1,
                     title: 'My journey with Vue 3',
-                    description: "auf",
+                    ingredients: ["Mozarella", "Peperoni", "Tomatoes", "BBQ sauce"],
                     price: 122,
-                    logo: '../img/pizza-menu-item.jpg'
+                    logo: 'https://roll-club.kh.ua/wp-content/uploads/2019/03/kapricheza.jpg.webp'
                 }
             ],
             cartList: []
@@ -131,7 +137,6 @@ const Login = {
       </div>
     `,
 }
-
 
 const CartTr = {
     props: ['item', 'index'],
@@ -328,7 +333,6 @@ const FiltersPanel = {
                     <div class="accordion-body">
                         <div class="filter-content">
                           <div class="card-body">
-                                <check name="More meat"></check>
                                 <check name="More cheese"></check>
                                 <check name="More vegetables"></check>
                                 <check name="More sauce"></check>
@@ -338,7 +342,8 @@ const FiltersPanel = {
                 </div>
             </div>
         </div>
-    </div> `
+    </div> `,
+
 }
 
 const Check = {
@@ -355,11 +360,9 @@ const Supplier = {
     template: `
       <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
            style="border-radius: 10px; max-height: 700px; max-width: 760px">
-      <div class="icon-box"
-           style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
+      <div class="icon-box">
         <router-link :to="{ path : String(id) }"><img :src="logo" class="img-fluid" alt="Pizza picture"></router-link>
         <h4><a href="#">{{ title }}</a></h4>
-        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
       </div>
       </div> `
 }
@@ -374,13 +377,10 @@ const Product = {
     template: `
       <div class="col-lg-3 col-md-6 d-flex align-items-stretch mt-4"
            style="border-radius: 10px; max-height: 700px; max-width: 760px">
-      <div class="icon-box"
-           style="border-style: solid; border-width: 1px; border-color: rgba(194, 184, 184, 0.26);">
+      <div class="icon-box">
         <img :src="logo" class="img-fluid" data-bs-toggle="modal" data-bs-target="#item-modal"
              @click="this.showItem = true" alt="menu-item"/>
-
         <h4>{{ title }}</h4>
-        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
         <Teleport to="#pop-portal">
           <product-item :id="id" v-if="this.showItem" @close="this.showItem = false"></product-item>
         </Teleport>
@@ -410,7 +410,10 @@ const ProductPopUp = {
               <div class="product-data">
                 <div class="data">
                   <h1>{{ item.title }}</h1>
-                  <p>{{ item.description }}</p>
+                  <b>Ingredients: </b>
+                  <text v-for="ingredient in item.ingredients">
+                    <text>{{ ingredient }}{{ ", " }}</text>
+                  </text>
                 </div>
               </div>
               <div class="d-flex bd-highlight item-overlay-panel">
@@ -456,7 +459,6 @@ const ProductPopUp = {
             }
 
             this.$root.cartList.push(orderItem)
-            console.log(this.$root.cartList)
         },
         reduce: function () {
             if (parseInt(this.quantity, 10) === 1) return;

@@ -34,8 +34,8 @@
 
 .product-data {
     background-color: rgba(255, 255, 255, 0.5);
-    width: 730px;
-    height: 350px;
+    width: 695px;
+    max-height: 300px;
     margin: 0 35px;
     position: absolute;
     z-index: 10;
