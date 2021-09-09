@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
+	yolo_log "github.com/YRIDZE/yolo-log"
 )
 
 type UserHandler struct {
+	logger  *yolo_log.Logger
 	service *services.UserService
 }
 
-func NewUserHandler(userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
+func NewUserHandler(logger *yolo_log.Logger, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
 	s := services.NewUserService(&userRepo, &tokenRepo)
-	return &UserHandler{service: s}
+	return &UserHandler{logger: logger, service: s}
 }
 
 func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
@@ -34,14 +35,14 @@ func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 	user := new(models.User)
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	u, err := h.service.Create(user)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
@@ -49,13 +50,13 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(respJ)
-	internal.Log.Infof("user %d successfully created", u.ID)
+	h.logger.Infof("user %d successfully created", u.ID)
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	users, err := h.service.GetAll()
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
@@ -74,13 +75,13 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("users successfully extracted")
+	h.logger.Infof("users successfully extracted")
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	user := new(models.User)
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
@@ -88,28 +89,28 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	user.ID = req.Context().Value("user").(*models.User).ID
 	u, err := h.service.Update(user)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
 	respJ, _ := json.Marshal(u)
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user %d successfully updated", user.ID)
+	h.logger.Infof("user %d successfully updated", user.ID)
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 	err := h.service.Delete(userID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("user successfully deleted"))
-	internal.Log.Infof("user %d successfully deleted", userID)
+	h.logger.Infof("user %d successfully deleted", userID)
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
@@ -125,5 +126,5 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user %d successfully fetched profile", user.ID)
+	h.logger.Infof("user %d successfully fetched profile", user.ID)
 }

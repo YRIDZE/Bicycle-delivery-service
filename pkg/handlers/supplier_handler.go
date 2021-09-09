@@ -5,19 +5,20 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
+	yolo_log "github.com/YRIDZE/yolo-log"
 )
 
 type SupplierHandler struct {
+	logger   *yolo_log.Logger
 	services *services.SupplierService
 }
 
-func NewSupplierHandler(repo db_repository.SupplierRepositoryI) *SupplierHandler {
+func NewSupplierHandler(logger *yolo_log.Logger, repo db_repository.SupplierRepositoryI) *SupplierHandler {
 	s := services.NewSupplierService(repo)
-	return &SupplierHandler{services: s}
+	return &SupplierHandler{logger: logger, services: s}
 }
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
@@ -31,13 +32,13 @@ func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 	supplier := new(models.SupplierResponse)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 	s, err := h.services.Create(supplier)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
@@ -46,7 +47,7 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(respJ)
-	internal.Log.Infof("supplier %d successfully created", s.ID)
+	h.logger.Infof("supplier %d successfully created", s.ID)
 }
 
 func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
@@ -54,7 +55,7 @@ func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 
 	order, err := h.services.GetByID(supplierID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
@@ -64,13 +65,13 @@ func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user successfully fetched supplier %d", supplierID)
+	h.logger.Infof("user successfully fetched supplier %d", supplierID)
 }
 
 func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	supplier, err := h.services.GetAll()
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
@@ -80,20 +81,20 @@ func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user fetched suppliers")
+	h.logger.Infof("user fetched suppliers")
 }
 
 func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 	supplier := new(models.SupplierResponse)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	s, err := h.services.Update(supplier)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
@@ -101,7 +102,7 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("supplier %d successfully updated", supplier.ID)
+	h.logger.Infof("supplier %d successfully updated", supplier.ID)
 }
 
 func (h *SupplierHandler) Delete(w http.ResponseWriter, req *http.Request) {
@@ -110,12 +111,12 @@ func (h *SupplierHandler) Delete(w http.ResponseWriter, req *http.Request) {
 
 	err := h.services.Delete(int32(supplierID))
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("supplier successfully deleted"))
-	internal.Log.Infof("supplier %d successfully deleted", supplierID)
+	h.logger.Infof("supplier %d successfully deleted", supplierID)
 }

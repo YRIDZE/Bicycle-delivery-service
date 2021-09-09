@@ -8,21 +8,23 @@ import (
 	"sync"
 	"time"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	yolo_log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
 )
 
 var wg sync.WaitGroup
 
 type SupplierProductsParser struct {
+	logger       *yolo_log.Logger
 	supplierRepo db_repository.SupplierRepository
 	productsRepo db_repository.ProductRepository
 }
 
-func NewParser(supplierRepo *db_repository.SupplierRepository, productsRepo *db_repository.ProductRepository) *SupplierProductsParser {
+func NewParser(logger *yolo_log.Logger, supplierRepo *db_repository.SupplierRepository, productsRepo *db_repository.ProductRepository) *SupplierProductsParser {
 	return &SupplierProductsParser{
+		logger:       logger,
 		supplierRepo: *supplierRepo,
 		productsRepo: *productsRepo,
 	}
@@ -30,53 +32,55 @@ func NewParser(supplierRepo *db_repository.SupplierRepository, productsRepo *db_
 
 type MenuParserI interface {
 	Parse()
-	Save(suppliersList *[]models.SuppliersResponse)
+	Save(suppliersList *[]models.Supplier)
+	GetSuppliers() ([]models.Supplier, error)
+	GetSupplierProductsByID(id int) ([]models.Product, error)
 }
 
-func (mp *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
+func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 	for _, s := range *suppliersList {
-		oldSupplierID, _ := mp.supplierRepo.GetByName(s.Name)
+		oldSupplierID, _ := h.supplierRepo.GetByName(s.Name)
 
 		if oldSupplierID != 0 {
-			err := mp.supplierRepo.Delete(oldSupplierID)
+			err := h.supplierRepo.Delete(oldSupplierID)
 			if err != nil {
-				internal.Log.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
+				h.logger.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
 				return
 			}
-			internal.Log.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
+			h.logger.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
 		}
-		supplier, err := mp.supplierRepo.Create(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
+		supplier, err := h.supplierRepo.Create(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
 		if err != nil {
-			internal.Log.Errorf("supplier didn't created: %s", err.Error())
+			h.logger.Errorf("supplier didn't created: %s", err.Error())
 			return
 		}
-		internal.Log.Debugf("supplier %d created", supplier.ID)
+		h.logger.Debugf("supplier %d created", supplier.ID)
 
 		for _, m := range s.Menu {
 			m.SupplierID = supplier.ID
 
-			oldProductID, _ := mp.productsRepo.GetByName(m.Name)
+			oldProductID, _ := h.productsRepo.GetByName(m.Name)
 			if oldProductID != 0 {
-				err := mp.productsRepo.Delete(int(oldProductID))
+				err := h.productsRepo.Delete(int(oldProductID))
 				if err != nil {
 					return
 				}
 			}
-			_, err = mp.productsRepo.Create(&m)
+			_, err = h.productsRepo.Create(&m)
 			if err != nil {
-				internal.Log.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
+				h.logger.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
 				return
 			}
-			internal.Log.Debugf("supplier %d menu created", supplier.ID)
+			h.logger.Debugf("supplier %d menu created", supplier.ID)
 		}
 	}
 	return
 }
 
-func (mp *SupplierProductsParser) Parse() {
+func (h *SupplierProductsParser) Parse() {
 	for {
-		internal.Log.Debug("New parsing iteration...")
-		suppliersList, err := GetSuppliers()
+		h.logger.Debug("New parsing iteration...")
+		suppliersList, err := h.GetSuppliers()
 		if err != nil {
 			return
 		}
@@ -85,7 +89,7 @@ func (mp *SupplierProductsParser) Parse() {
 			go func(i int) {
 				defer wg.Done()
 
-				supplierMenu, err2 := GetSupplierProductsByID(i + 1)
+				supplierMenu, err2 := h.GetSupplierProductsByID(i + 1)
 				if err2 != nil {
 					return
 				}
@@ -94,12 +98,12 @@ func (mp *SupplierProductsParser) Parse() {
 		}
 		wg.Wait()
 
-		mp.Save(&suppliersList)
+		h.Save(&suppliersList)
 		time.Sleep(time.Duration(viper.GetInt("parser.delay")) * time.Minute)
 	}
 }
 
-func GetSuppliers() ([]models.Supplier, error) {
+func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 	resp, err := http.Get(fmt.Sprintf("%s", viper.GetString("parser.url")))
 	if err != nil {
 		return nil, err
@@ -107,7 +111,7 @@ func GetSuppliers() ([]models.Supplier, error) {
 
 	jsonBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		internal.Log.Errorf("error close body", err)
+		h.logger.Errorf("error close body", err)
 	}
 
 	var suppliersList models.SuppliersResponse
@@ -119,23 +123,23 @@ func GetSuppliers() ([]models.Supplier, error) {
 	return suppliersList.Suppliers, nil
 }
 
-func GetSupplierProductsByID(id int) ([]models.Product, error) {
+func (h *SupplierProductsParser) GetSupplierProductsByID(id int) ([]models.Product, error) {
 	response, err := http.Get(fmt.Sprintf("%s/%d/%s", viper.GetString("parser.url"), id, "menu"))
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		return nil, err
 	}
 
 	jsonBytes, err := io.ReadAll(response.Body)
 	err = response.Body.Close()
 	if err != nil {
-		internal.Log.Errorf("error close body", err)
+		h.logger.Errorf("error close body", err)
 	}
 
 	supplierProducts := new(models.ProductsResponse)
 	err = json.Unmarshal(jsonBytes, &supplierProducts)
 	if err != nil {
-		internal.Log.Error(err)
+		h.logger.Error(err)
 		return nil, err
 	}
 

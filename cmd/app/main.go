@@ -10,7 +10,6 @@ import (
 	app "github.com/YRIDZE/Bicycle-delivery-service"
 	"github.com/YRIDZE/Bicycle-delivery-service/cmd/parser"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	log "github.com/YRIDZE/yolo-log"
@@ -18,8 +17,7 @@ import (
 )
 
 func main() {
-	var err error
-	internal.Log, err = log.NewLogger(
+	logger, err := log.NewLogger(
 		log.LoggerParams{
 			ConsoleOutputStream: os.Stdout,
 			ConsoleLogLevel:     log.INFO,
@@ -31,7 +29,15 @@ func main() {
 		panic(err.Error())
 	}
 
+	c := context.WithValue(context.Background(), "logger", logger)
+
+	conf.GetEnv(c)
+	if err := InitConfig(); err != nil {
+		logger.Error("error initializing configs")
+	}
+
 	db, err := db_repository.NewDB(
+		c,
 		db_repository.Config{
 			Port:     viper.GetString("db.port"),
 			Username: viper.GetString("db.username"),
@@ -40,9 +46,10 @@ func main() {
 		},
 	)
 	if err != nil {
-		internal.Log.Fatal("Could not connected to database. Panic!")
+		logger.Fatal("Could not connected to database. Panic!")
 		panic(err.Error())
 	}
+	c.Done()
 
 	userRepository := db_repository.NewUserRepository(db)
 	tokenRepository := db_repository.NewTokensRepository(db)
@@ -50,40 +57,46 @@ func main() {
 	supplierRepository := db_repository.NewSupplierRepository(db)
 	productRepository := db_repository.NewProductRepository(db)
 
-	p := parser.NewParser(supplierRepository, productRepository)
+	p := parser.NewParser(logger, supplierRepository, productRepository)
 	go p.Parse()
 
-	userHandler := handlers.NewUserHandler(userRepository, tokenRepository)
-	orderHandler := handlers.NewOrderHandler(orderRepository)
-	supplierHandler := handlers.NewSupplierHandler(supplierRepository)
-	productHandler := handlers.NewProductHandler(productRepository)
+	userHandler := handlers.NewUserHandler(logger, userRepository, tokenRepository)
+	orderHandler := handlers.NewOrderHandler(logger, orderRepository)
+	supplierHandler := handlers.NewSupplierHandler(logger, supplierRepository)
+	productHandler := handlers.NewProductHandler(logger, productRepository)
 
 	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
 
 	srv := new(app.Server)
 	go func() {
 		if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
-			internal.Log.Fatalf("error occurred while running http server: %s", err.Error())
+			logger.Fatalf("error occurred while running http server: %s", err.Error())
 			return
 		}
 	}()
 
-	internal.Log.Info("App Started")
+	logger.Info("App Started")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 
-	internal.Log.Info("App Shutting Down")
+	logger.Info("App Shutting Down")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		internal.Log.Errorf("error occurred on server shutting down: %s", err.Error())
+		logger.Errorf("error occurred on server shutting down: %s", err.Error())
 	}
 
 	if err := db.Close(); err != nil {
-		internal.Log.Errorf("error occurred on db connection close: %s", err.Error())
+		logger.Errorf("error occurred on db connection close: %s", err.Error())
 	}
+}
+
+func InitConfig() error {
+	viper.AddConfigPath("conf")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
