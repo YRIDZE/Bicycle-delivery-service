@@ -18,7 +18,7 @@ func NewUserService(userRepo *db_repository.UserRepositoryI, tokenRepo *db_repos
 	}
 }
 
-func (u UserService) Create(user *models.User) (int32, error) {
+func (u UserService) Create(user *models.User) (*models.User, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return u.userRepo.Create(user)
 }
@@ -35,7 +35,7 @@ func (u UserService) GetAll() (*[]models.User, error) {
 	return u.userRepo.GetAll()
 }
 
-func (u UserService) Update(user *models.User) error {
+func (u UserService) Update(user *models.User) (*models.User, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return u.userRepo.Update(user)
 }

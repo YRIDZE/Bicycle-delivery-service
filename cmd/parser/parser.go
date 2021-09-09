@@ -30,7 +30,7 @@ func NewParser(supplierRepo *db_repository.SupplierRepository, productsRepo *db_
 
 type MenuParserI interface {
 	Parse()
-	Save(suppliersList *[]models.Supplier)
+	Save(suppliersList *[]models.SuppliersResponse)
 }
 
 func (mp *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
@@ -45,15 +45,15 @@ func (mp *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 			}
 			internal.Log.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
 		}
-		supplierID, err := mp.supplierRepo.Create(&s)
+		supplier, err := mp.supplierRepo.Create(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
 		if err != nil {
-			internal.Log.Errorf("supplier %d didn't created: %s", supplierID, err.Error())
+			internal.Log.Errorf("supplier didn't created: %s", err.Error())
 			return
 		}
-		internal.Log.Debugf("supplier %d created", supplierID)
+		internal.Log.Debugf("supplier %d created", supplier.ID)
 
 		for _, m := range s.Menu {
-			m.SupplierID = supplierID
+			m.SupplierID = supplier.ID
 
 			oldProductID, _ := mp.productsRepo.GetByName(m.Name)
 			if oldProductID != 0 {
@@ -64,10 +64,10 @@ func (mp *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 			}
 			_, err = mp.productsRepo.Create(&m)
 			if err != nil {
-				internal.Log.Errorf("supplier %d menu didn't created: %s", supplierID, err.Error())
+				internal.Log.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
 				return
 			}
-			internal.Log.Debugf("supplier %d menu created", supplierID)
+			internal.Log.Debugf("supplier %d menu created", supplier.ID)
 		}
 	}
 	return

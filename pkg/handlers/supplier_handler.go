@@ -21,30 +21,32 @@ func NewSupplierHandler(repo db_repository.SupplierRepositoryI) *SupplierHandler
 }
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.HandleFunc("/supplierC", h.Create)
-	r.HandleFunc("/supplier", h.GetByID)
-	r.HandleFunc("/suppliers", h.GetAll)
-	r.HandleFunc("/supplierU", h.Update)
-	r.HandleFunc("/supplierD", h.Delete)
+	r.HandleFunc("/createSupplier", h.Create)
+	r.HandleFunc("/getSupplierById", h.GetByID)
+	r.HandleFunc("/getSuppliers", h.GetAll)
+	r.HandleFunc("/updateSupplier", h.Update)
+	r.HandleFunc("/deleteSupplier", h.Delete)
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
-	supplier := new(models.Supplier)
+	supplier := new(models.SupplierResponse)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
-	supplierID, err := h.services.Create(supplier)
+	s, err := h.services.Create(supplier)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("supplier created"))
-	internal.Log.Infof("supplier %d successfully created", supplierID)
+	respJ, _ := json.Marshal(models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(respJ)
+	internal.Log.Infof("supplier %d successfully created", s.ID)
 }
 
 func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
@@ -89,15 +91,16 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := h.services.Update(supplier)
+	s, err := h.services.Update(supplier)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
+	respJ, _ := json.Marshal(s)
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("supplier updated"))
+	w.Write(respJ)
 	internal.Log.Infof("supplier %d successfully updated", supplier.ID)
 }
 

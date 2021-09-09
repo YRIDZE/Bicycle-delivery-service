@@ -21,11 +21,11 @@ func NewOrderHandler(repo db_repository.OrderRepositoryI) *OrderHandler {
 }
 
 func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/orderC", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
-	r.Handle("/order", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
-	r.Handle("/orders", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
-	r.Handle("/orderU", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/orderD", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.Handle("/createOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.Handle("/getOrderById", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
+	r.Handle("/getOrders", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	r.Handle("/updateOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -36,16 +36,19 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
-	orderID, err := h.services.Create(order)
+	o, err := h.services.Create(order)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
+	respJ, _ := json.Marshal(o)
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("order created"))
-	internal.Log.Infof("order %d successfully created by User %d", orderID, order.UserID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(respJ)
+
+	internal.Log.Infof("order %d successfully created by User %d", o.ID, order.UserID)
 
 }
 
@@ -64,8 +67,8 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user %d fetched order %d", order.UserID, orderID)
 
+	internal.Log.Infof("user %d fetched order %d", order.UserID, orderID)
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
@@ -82,8 +85,8 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(respJ)
-	internal.Log.Infof("user %d fetched orders", userID)
 
+	internal.Log.Infof("user %d fetched orders", userID)
 }
 
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
@@ -94,17 +97,17 @@ func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
-	err := h.services.Update(order)
+	o, err := h.services.Update(order)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
+	respJ, _ := json.Marshal(o)
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Order updated"))
+	w.Write(respJ)
 	internal.Log.Infof("order %d successfully updated", order.ID)
-
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
@@ -120,5 +123,4 @@ func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("order successfully deleted"))
 	internal.Log.Infof("order %d successfully deleted", orderID)
-
 }

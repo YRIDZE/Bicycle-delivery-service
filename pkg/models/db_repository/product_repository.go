@@ -10,10 +10,10 @@ import (
 )
 
 type ProductRepositoryI interface {
-	Create(product *models.Product) (int, error)
+	Create(product *models.Product) (*models.Product, error)
 	GetByID(id int) (*models.Product, error)
 	GetAll() (*[]models.Product, error)
-	Update(product *models.Product) error
+	Update(product *models.Product) (*models.Product, error)
 	Delete(id int) error
 	GetByName(name string) (int32, error)
 	GetBySupplier(id int32) (*[]models.Product, error)
@@ -27,7 +27,7 @@ func NewProductRepository(db *sql.DB) *ProductRepository {
 	return &ProductRepository{db: db}
 }
 
-func (p ProductRepository) Create(product *models.Product) (int, error) {
+func (p ProductRepository) Create(product *models.Product) (*models.Product, error) {
 
 	productQuery := fmt.Sprintf(
 		"insert into %s (supplier_id, name, price, type, image, ingredients) value (?, ?, ?, ?, ?, ?)", ProductsTable,
@@ -37,22 +37,23 @@ func (p ProductRepository) Create(product *models.Product) (int, error) {
 		productQuery, product.SupplierID, product.Name, product.Price, product.Type, product.Image, ingredientsJson,
 	)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
+	product.ID = int(lastID)
 
-	return int(lastId), nil
+	return product, nil
 }
 
 func (p ProductRepository) GetByID(id int) (*models.Product, error) {
 	product := new(models.Product)
 
 	query := fmt.Sprintf(
-		"select id, name, price, type, ingredients, image, supplier_id from %s where id = ? and deleted is null",
+		"select id, name, price, type, ingredients, image, supplier_id from %s where id = ?",
 		ProductsTable,
 	)
 	var ingredientsJson string
@@ -74,7 +75,8 @@ func (p ProductRepository) GetBySupplier(supplierID int32) (*[]models.Product, e
 	var ingredientsJson string
 
 	query := fmt.Sprintf(
-		"select id, supplier_id, name, price, type, ingredients, image from %s where supplier_id = ? and deleted is null ", ProductsTable,
+		"select id, supplier_id, name, price, type, ingredients, image from %s where supplier_id = ? and deleted is null ",
+		ProductsTable,
 	)
 	pr, err := p.db.Prepare(query)
 	if err != nil {
@@ -120,7 +122,9 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 	var product models.Product
 	var ingredientsJson string
 
-	query := fmt.Sprintf("select id, supplier_id, name, price, type, ingredients, image from %s where deleted is null ", ProductsTable)
+	query := fmt.Sprintf(
+		"select id, supplier_id, name, price, type, ingredients, image from %s where deleted is null ", ProductsTable,
+	)
 	pr, err := p.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -149,7 +153,7 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 	return &products, nil
 }
 
-func (p ProductRepository) Update(product *models.Product) error {
+func (p ProductRepository) Update(product *models.Product) (*models.Product, error) {
 
 	ingredientsJson, _ := json.Marshal(product.Ingredients)
 	productQuery := fmt.Sprintf(
@@ -157,10 +161,10 @@ func (p ProductRepository) Update(product *models.Product) error {
 	)
 	_, err := p.db.Exec(productQuery, product.Name, product.Price, product.Type, ingredientsJson, product.Image, product.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return product, nil
 }
 
 func (p ProductRepository) Delete(id int) error {

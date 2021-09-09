@@ -9,10 +9,10 @@ import (
 )
 
 type SupplierRepositoryI interface {
-	Create(supplier *models.Supplier) (int32, error)
+	Create(supplier *models.SupplierResponse) (*models.SupplierResponse, error)
 	GetByID(id int) (*models.SupplierResponse, error)
 	GetAll() (*[]models.SupplierResponse, error)
-	Update(supplier *models.SupplierResponse) error
+	Update(supplier *models.SupplierResponse) (*models.SupplierResponse, error)
 	Delete(id int32) error
 	GetByName(name string) (int32, error)
 }
@@ -25,20 +25,21 @@ func NewSupplierRepository(db *sql.DB) *SupplierRepository {
 	return &SupplierRepository{db: db}
 }
 
-func (s SupplierRepository) Create(supplier *models.Supplier) (int32, error) {
+func (s SupplierRepository) Create(supplier *models.SupplierResponse) (*models.SupplierResponse, error) {
 	query := fmt.Sprintf("insert into %s (name, image) value (?, ?)", SuppliersTable)
 
 	res, err := s.db.Exec(query, supplier.Name, supplier.Image)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
+	supplier.ID = int32(lastID)
 
-	return int32(lastId), nil
+	return supplier, nil
 }
 
 func (s SupplierRepository) GetByID(id int) (*models.SupplierResponse, error) {
@@ -51,11 +52,11 @@ func (s SupplierRepository) GetByID(id int) (*models.SupplierResponse, error) {
 		return nil, err
 	}
 
+	supplier.Deleted = ""
 	if deletedV.Valid {
 		supplier.Deleted = deletedV.String
-	} else {
-		supplier.Deleted = ""
 	}
+
 	return supplier, nil
 }
 
@@ -98,13 +99,13 @@ func (s SupplierRepository) GetAll() (*[]models.SupplierResponse, error) {
 	return &suppliers, nil
 }
 
-func (s SupplierRepository) Update(supplier *models.SupplierResponse) error {
+func (s SupplierRepository) Update(supplier *models.SupplierResponse) (*models.SupplierResponse, error) {
 	query := fmt.Sprintf("update %s set name = ?, image = ? where id = ?", SuppliersTable)
 	_, err := s.db.Exec(query, &supplier.Name, &supplier.Image, supplier.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return supplier, nil
 }
 
 func (s SupplierRepository) Delete(id int32) error {

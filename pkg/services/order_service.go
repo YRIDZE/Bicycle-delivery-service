@@ -13,7 +13,7 @@ func NewOrderService(repo db_repository.OrderRepositoryI) *OrderService {
 	return &OrderService{repo: repo}
 }
 
-func (o OrderService) Create(order *models.Order) (int, error) {
+func (o OrderService) Create(order *models.Order) (*models.Order, error) {
 	return o.repo.Create(order)
 }
 
@@ -25,7 +25,7 @@ func (o OrderService) GetAll(userID int32) (*[]models.Order, error) {
 	return o.repo.GetAll(userID)
 }
 
-func (o OrderService) Update(order *models.Order) error {
+func (o OrderService) Update(order *models.Order) (*models.Order, error) {
 	return o.repo.Update(order)
 }
 

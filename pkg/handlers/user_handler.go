@@ -21,34 +21,35 @@ func NewUserHandler(userRepo db_repository.UserRepositoryI, tokenRepo db_reposit
 
 func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/login", h.Login)
-	r.HandleFunc("/refresh", h.Refresh)
+	r.HandleFunc("/refreshTokens", h.Refresh)
 	r.Handle("/logout", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
 
-	r.HandleFunc("/userC", appH.userHandler.Create)
-	r.HandleFunc("/users", appH.userHandler.GetAll)
-	r.Handle("/user", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
-	r.Handle("/userU", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/userD", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.HandleFunc("/createUser", appH.userHandler.Create)
+	r.HandleFunc("/getUsers", appH.userHandler.GetAll)
+	r.Handle("/getUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
+	r.Handle("/updateUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
-	r := new(models.User)
-	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
+	user := new(models.User)
+	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
-	userID, err := h.service.Create(r)
+	u, err := h.service.Create(user)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
+	respJ, _ := json.Marshal(u)
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("user created"))
-	internal.Log.Infof("user %d successfully created", userID)
+	w.WriteHeader(http.StatusCreated)
+	w.Write(respJ)
+	internal.Log.Infof("user %d successfully created", u.ID)
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
@@ -85,15 +86,15 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 
 	user.ID = req.Context().Value("user").(*models.User).ID
-	err := h.service.Update(user)
+	u, err := h.service.Update(user)
 	if err != nil {
 		internal.Log.Error(err.Error())
 		http.Error(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
-
+	respJ, _ := json.Marshal(u)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("user successfully updated"))
+	w.Write(respJ)
 	internal.Log.Infof("user %d successfully updated", user.ID)
 }
 

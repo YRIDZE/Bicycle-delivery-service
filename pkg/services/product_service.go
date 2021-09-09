@@ -13,7 +13,7 @@ func NewProductService(repo db_repository.ProductRepositoryI) *ProductService {
 	return &ProductService{repo: repo}
 }
 
-func (p ProductService) Create(product *models.Product) (int, error) {
+func (p ProductService) Create(product *models.Product) (*models.Product, error) {
 	return p.repo.Create(product)
 }
 
@@ -25,7 +25,7 @@ func (p ProductService) GetAll() (*[]models.Product, error) {
 	return p.repo.GetAll()
 }
 
-func (p ProductService) Update(product *models.Product) error {
+func (p ProductService) Update(product *models.Product) (*models.Product, error) {
 	return p.repo.Update(product)
 }
 

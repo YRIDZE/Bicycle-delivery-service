@@ -13,7 +13,7 @@ func NewSupplierService(repo db_repository.SupplierRepositoryI) *SupplierService
 	return &SupplierService{repo: repo}
 }
 
-func (s SupplierService) Create(supplier *models.Supplier) (int32, error) {
+func (s SupplierService) Create(supplier *models.SupplierResponse) (*models.SupplierResponse, error) {
 	return s.repo.Create(supplier)
 }
 
@@ -29,7 +29,7 @@ func (s SupplierService) GetAll() (*[]models.SupplierResponse, error) {
 	return s.repo.GetAll()
 }
 
-func (s SupplierService) Update(supplier *models.SupplierResponse) error {
+func (s SupplierService) Update(supplier *models.SupplierResponse) (*models.SupplierResponse, error) {
 	return s.repo.Update(supplier)
 }
 
