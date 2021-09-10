@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -32,6 +33,7 @@ func NewParser(logger *yolo_log.Logger, supplierRepo *db_repository.SupplierRepo
 
 type MenuParserI interface {
 	Parse()
+	ParseIteration()
 	Save(suppliersList *[]models.Supplier)
 	GetSuppliers() ([]models.Supplier, error)
 	GetSupplierProductsByID(id int) ([]models.Product, error)
@@ -80,27 +82,36 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 func (h *SupplierProductsParser) Parse() {
 	for {
 		h.logger.Debug("New parsing iteration...")
-		suppliersList, err := h.GetSuppliers()
-		if err != nil {
-			return
-		}
-		for i := range suppliersList {
-			wg.Add(1)
-			go func(i int) {
-				defer wg.Done()
-
-				supplierMenu, err2 := h.GetSupplierProductsByID(i + 1)
-				if err2 != nil {
-					return
-				}
-				suppliersList[i].Menu = supplierMenu
-			}(i)
-		}
-		wg.Wait()
-
-		h.Save(&suppliersList)
+		h.ParseIteration()
 		time.Sleep(time.Duration(viper.GetInt("parser.delay")) * time.Minute)
 	}
+}
+
+func (h *SupplierProductsParser) ParseIteration() {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(viper.GetInt("parser.delay"))*time.Minute)
+	defer cancel()
+
+	suppliersList, err := h.GetSuppliers()
+	if err != nil {
+		return
+	}
+
+	for i := range suppliersList {
+		wg.Add(1)
+
+		go func(ctx context.Context, i int) {
+			defer wg.Done()
+
+			supplierMenu, err2 := h.GetSupplierProductsByID(i + 1)
+			if err2 != nil {
+				return
+			}
+			suppliersList[i].Menu = supplierMenu
+		}(ctx, i)
+	}
+	wg.Wait()
+	h.Save(&suppliersList)
 }
 
 func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
@@ -116,6 +127,7 @@ func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 
 	var suppliersList models.SuppliersResponse
 	err = json.Unmarshal(jsonBytes, &suppliersList)
+
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	yolo_log "github.com/YRIDZE/yolo-log"
+	log "github.com/YRIDZE/yolo-log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -27,7 +27,7 @@ type Config struct {
 }
 
 func NewDB(ctx context.Context, cfg Config) (*sql.DB, error) {
-	logger := ctx.Value("logger").(*yolo_log.Logger)
+	logger := ctx.Value("logger").(*log.Logger)
 
 	db, err := sql.Open(
 		"mysql",
