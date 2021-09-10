@@ -49,7 +49,7 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 			}
 			h.logger.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
 		}
-		supplier, err := h.supplierRepo.Create(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
+		supplier, err := h.supplierRepo.Create(&s)
 		if err != nil {
 			h.logger.Errorf("supplier didn't created: %s", err.Error())
 			return

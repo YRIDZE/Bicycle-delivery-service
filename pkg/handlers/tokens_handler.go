@@ -6,6 +6,7 @@ import (
 
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -71,7 +72,6 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		AccessToken:  accessString,
 		RefreshToken: refreshString,
 	}
-	respJ, _ := json.Marshal(resp)
 
 	http.SetCookie(
 		w, &http.Cookie{
@@ -84,12 +84,12 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user %d token successfully refreshed", claims.ID)
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
-	r := new(models.LoginRequest)
+	r := new(requests.LoginRequest)
 	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -137,7 +137,6 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		AccessToken:  accessString,
 		RefreshToken: refreshString,
 	}
-	respJ, _ := json.Marshal(resp)
 
 	http.SetCookie(
 		w, &http.Cookie{
@@ -149,6 +148,6 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user %d successfully logged in", user.ID)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	yolo_log "github.com/YRIDZE/yolo-log"
 )
@@ -30,7 +31,7 @@ func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
-	order := new(models.Order)
+	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -43,54 +44,53 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
-	respJ, _ := json.Marshal(o)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(respJ)
-
-	h.logger.Infof("order %d successfully created by User %d", o.ID, order.UserID)
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("order %d successfully created by User %d", o.ID, o.UserID)
 }
 
 func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 	orderID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 
-	order, err := h.services.GetByID(orderID)
+	o, err := h.services.GetByID(orderID)
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-
-	h.logger.Infof("user %d fetched order %d", order.UserID, orderID)
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("user %d fetched order %d", o.UserID, o.ID)
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
-	order, err := h.services.GetAll(userID)
+	o, err := h.services.GetAll(userID)
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
+	var resp []models.OrderResponse
+	for _, x := range *o {
+		resp = append(
+			resp, models.OrderResponse{ID: x.ID, UserID: x.UserID, Address: x.Address, Status: x.Address, Products: x.Products},
+		)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user %d fetched orders", userID)
 }
 
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
-	order := new(models.Order)
+	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -104,12 +104,11 @@ func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
-	respJ, _ := json.Marshal(o)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	h.logger.Infof("order %d successfully updated", order.ID)
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("order %d successfully updated", o.ID)
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {

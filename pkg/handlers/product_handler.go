@@ -7,6 +7,7 @@ import (
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	yolo_log "github.com/YRIDZE/yolo-log"
 )
@@ -31,7 +32,7 @@ func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
-	product := new(models.Product)
+	product := new(requests.ProductRequest)
 	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -44,10 +45,10 @@ func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
-	respJ, _ := json.Marshal(p)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
 	h.logger.Infof("product %d successfully created", p.ID)
 }
 
@@ -61,32 +62,36 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	respJ, _ := json.Marshal(p)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
 	h.logger.Infof("user successfully fetched product %d", p.ID)
 }
 
 func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	product, err := h.services.GetAll()
+	p, err := h.services.GetAll()
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(product)
+	var resp []models.ProductResponse
+	for _, x := range *p {
+		resp = append(
+			resp,
+			models.ProductResponse{ID: x.ID, SupplierID: x.SupplierID, Name: x.Name, Image: x.Image, Price: x.Price, Type: x.Type, Ingredients: x.Ingredients},
+		)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user fetched all products")
 }
 
 func (h *ProductHandler) Update(w http.ResponseWriter, req *http.Request) {
-	product := new(models.Product)
+	product := new(requests.ProductRequest)
 	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -99,11 +104,10 @@ func (h *ProductHandler) Update(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
-	respJ, _ := json.Marshal(p)
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	h.logger.Infof("product %d successfully updated", product.ID)
+	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
+	h.logger.Infof("product %d successfully updated", p.ID)
 }
 
 func (h *ProductHandler) Delete(w http.ResponseWriter, req *http.Request) {
@@ -124,17 +128,23 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, req *http.Request) {
 func (h *ProductHandler) GetBySupplier(w http.ResponseWriter, req *http.Request) {
 	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 
-	order, err := h.services.GetBySupplier(int32(supplierID))
+	pr, err := h.services.GetBySupplier(int32(supplierID))
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
+	var resp []models.ProductResponse
+	for _, x := range *pr {
+		resp = append(
+			resp,
+			models.ProductResponse{ID: x.ID, SupplierID: x.SupplierID, Name: x.Name, Image: x.Image, Price: x.Price, Type: x.Type, Ingredients: x.Ingredients},
+		)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user successfully fetched supplier %d products ", supplierID)
 }

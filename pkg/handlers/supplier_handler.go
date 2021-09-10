@@ -7,6 +7,7 @@ import (
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
 	yolo_log "github.com/YRIDZE/yolo-log"
 )
@@ -23,19 +24,21 @@ func NewSupplierHandler(logger *yolo_log.Logger, repo db_repository.SupplierRepo
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/createSupplier", h.Create)
-	r.HandleFunc("/getSupplierById", h.GetByID)
+	r.HandleFunc("/getSupplierById/", h.GetByID)
 	r.HandleFunc("/getSuppliers", h.GetAll)
 	r.HandleFunc("/updateSupplier", h.Update)
-	r.HandleFunc("/deleteSupplier", h.Delete)
+	r.HandleFunc("/deleteSupplier/", h.Delete)
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
-	supplier := new(models.SupplierResponse)
+	supplier := new(requests.SupplierRequest)
+
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
+
 	s, err := h.services.Create(supplier)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -43,49 +46,53 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	respJ, _ := json.Marshal(models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
-
 	w.WriteHeader(http.StatusCreated)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
 	h.logger.Infof("supplier %d successfully created", s.ID)
 }
 
 func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
-
-	order, err := h.services.GetByID(supplierID)
+	supplierID, err := requests.Params(req)
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
+	s, err := h.services.GetByID(supplierID)
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image, Deleted: s.Deleted})
 	h.logger.Infof("user successfully fetched supplier %d", supplierID)
 }
 
 func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	supplier, err := h.services.GetAll()
+	s, err := h.services.GetAll()
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(supplier)
+	var resp []models.SupplierResponse
+	for _, x := range *s {
+		resp = append(resp, models.SupplierResponse{ID: x.ID, Name: x.Name, Image: x.Image, Deleted: x.Deleted})
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user fetched suppliers")
 }
 
 func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
-	supplier := new(models.SupplierResponse)
+	supplier := new(requests.SupplierRequest)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
@@ -98,15 +105,14 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
-	respJ, _ := json.Marshal(s)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
+	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image, Deleted: s.Deleted})
 	h.logger.Infof("supplier %d successfully updated", supplier.ID)
 }
 
 func (h *SupplierHandler) Delete(w http.ResponseWriter, req *http.Request) {
-
 	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 
 	err := h.services.Delete(int32(supplierID))
