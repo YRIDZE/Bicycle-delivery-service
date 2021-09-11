@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -24,10 +25,10 @@ func NewSupplierHandler(logger *yolo_log.Logger, repo db_repository.SupplierRepo
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/createSupplier", h.Create)
-	r.HandleFunc("/getSupplierById/", h.GetByID)
+	r.HandleFunc("/getSupplierById", h.GetByID)
 	r.HandleFunc("/getSuppliers", h.GetAll)
 	r.HandleFunc("/updateSupplier", h.Update)
-	r.HandleFunc("/deleteSupplier/", h.Delete)
+	r.HandleFunc("/deleteSupplier", h.Delete)
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -36,6 +37,12 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	if err := supplier.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
 		return
 	}
 
@@ -52,10 +59,10 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	supplierID, err := requests.Params(req)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
+	supplierID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || supplierID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
 		return
 	}
 
@@ -99,6 +106,12 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if err := supplier.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
 	s, err := h.services.Update(supplier)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -113,11 +126,16 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	supplierID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || supplierID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
+		return
+	}
 
-	err := h.services.Delete(int32(supplierID))
+	err = h.services.Delete(int32(supplierID))
 	if err != nil {
-		h.logger.Error(err.Error())
+		h.logger.Error(err)
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}

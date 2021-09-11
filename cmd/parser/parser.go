@@ -32,8 +32,8 @@ func NewParser(logger *yolo_log.Logger, supplierRepo *db_repository.SupplierRepo
 }
 
 type MenuParserI interface {
-	Parse()
-	ParseIteration()
+	Parse(ctx context.Context)
+	ParseIteration(ctx context.Context)
 	Save(suppliersList *[]models.Supplier)
 	GetSuppliers() ([]models.Supplier, error)
 	GetSupplierProductsByID(id int) ([]models.Product, error)
@@ -79,17 +79,17 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 	return
 }
 
-func (h *SupplierProductsParser) Parse() {
+func (h *SupplierProductsParser) Parse(ctx context.Context) {
 	for {
 		h.logger.Debug("New parsing iteration...")
-		h.ParseIteration()
+		h.ParseIteration(ctx)
 		time.Sleep(time.Duration(viper.GetInt("parser.delay")) * time.Minute)
 	}
 }
 
-func (h *SupplierProductsParser) ParseIteration() {
+func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(viper.GetInt("parser.delay"))*time.Minute)
+	parserContext, cancel := context.WithTimeout(ctx, time.Duration(viper.GetInt("parser.delay"))*time.Minute)
 	defer cancel()
 
 	suppliersList, err := h.GetSuppliers()
@@ -108,7 +108,7 @@ func (h *SupplierProductsParser) ParseIteration() {
 				return
 			}
 			suppliersList[i].Menu = supplierMenu
-		}(ctx, i)
+		}(parserContext, i)
 	}
 	wg.Wait()
 	h.Save(&suppliersList)

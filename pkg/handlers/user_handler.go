@@ -8,15 +8,15 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
-	yolo_log "github.com/YRIDZE/yolo-log"
+	log "github.com/YRIDZE/yolo-log"
 )
 
 type UserHandler struct {
-	logger  *yolo_log.Logger
+	logger  *log.Logger
 	service *services.UserService
 }
 
-func NewUserHandler(logger *yolo_log.Logger, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
+func NewUserHandler(logger *log.Logger, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
 	s := services.NewUserService(&userRepo, &tokenRepo)
 	return &UserHandler{logger: logger, service: s}
 }
@@ -43,12 +43,9 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if validErrs := user.Validate(); len(validErrs) > 0 {
-		err := map[string]interface{}{"validationError": validErrs}
-		w.Header().Set("Content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		h.logger.Errorf("validationError: %v", err)
-		json.NewEncoder(w).Encode(err)
+	if err := user.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
 		return
 	}
 
@@ -59,7 +56,6 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
 	h.logger.Infof("user %d successfully created", u.ID)
@@ -78,7 +74,6 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 		resp = append(resp, models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("users successfully extracted")
@@ -94,12 +89,9 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if validErrs := user.Validate(); len(validErrs) > 0 {
-		err := map[string]interface{}{"validationError": validErrs}
-		w.Header().Set("Content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		h.logger.Errorf("validationError: %v", err)
-		json.NewEncoder(w).Encode(err)
+	if err := user.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
 		return
 	}
 
@@ -134,7 +126,6 @@ func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
 	user := req.Context().Value("user").(*models.User)
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.UserResponse{ID: user.ID, FirstName: user.FirstName, LastName: user.LastName, Email: user.Email})
 	h.logger.Infof("user %d successfully fetched profile", user.ID)

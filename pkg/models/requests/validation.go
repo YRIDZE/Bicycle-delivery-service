@@ -1,12 +1,11 @@
 package requests
 
 import (
+	"encoding/json"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
-func Params(r *http.Request) (int, error) {
-	fields := strings.Split(r.URL.String(), "/")
-	return strconv.Atoi(fields[len(fields)-1])
+func ValidationErrorResponse(w http.ResponseWriter, err error) {
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(map[string]interface{}{"validationError": err.Error()})
 }

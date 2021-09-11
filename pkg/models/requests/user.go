@@ -1,6 +1,9 @@
 package requests
 
-import "net/url"
+import (
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+)
 
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -15,28 +18,20 @@ type UserRequest struct {
 	Password  string `json:"password"`
 }
 
-func (a UserRequest) Validate() url.Values {
-	errs := url.Values{}
+func (c UserRequest) Validate() error {
+	return validation.ValidateStruct(
+		&c,
+		validation.Field(&c.FirstName, validation.Required, validation.Length(1, 30)),
+		validation.Field(&c.LastName, validation.Required, validation.Length(1, 30)),
+		validation.Field(&c.Email, validation.Required, is.Email, validation.Length(7, 30)),
+		validation.Field(&c.Password, validation.Required, validation.Length(7, 20)),
+	)
+}
 
-	if a.FirstName == "" {
-		errs.Add("firstName", "The firstName field is required!")
-	}
-
-	if a.LastName == "" {
-		errs.Add("lastName", "The lastName field is required!")
-	}
-
-	if a.Email == "" {
-		errs.Add("email", "The email field is required!")
-	}
-
-	if a.Password == "" {
-		errs.Add("password", "The password field is required!")
-	}
-
-	if len(a.Password) < 8 || len(a.Password) > 20 {
-		errs.Add("password", "The password field must be between 8-20 chars!")
-	}
-
-	return errs
+func (c LoginRequest) Validate() error {
+	return validation.ValidateStruct(
+		&c,
+		validation.Field(&c.Email, validation.Required, is.Email),
+		validation.Field(&c.Password, validation.Required),
+	)
 }

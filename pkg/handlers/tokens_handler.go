@@ -96,6 +96,12 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if err := r.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
 	user, err := h.service.GetByEmail(r.Email)
 	if err != nil {
 		h.logger.Error(err.Error())

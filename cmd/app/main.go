@@ -17,6 +17,8 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	logger, err := log.NewLogger(
 		log.LoggerParams{
 			ConsoleOutputStream: os.Stdout,
@@ -28,16 +30,11 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+	loggerContext := context.WithValue(ctx, "logger", logger)
 
-	c := context.WithValue(context.Background(), "logger", logger)
-
-	conf.GetEnv(c)
-	if err := InitConfig(); err != nil {
-		logger.Error("error initializing configs")
-	}
-
+	conf.GetEnv(loggerContext)
 	db, err := db_repository.NewDB(
-		c,
+		loggerContext,
 		db_repository.Config{
 			Port:     viper.GetString("db.port"),
 			Username: viper.GetString("db.username"),
@@ -45,11 +42,11 @@ func main() {
 			Password: conf.DbPassword,
 		},
 	)
+
 	if err != nil {
 		logger.Fatal("Could not connected to database. Panic!")
 		panic(err.Error())
 	}
-	c.Done()
 
 	userRepository := db_repository.NewUserRepository(db)
 	tokenRepository := db_repository.NewTokensRepository(db)
@@ -58,13 +55,12 @@ func main() {
 	productRepository := db_repository.NewProductRepository(db)
 
 	p := parser.NewParser(logger, supplierRepository, productRepository)
-	go p.Parse()
+	go p.Parse(ctx)
 
 	userHandler := handlers.NewUserHandler(logger, userRepository, tokenRepository)
 	orderHandler := handlers.NewOrderHandler(logger, orderRepository)
 	supplierHandler := handlers.NewSupplierHandler(logger, supplierRepository)
 	productHandler := handlers.NewProductHandler(logger, productRepository)
-
 	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
 
 	srv := new(app.Server)
@@ -83,20 +79,14 @@ func main() {
 
 	logger.Info("App Shutting Down")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	shutdownContext, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(shutdownContext); err != nil {
 		logger.Errorf("error occurred on server shutting down: %s", err.Error())
 	}
 
 	if err := db.Close(); err != nil {
 		logger.Errorf("error occurred on db connection close: %s", err.Error())
 	}
-}
-
-func InitConfig() error {
-	viper.AddConfigPath("conf")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }

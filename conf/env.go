@@ -5,8 +5,9 @@ import (
 	"os"
 	"strconv"
 
-	yolo_log "github.com/YRIDZE/yolo-log"
+	log "github.com/YRIDZE/yolo-log"
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 var DbPassword string
@@ -18,8 +19,11 @@ var AccessLifetimeMinutes int
 var RefreshLifetimeMinutes int
 
 func GetEnv(ctx context.Context) {
+	logger := ctx.Value("logger").(*log.Logger)
 
-	logger := ctx.Value("logger").(*yolo_log.Logger)
+	if err := InitConfig(); err != nil {
+		logger.Error("error initializing configs")
+	}
 
 	if err := godotenv.Load(); err != nil {
 		logger.Fatalf("Could not load .env file. Returned error was: ", err.Error())
@@ -33,5 +37,10 @@ func GetEnv(ctx context.Context) {
 
 	AccessLifetimeMinutes, _ = strconv.Atoi(os.Getenv("ACCESS_LIFETIME_MINUTES"))
 	RefreshLifetimeMinutes, _ = strconv.Atoi(os.Getenv("REFRESH_LIFETIME_MINUTES"))
+}
 
+func InitConfig() error {
+	viper.AddConfigPath("conf")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
