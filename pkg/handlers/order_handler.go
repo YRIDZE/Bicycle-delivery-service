@@ -2,120 +2,149 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
-	"github.com/gorilla/mux"
+	yolo_log "github.com/YRIDZE/yolo-log"
 )
 
 type OrderHandler struct {
+	logger   *yolo_log.Logger
 	services *services.OrderService
 }
 
-func NewOrderHandler(repo db_repository.OrderRepositoryI) *OrderHandler {
+func NewOrderHandler(logger *yolo_log.Logger, repo db_repository.OrderRepositoryI) *OrderHandler {
 	s := services.NewOrderService(repo)
-	return &OrderHandler{services: s}
+	return &OrderHandler{logger: logger, services: s}
 }
 
-func (h *OrderHandler) RegisterRoutes(r *mux.Router, appH *AppHandlers) {
-	r.Handle("/order", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create))).Methods(http.MethodPost)
-	r.Handle("/order/{id}", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetByID))).Methods(http.MethodGet)
-	r.Handle("/orders", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll))).Methods(http.MethodGet)
-	r.Handle("/order", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update))).Methods(http.MethodPut)
-	r.Handle("/order/{id}", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete))).Methods(http.MethodDelete)
+func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
+	r.Handle("/createOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.Handle("/getOrderById", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
+	r.Handle("/getOrders", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	r.Handle("/updateOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
-	order := new(models.Order)
+	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
-	orderID, err := h.services.Create(order)
+	if err := order.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	o, err := h.services.Create(order)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("order created"))
-	internal.Log.Infof("order %d successfully created by User %d", orderID, order.UserID)
-
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("order %d successfully created by User %d", o.ID, o.UserID)
 }
 
 func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
-	order, err := h.services.GetByID(orderID)
+	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || orderID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
+		return
+	}
+
+	o, err := h.services.GetByID(orderID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	internal.Log.Infof("user %d fetched order %d", order.UserID, orderID)
-
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("user %d fetched order %d", o.UserID, o.ID)
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
-	order, err := h.services.GetAll(userID)
+	o, err := h.services.GetAll(userID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	respJ, _ := json.Marshal(order)
+	var resp []models.OrderResponse
+	for _, x := range *o {
+		resp = append(
+			resp, models.OrderResponse{ID: x.ID, UserID: x.UserID, Address: x.Address, Status: x.Address, Products: x.Products},
+		)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	internal.Log.Infof("user %d fetched orders", userID)
-
+	json.NewEncoder(w).Encode(resp)
+	h.logger.Infof("user %d fetched orders", userID)
 }
 
 func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
-	order := new(models.Order)
+	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
+
 	order.UserID = req.Context().Value("user").(*models.User).ID
-	err := h.services.Update(order)
+	if err := order.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	o, err := h.services.Update(order)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid data", http.StatusUnauthorized)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Order updated"))
-	internal.Log.Infof("order %d successfully updated", order.ID)
+	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
+	h.logger.Infof("order %d successfully updated", o.ID)
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	orderID, _ := strconv.Atoi(mux.Vars(req)["id"])
-	err := h.services.Delete(orderID)
+	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || orderID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
+		return
+	}
+
+	err = h.services.Delete(orderID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("order successfully deleted"))
-	internal.Log.Infof("order %d successfully deleted", orderID)
+	h.logger.Infof("order %d successfully deleted", orderID)
 }

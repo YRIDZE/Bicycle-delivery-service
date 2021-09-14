@@ -1,10 +1,11 @@
 package conf
 
 import (
+	"context"
 	"os"
 	"strconv"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
+	log "github.com/YRIDZE/yolo-log"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
@@ -17,9 +18,15 @@ var RefreshSecret string
 var AccessLifetimeMinutes int
 var RefreshLifetimeMinutes int
 
-func init() {
+func GetEnv(ctx context.Context) {
+	logger := ctx.Value("logger").(*log.Logger)
+
+	if err := InitConfig(); err != nil {
+		logger.Error("error initializing configs")
+	}
+
 	if err := godotenv.Load(); err != nil {
-		internal.Log.Fatalf("Could not load .env file. Returned error was: ", err.Error())
+		logger.Fatalf("Could not load .env file. Returned error was: ", err.Error())
 		panic(err.Error())
 	}
 
@@ -30,10 +37,6 @@ func init() {
 
 	AccessLifetimeMinutes, _ = strconv.Atoi(os.Getenv("ACCESS_LIFETIME_MINUTES"))
 	RefreshLifetimeMinutes, _ = strconv.Atoi(os.Getenv("REFRESH_LIFETIME_MINUTES"))
-
-	if err := InitConfig(); err != nil {
-		internal.Log.Error("error initializing configs")
-	}
 }
 
 func InitConfig() error {

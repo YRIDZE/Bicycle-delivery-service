@@ -4,129 +4,129 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/YRIDZE/Bicycle-delivery-service/internal"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
-	"github.com/gorilla/mux"
+	log "github.com/YRIDZE/yolo-log"
 )
 
 type UserHandler struct {
+	logger  *log.Logger
 	service *services.UserService
 }
 
-func NewUserHandler(userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
+func NewUserHandler(logger *log.Logger, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
 	s := services.NewUserService(&userRepo, &tokenRepo)
-	return &UserHandler{service: s}
+	return &UserHandler{logger: logger, service: s}
 }
 
-func (h *UserHandler) RegisterRoutes(r *mux.Router, appH *AppHandlers) {
-	r.HandleFunc("/login", h.Login).Methods(http.MethodPost)
-	r.HandleFunc("/refresh", h.Refresh).Methods(http.MethodPost)
-	r.Handle("/logout", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Logout))).Methods(http.MethodPost)
+func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
+	r.HandleFunc("/login", h.Login)
+	r.HandleFunc("/refreshTokens", h.Refresh)
+	r.Handle("/logout", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
 
-	r.HandleFunc("/user", appH.userHandler.Create).Methods(http.MethodPost)
-	r.HandleFunc("/users", appH.userHandler.GetAll).Methods(http.MethodGet)
-	r.Handle("/user", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile))).Methods(http.MethodGet)
-	r.Handle("/user", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update))).Methods(http.MethodPut)
-	r.Handle("/user", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete))).Methods(http.MethodDelete)
+	r.HandleFunc("/createUser", appH.userHandler.Create)
+	r.HandleFunc("/getUsers", appH.userHandler.GetAll)
+	r.Handle("/getUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
+	r.Handle("/updateUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
-	r := new(models.User)
-	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
-		internal.Log.Error(err.Error())
+	user := new(requests.UserRequest)
+
+	defer req.Body.Close()
+	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
-	userID, err := h.service.Create(r)
+	if err := user.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	u, err := h.service.Create(user)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("user created"))
-	internal.Log.Infof("user %d successfully created", userID)
-
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
+	h.logger.Infof("user %d successfully created", u.ID)
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	users, err := h.service.GetAll()
+	u, err := h.service.GetAll()
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
-	var resp []models.UserResponse
-	for _, u := range *users {
-		us := &models.UserResponse{
-			ID:        u.ID,
-			FirstName: u.FirstName,
-			LastName:  u.LastName,
-			Email:     u.Email,
-		}
-		resp = append(resp, *us)
-	}
-	respJ, _ := json.Marshal(resp)
 
-	w.Header().Set("Content-Type", "application/json")
+	var resp []models.UserResponse
+	for _, u := range *u {
+		resp = append(resp, models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	internal.Log.Infof("users successfully extracted")
+	json.NewEncoder(w).Encode(resp)
+	h.logger.Infof("users successfully extracted")
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
-	user := new(models.User)
+	user := new(requests.UserRequest)
+
+	defer req.Body.Close()
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
-	user.ID = req.Context().Value("user").(*models.User).ID
-	err := h.service.Update(user)
+	if err := user.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	userID := req.Context().Value("user").(*models.User).ID
+	u, err := h.service.Update(user)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("user successfully updated"))
-	internal.Log.Infof("user %d successfully updated", user.ID)
+	json.NewEncoder(w).Encode(&models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
+	h.logger.Infof("user %d successfully updated", userID)
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
+
 	err := h.service.Delete(userID)
 	if err != nil {
-		internal.Log.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("user successfully deleted"))
-	internal.Log.Infof("user %d successfully deleted", userID)
-
+	h.logger.Infof("user %d successfully deleted", userID)
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
 	user := req.Context().Value("user").(*models.User)
-	resp := &models.UserResponse{
-		ID:        user.ID,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
-	}
-	respJ, _ := json.Marshal(resp)
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(respJ)
-	internal.Log.Infof("user %d successfully fetched profile", user.ID)
-
+	json.NewEncoder(w).Encode(&models.UserResponse{ID: user.ID, FirstName: user.FirstName, LastName: user.LastName, Email: user.Email})
+	h.logger.Infof("user %d successfully fetched profile", user.ID)
 }

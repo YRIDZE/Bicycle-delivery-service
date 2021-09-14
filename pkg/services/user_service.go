@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,9 +19,15 @@ func NewUserService(userRepo *db_repository.UserRepositoryI, tokenRepo *db_repos
 	}
 }
 
-func (u UserService) Create(user *models.User) (int32, error) {
-	user.Password = generatePasswordHash(user.Password)
-	return u.userRepo.Create(user)
+func (u UserService) Create(user *requests.UserRequest) (*models.User, error) {
+	return u.userRepo.Create(
+		&models.User{
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Password:  generatePasswordHash(user.Password),
+		},
+	)
 }
 
 func (u UserService) GetByEmail(email string) (*models.User, error) {
@@ -35,9 +42,15 @@ func (u UserService) GetAll() (*[]models.User, error) {
 	return u.userRepo.GetAll()
 }
 
-func (u UserService) Update(user *models.User) error {
-	user.Password = generatePasswordHash(user.Password)
-	return u.userRepo.Update(user)
+func (u UserService) Update(user *requests.UserRequest) (*models.User, error) {
+	return u.userRepo.Create(
+		&models.User{
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Password:  generatePasswordHash(user.Password),
+		},
+	)
 }
 
 func (u UserService) Delete(id int32) error {

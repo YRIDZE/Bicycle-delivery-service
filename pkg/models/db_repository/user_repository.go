@@ -9,11 +9,11 @@ import (
 )
 
 type UserRepositoryI interface {
-	Create(user *models.User) (int32, error)
+	Create(user *models.User) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 	GetByID(id int32) (*models.User, error)
 	GetAll() (*[]models.User, error)
-	Update(user *models.User) error
+	Update(user *models.User) (*models.User, error)
 	Delete(id int32) error
 }
 
@@ -25,25 +25,25 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (u *UserRepository) Create(user *models.User) (int32, error) {
+func (u *UserRepository) Create(user *models.User) (*models.User, error) {
 	createUserQuery := fmt.Sprintf("insert into %s (firstname, lastname, email, password) value (?, ?, ?, ?)", UsersTable)
 
 	res, err := u.db.Exec(createUserQuery, user.FirstName, user.LastName, user.Email, user.Password)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-
-	return int32(lastId), nil
+	user.ID = int32(lastID)
+	return user, nil
 }
 
 func (u *UserRepository) GetByID(id int32) (*models.User, error) {
 	user := new(models.User)
-	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where id = ?", UsersTable)
+	query := fmt.Sprintf("select id, firstname, lastname, email, password from %s where id = ? and deleted is null", UsersTable)
 
 	err := u.db.QueryRow(query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password)
 	if err != nil {
@@ -55,7 +55,7 @@ func (u *UserRepository) GetByID(id int32) (*models.User, error) {
 func (u *UserRepository) GetByEmail(email string) (*models.User, error) {
 	user := new(models.User)
 	query := fmt.Sprintf(
-		"select id, firstname, lastname, email, password from %s where email = ?", UsersTable,
+		"select id, firstname, lastname, email, password from %s where email = ? and deleted is null", UsersTable,
 	)
 
 	err := u.db.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password)
@@ -93,13 +93,13 @@ func (u *UserRepository) GetAll() (*[]models.User, error) {
 	return &users, nil
 }
 
-func (u *UserRepository) Update(user *models.User) error {
+func (u *UserRepository) Update(user *models.User) (*models.User, error) {
 	query := fmt.Sprintf("update %s set firstname = ?, lastname = ?, email = ?, password = ? where id = ?", UsersTable)
 	_, err := u.db.Exec(query, user.FirstName, user.LastName, user.Email, user.Password, user.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return user, nil
 }
 
 func (u *UserRepository) Delete(id int32) error {

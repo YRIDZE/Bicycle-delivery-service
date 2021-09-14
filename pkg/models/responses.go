@@ -21,10 +21,35 @@ type CachedTokens struct {
 	RefreshUID string `json:"refresh"`
 }
 
+type OrderResponse struct {
+	ID       int32           `json:"id"`
+	UserID   int32           `json:"user_id"`
+	Address  string          `json:"address"`
+	Status   string          `json:"status"`
+	Products []OrderProducts `json:"products"`
+}
+
 type SuppliersResponse struct {
 	Suppliers []Supplier `json:"restaurants"`
 }
 
+type SupplierResponse struct {
+	ID      int32  `json:"id"`
+	Name    string `json:"name"`
+	Image   string `json:"image"`
+	Deleted string `json:"deleted"`
+}
+
 type ProductsResponse struct {
 	Products []Product `json:"menu"`
+}
+
+type ProductResponse struct {
+	ID          int      `json:"id"`
+	SupplierID  int32    `json:"supplier_id"`
+	Name        string   `json:"name"`
+	Price       float64  `json:"price"`
+	Type        string   `json:"type"`
+	Ingredients []string `json:"ingredients"`
+	Image       string   `json:"image"`
 }

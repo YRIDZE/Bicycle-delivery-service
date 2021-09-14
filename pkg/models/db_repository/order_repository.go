@@ -11,11 +11,11 @@ import (
 )
 
 type OrderRepositoryI interface {
-	Create(order *models.Order) (int, error)
+	Create(order *models.Order) (*models.Order, error)
 	GetByID(id int) (*models.Order, error)
 	GetAll(userID int32) (*[]models.Order, error)
 	GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error)
-	Update(order *models.Order) error
+	Update(order *models.Order) (*models.Order, error)
 	Delete(id int) error
 }
 
@@ -27,39 +27,41 @@ func NewOrderRepository(db *sql.DB) *OrderRepository {
 	return &OrderRepository{db: db}
 }
 
-func (o OrderRepository) Create(order *models.Order) (int, error) {
+func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	query := fmt.Sprintf("insert into %s (address, user_id) values (?, ?)", OrdersTable)
 	res, err := tx.ExecContext(ctx, query, order.Address, order.UserID)
 	if err != nil {
 		_ = tx.Rollback()
-		return 0, err
+		return nil, err
 	}
 
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
+	order.ID = int32(lastID)
 
 	query2 := fmt.Sprintf("insert into %s (order_id, product_id, quantity) values (?, ?, ?)", OPTable)
-	for _, x := range order.Products {
-		_, err := tx.ExecContext(ctx, query2, lastId, x.ProductID, x.Quantity)
+	for i, x := range order.Products {
+		_, err := tx.ExecContext(ctx, query2, order.ID, x.ProductID, x.Quantity)
 		if err != nil {
 			_ = tx.Rollback()
-			return 0, err
+			return nil, err
 		}
+		order.Products[i].OrderID = order.ID
 	}
 	err = tx.Commit()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return int(lastId), nil
+	return order, nil
 }
 
 func (o OrderRepository) GetByID(id int) (*models.Order, error) {
@@ -165,18 +167,18 @@ func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.
 	return
 }
 
-func (o OrderRepository) Update(order *models.Order) error {
+func (o OrderRepository) Update(order *models.Order) (*models.Order, error) {
 	ctx := context.Background()
 	tx, err := o.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	query := fmt.Sprintf("update %s set address = ?, status = ? where id = ?", OrdersTable)
 	_, err = tx.ExecContext(ctx, query, order.Address, order.Status, order.ID)
 	if err != nil {
 		_ = tx.Rollback()
-		return err
+		return nil, err
 	}
 
 	for _, x := range order.Products {
@@ -184,15 +186,15 @@ func (o OrderRepository) Update(order *models.Order) error {
 		_, err = tx.ExecContext(ctx, query, x.Quantity, x.OrderID, x.ProductID)
 		if err != nil {
 			_ = tx.Rollback()
-			return err
+			return nil, err
 		}
 	}
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return order, nil
 }
 
 func (o OrderRepository) Delete(id int) error {
