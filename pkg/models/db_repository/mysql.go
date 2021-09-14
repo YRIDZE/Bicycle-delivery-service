@@ -1,7 +1,6 @@
 package db_repository
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 
@@ -26,9 +25,7 @@ type Config struct {
 	DBName   string
 }
 
-func NewDB(ctx context.Context, cfg Config) (*sql.DB, error) {
-	logger := ctx.Value("logger").(*log.Logger)
-
+func NewDB(logger *log.Logger, cfg Config) (*sql.DB, error) {
 	db, err := sql.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName),

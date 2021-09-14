@@ -28,9 +28,11 @@ func (u *UserService) GenerateToken(userID int32, lifetimeMinutes int, secret st
 }
 
 func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secretString), nil
-	})
+	token, err := jwt.ParseWithClaims(
+		tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(secretString), nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

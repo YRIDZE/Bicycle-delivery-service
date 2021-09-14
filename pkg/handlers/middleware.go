@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-
-	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 )
 
 func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
@@ -14,14 +12,14 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 			bearerString := req.Header.Get("Authorization")
 			tokenString, err := h.service.GetTokenFromBearerString(bearerString)
 			if err != nil {
-				h.logger.Error(err.Error())
+				h.cfg.Logger.Error(err.Error())
 				http.Error(w, fmt.Sprint("bad token: ", err.Error()), http.StatusUnauthorized)
 				return
 			}
 
-			claims, err := h.service.ValidateToken(tokenString, conf.AccessSecret)
+			claims, err := h.service.ValidateToken(tokenString, h.cfg.AccessSecret)
 			if err != nil {
-				h.logger.Error(err.Error())
+				h.cfg.Logger.Error(err.Error())
 				http.Error(w, fmt.Sprint("bad token: ", err.Error()), http.StatusUnauthorized)
 				return
 			}
@@ -33,7 +31,7 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 
 			user, err := h.service.GetByID(claims.ID)
 			if err != nil {
-				h.logger.Error(err.Error())
+				h.cfg.Logger.Error(err.Error())
 				http.Error(w, "invalid credentials", http.StatusBadRequest)
 				return
 			}

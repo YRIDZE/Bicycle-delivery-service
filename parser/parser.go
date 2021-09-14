@@ -9,23 +9,23 @@ import (
 	"sync"
 	"time"
 
+	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
-	yolo_log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
 )
 
 var wg sync.WaitGroup
 
 type SupplierProductsParser struct {
-	logger       *yolo_log.Logger
+	cfg          conf.Config
 	supplierRepo db_repository.SupplierRepository
 	productsRepo db_repository.ProductRepository
 }
 
-func NewParser(logger *yolo_log.Logger, supplierRepo *db_repository.SupplierRepository, productsRepo *db_repository.ProductRepository) *SupplierProductsParser {
+func NewParser(cfg *conf.Config, supplierRepo *db_repository.SupplierRepository, productsRepo *db_repository.ProductRepository) *SupplierProductsParser {
 	return &SupplierProductsParser{
-		logger:       logger,
+		cfg:          *cfg,
 		supplierRepo: *supplierRepo,
 		productsRepo: *productsRepo,
 	}
@@ -46,17 +46,17 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 		if oldSupplierID != 0 {
 			err := h.supplierRepo.Delete(oldSupplierID)
 			if err != nil {
-				h.logger.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
+				h.cfg.Logger.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
 				return
 			}
-			h.logger.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
+			h.cfg.Logger.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
 		}
 		supplier, err := h.supplierRepo.Create(&s)
 		if err != nil {
-			h.logger.Errorf("supplier didn't created: %s", err.Error())
+			h.cfg.Logger.Errorf("supplier didn't created: %s", err.Error())
 			return
 		}
-		h.logger.Debugf("supplier %d created", supplier.ID)
+		h.cfg.Logger.Debugf("supplier %d created", supplier.ID)
 
 		for _, m := range s.Menu {
 			m.SupplierID = supplier.ID
@@ -70,10 +70,10 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 			}
 			_, err = h.productsRepo.Create(&m)
 			if err != nil {
-				h.logger.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
+				h.cfg.Logger.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
 				return
 			}
-			h.logger.Debugf("supplier %d menu created", supplier.ID)
+			h.cfg.Logger.Debugf("supplier %d menu created", supplier.ID)
 		}
 	}
 	return
@@ -81,7 +81,7 @@ func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
 
 func (h *SupplierProductsParser) Parse(ctx context.Context) {
 	for {
-		h.logger.Debug("New parsing iteration...")
+		h.cfg.Logger.Debug("New parsing iteration...")
 		h.ParseIteration(ctx)
 		time.Sleep(time.Duration(viper.GetInt("parser.delay")) * time.Minute)
 	}
@@ -103,8 +103,8 @@ func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 		go func(ctx context.Context, i int) {
 			defer wg.Done()
 
-			supplierMenu, err := h.GetSupplierProductsByID(i + 1)
-			if err != nil {
+			supplierMenu, err2 := h.GetSupplierProductsByID(i + 1)
+			if err2 != nil {
 				return
 			}
 			suppliersList[i].Menu = supplierMenu
@@ -122,7 +122,7 @@ func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 
 	jsonBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		h.logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body", err)
 	}
 
 	var suppliersList models.SuppliersResponse
@@ -138,20 +138,20 @@ func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 func (h *SupplierProductsParser) GetSupplierProductsByID(id int) ([]models.Product, error) {
 	response, err := http.Get(fmt.Sprintf("%s/%d/%s", viper.GetString("parser.url"), id, "menu"))
 	if err != nil {
-		h.logger.Error(err.Error())
+		h.cfg.Logger.Error(err.Error())
 		return nil, err
 	}
 
 	jsonBytes, err := io.ReadAll(response.Body)
 	err = response.Body.Close()
 	if err != nil {
-		h.logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body", err)
 	}
 
 	supplierProducts := new(models.ProductsResponse)
 	err = json.Unmarshal(jsonBytes, &supplierProducts)
 	if err != nil {
-		h.logger.Error(err)
+		h.cfg.Logger.Error(err)
 		return nil, err
 	}
 

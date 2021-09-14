@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
@@ -8,12 +9,14 @@ import (
 )
 
 type UserService struct {
+	cfg       conf.Config
 	userRepo  db_repository.UserRepositoryI
 	tokenRepo db_repository.TokensRepositoryI
 }
 
-func NewUserService(userRepo *db_repository.UserRepositoryI, tokenRepo *db_repository.TokensRepositoryI) *UserService {
+func NewUserService(cfg *conf.Config, userRepo *db_repository.UserRepositoryI, tokenRepo *db_repository.TokensRepositoryI) *UserService {
 	return &UserService{
+		cfg:       *cfg,
 		userRepo:  *userRepo,
 		tokenRepo: *tokenRepo,
 	}
