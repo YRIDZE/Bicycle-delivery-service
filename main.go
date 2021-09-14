@@ -38,6 +38,7 @@ func main() {
 	orderRepository := db_repository.NewOrderRepository(db)
 	supplierRepository := db_repository.NewSupplierRepository(db)
 	productRepository := db_repository.NewProductRepository(db)
+	cartRepository := db_repository.NewCartRepository(db)
 
 	p := parser.NewParser(cfg, supplierRepository, productRepository)
 	go p.Parse(ctx)
@@ -46,7 +47,8 @@ func main() {
 	orderHandler := handlers.NewOrderHandler(cfg, orderRepository)
 	supplierHandler := handlers.NewSupplierHandler(cfg, supplierRepository)
 	productHandler := handlers.NewProductHandler(cfg, productRepository)
-	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
+	cartHandler := handlers.NewCartHandler(cfg, cartRepository)
+	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler, cartHandler)
 
 	srv := new(server.Server)
 	go func() {

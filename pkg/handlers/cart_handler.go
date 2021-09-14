@@ -1,0 +1,204 @@
+package handlers
+
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+	"strconv"
+
+	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
+)
+
+type CartHandler struct {
+	cfg     *conf.Config
+	service *services.CartService
+}
+
+func NewCartHandler(cfg *conf.Config, repo db_repository.CartRepositoryI) *CartHandler {
+	return &CartHandler{
+		cfg:     cfg,
+		service: services.NewCartService(&repo),
+	}
+}
+
+func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
+	r.Handle("/createCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.Handle("/createCartProduct", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
+	r.Handle("/getCartProducts", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	r.Handle("/updateCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.Handle("/deleteCartProduct", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
+}
+
+func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
+	cart := new(requests.CartRequest)
+	cart.UserID = req.Context().Value("user").(*models.User).ID
+	c, err := h.service.Create(cart)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "invalid data", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&models.CartResponse{ID: c.ID, UserID: c.UserID})
+	h.cfg.Logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
+}
+
+func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
+	userID := req.Context().Value("user").(*models.User).ID
+
+	cartRequest := new(requests.CartProductRequest)
+	cart := new(models.Cart)
+
+	if err := json.NewDecoder(req.Body).Decode(&cartRequest); err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	if err := cartRequest.Validate(); err != nil {
+		h.cfg.Logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	exist, err := h.service.GetCart(userID)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	switch exist {
+	case 1:
+		cart, err = h.service.GetCartByUserID(userID)
+		if err != nil {
+			h.cfg.Logger.Error(err.Error())
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
+			return
+		}
+
+		for _, x := range cartRequest.Products {
+			p := models.CartProducts{CartID: cart.ID, ProductID: x.ProductID, Quantity: x.Quantity}
+			cart.Products = append(cart.Products, p)
+		}
+	case 0:
+		c := new(requests.CartRequest)
+		c.UserID = userID
+		cart, err = h.service.Create(c)
+		if err != nil {
+			h.cfg.Logger.Error(err.Error())
+			http.Error(w, "invalid data", http.StatusUnauthorized)
+			return
+		}
+	}
+
+	c, err := h.service.CreateProduct(cart)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "invalid data", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&models.CartProductResponse{ID: c.ID, UserID: c.UserID, Products: c.Products})
+	h.cfg.Logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
+}
+
+func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
+	user := req.Context().Value("user").(*models.User)
+
+	c, err := h.service.GetAllProductsFromCart(user.ID)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "invalid data", http.StatusUnauthorized)
+		return
+	}
+
+	var resp []models.CartProductResponse
+	for _, x := range *c {
+		resp = append(resp, models.CartProductResponse{ID: x.ID, UserID: x.UserID, Products: x.Products})
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+	h.cfg.Logger.Infof("user %d successfully fetched profile", user.ID)
+}
+
+func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
+	cartProduct := new(requests.CartProductRequest)
+
+	defer req.Body.Close()
+	if err := json.NewDecoder(req.Body).Decode(&cartProduct); err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	if err := cartProduct.Validate(); err != nil {
+		h.cfg.Logger.Error(err.Error())
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
+	p, err := h.service.Update(cartProduct)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "Invalid data", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&models.CartProductResponse{ID: p.ID, UserID: p.UserID, Products: p.Products})
+	h.cfg.Logger.Infof("cart %d product successfully updated", p.ID)
+}
+
+func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
+	userID := req.Context().Value("user").(*models.User).ID
+
+	cart, err := h.service.GetCartByUserID(userID)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	err = h.service.Delete(cart.ID)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("cart successfully deleted"))
+	h.cfg.Logger.Infof("cart %d successfully deleted", userID)
+}
+
+func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
+	userID := req.Context().Value("user").(*models.User).ID
+	productID, err := strconv.Atoi(req.URL.Query().Get("productId"))
+	if err != nil || productID < 1 {
+		h.cfg.Logger.Error(errors.New("invalid product id parameter"))
+		http.Error(w, "invalid product id parameter", http.StatusNotFound)
+		return
+	}
+
+	err = h.service.DeleteProductFromCart(userID, productID)
+	if err != nil {
+		h.cfg.Logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("cart successfully deleted"))
+	h.cfg.Logger.Infof("cart product %d successfully deleted", userID)
+}

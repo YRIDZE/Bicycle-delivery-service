@@ -10,12 +10,14 @@ import (
 )
 
 const (
-	UsersTable      = "users"
-	OrdersTable     = "orders"
-	OPTable         = "order_products"
-	SuppliersTable  = "suppliers"
-	ProductsTable   = "products"
-	CacheTokenTable = "uid_token"
+	UsersTable        = "users"
+	OrdersTable       = "orders"
+	OPTable           = "order_products"
+	SuppliersTable    = "suppliers"
+	ProductsTable     = "products"
+	CartTable         = "cart"
+	CartProductsTable = "cart_products"
+	CacheTokenTable   = "uid_token"
 )
 
 type Config struct {

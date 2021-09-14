@@ -53,3 +53,14 @@ type ProductResponse struct {
 	Ingredients []string `json:"ingredients"`
 	Image       string   `json:"image"`
 }
+
+type CartResponse struct {
+	ID     int   `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+type CartProductResponse struct {
+	ID       int            `json:"id"`
+	UserID   int32          `json:"user_id"`
+	Products []CartProducts `json:"products"`
+}
