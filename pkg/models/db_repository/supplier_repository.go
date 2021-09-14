@@ -12,9 +12,10 @@ type SupplierRepositoryI interface {
 	Create(supplier *models.Supplier) (*models.Supplier, error)
 	GetByID(id int) (*models.Supplier, error)
 	GetAll() (*[]models.Supplier, error)
+	GetByName(name string) (int32, error)
 	Update(supplier *models.Supplier) (*models.Supplier, error)
 	Delete(id int32) error
-	GetByName(name string) (int32, error)
+	DeleteUnnecessary(period int) error
 }
 
 type SupplierRepository struct {
@@ -111,6 +112,17 @@ func (s SupplierRepository) Update(supplier *models.Supplier) (*models.Supplier,
 func (s SupplierRepository) Delete(id int32) error {
 	query := fmt.Sprintf("update %s set deleted = ? where id = ?", SuppliersTable)
 	_, err := s.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s SupplierRepository) DeleteUnnecessary(period int) error {
+	query := fmt.Sprintf(
+		"update %s set deleted = ? where (current_timestamp - created_at) > ? and deleted is null", SuppliersTable,
+	)
+	_, err := s.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), period)
 	if err != nil {
 		return err
 	}

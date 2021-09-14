@@ -42,10 +42,10 @@ func main() {
 	p := parser.NewParser(cfg, supplierRepository, productRepository)
 	go p.Parse(ctx)
 
-	userHandler := handlers.NewUserHandler(*cfg, userRepository, tokenRepository)
-	orderHandler := handlers.NewOrderHandler(*cfg, orderRepository)
-	supplierHandler := handlers.NewSupplierHandler(*cfg, supplierRepository)
-	productHandler := handlers.NewProductHandler(*cfg, productRepository)
+	userHandler := handlers.NewUserHandler(cfg, userRepository, tokenRepository)
+	orderHandler := handlers.NewOrderHandler(cfg, orderRepository)
+	supplierHandler := handlers.NewSupplierHandler(cfg, supplierRepository)
+	productHandler := handlers.NewProductHandler(cfg, productRepository)
 	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
 
 	srv := new(server.Server)

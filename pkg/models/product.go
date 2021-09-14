@@ -9,4 +9,6 @@ type Product struct {
 	Ingredients []string `json:"ingredients"`
 	Image       string   `json:"image"`
 	Deleted     string   `json:"deleted"`
+	CreatedAt   string   `json:"created_at"`
+	UpdatedAt   string   `json:"updated_at"`
 }

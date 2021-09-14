@@ -111,6 +111,13 @@ func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 	}
 	wg.Wait()
 	h.Save(&suppliersList)
+
+	delay := viper.GetInt("parser.delay")
+	if err = h.supplierRepo.DeleteUnnecessary(delay); err != nil {
+		h.cfg.Logger.Errorf("error delete unnecessary suppliers: ", err.Error())
+		return
+	}
+
 }
 
 func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {

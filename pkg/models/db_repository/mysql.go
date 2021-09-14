@@ -41,6 +41,6 @@ func NewDB(logger *log.Logger, cfg Config) (*sql.DB, error) {
 		logger.Fatalf("database error: %v", err)
 		return nil, err
 	}
-	
+
 	return db, nil
 }

@@ -12,18 +12,22 @@ import (
 )
 
 type UserHandler struct {
-	cfg     *conf.Config
-	service *services.UserService
+	cfg          *conf.Config
+	userService  *services.UserService
+	tokenService *services.TokenService
 }
 
-func NewUserHandler(cfg conf.Config, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
-	s := services.NewUserService(&cfg, &userRepo, &tokenRepo)
-	return &UserHandler{cfg: &cfg, service: s}
+func NewUserHandler(cfg *conf.Config, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
+	return &UserHandler{
+		cfg:          cfg,
+		userService:  services.NewUserService(cfg, &userRepo),
+		tokenService: services.NewTokenService(cfg, &tokenRepo),
+	}
 }
 
 func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/login", h.Login)
-	r.HandleFunc("/refreshTokens", h.Refresh)
+	r.HandleFunc("/refresh", h.Refresh)
 	r.Handle("/logout", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
 
 	r.HandleFunc("/createUser", appH.userHandler.Create)
@@ -49,7 +53,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, err := h.service.Create(user)
+	u, err := h.userService.Create(user)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
@@ -62,7 +66,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	u, err := h.service.GetAll()
+	u, err := h.userService.GetAll()
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
@@ -96,7 +100,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 
 	userID := req.Context().Value("user").(*models.User).ID
-	u, err := h.service.Update(user)
+	u, err := h.userService.Update(user)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "Invalid data", http.StatusInternalServerError)
@@ -111,7 +115,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 
-	err := h.service.Delete(userID)
+	err := h.userService.Delete(userID)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)

@@ -18,9 +18,11 @@ type SupplierHandler struct {
 	services *services.SupplierService
 }
 
-func NewSupplierHandler(cfg conf.Config, repo db_repository.SupplierRepositoryI) *SupplierHandler {
-	s := services.NewSupplierService(repo)
-	return &SupplierHandler{cfg: &cfg, services: s}
+func NewSupplierHandler(cfg *conf.Config, repo db_repository.SupplierRepositoryI) *SupplierHandler {
+	return &SupplierHandler{
+		cfg:      cfg,
+		services: services.NewSupplierService(repo),
+	}
 }
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {

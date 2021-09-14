@@ -9,16 +9,14 @@ import (
 )
 
 type UserService struct {
-	cfg       conf.Config
-	userRepo  db_repository.UserRepositoryI
-	tokenRepo db_repository.TokensRepositoryI
+	cfg      conf.Config
+	userRepo db_repository.UserRepositoryI
 }
 
-func NewUserService(cfg *conf.Config, userRepo *db_repository.UserRepositoryI, tokenRepo *db_repository.TokensRepositoryI) *UserService {
+func NewUserService(cfg *conf.Config, userRepo *db_repository.UserRepositoryI) *UserService {
 	return &UserService{
-		cfg:       *cfg,
-		userRepo:  *userRepo,
-		tokenRepo: *tokenRepo,
+		cfg:      *cfg,
+		userRepo: *userRepo,
 	}
 }
 

@@ -17,9 +17,11 @@ type ProductHandler struct {
 	services *services.ProductService
 }
 
-func NewProductHandler(cfg conf.Config, repo db_repository.ProductRepositoryI) *ProductHandler {
-	s := services.NewProductService(repo)
-	return &ProductHandler{cfg: &cfg, services: s}
+func NewProductHandler(cfg *conf.Config, repo db_repository.ProductRepositoryI) *ProductHandler {
+	return &ProductHandler{
+		cfg:      cfg,
+		services: services.NewProductService(repo),
+	}
 }
 
 func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {

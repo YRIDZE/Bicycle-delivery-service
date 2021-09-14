@@ -2,11 +2,14 @@ package services
 
 import (
 	"errors"
-	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/google/uuid"
 	"strings"
 	"time"
+
+	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 type JwtCustomClaims struct {
@@ -15,7 +18,27 @@ type JwtCustomClaims struct {
 	UID string `json:"uid"`
 }
 
-func (u *UserService) GenerateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
+type TokenService struct {
+	cfg       *conf.Config
+	tokenRepo db_repository.TokensRepositoryI
+}
+
+func NewTokenService(cfg *conf.Config, tokenRepo *db_repository.TokensRepositoryI) *TokenService {
+	return &TokenService{
+		cfg:       cfg,
+		tokenRepo: *tokenRepo,
+	}
+}
+
+func (s *TokenService) GenerateAccessToken(userID int32) (string, string, error) {
+	return s.generateToken(userID, s.cfg.AccessLifetimeMinutes, s.cfg.AccessSecret)
+}
+
+func (s *TokenService) GenerateRefreshToken(userID int32) (string, string, error) {
+	return s.generateToken(userID, s.cfg.RefreshLifetimeMinutes, s.cfg.RefreshSecret)
+}
+
+func (u *TokenService) generateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
 	uid := uuid.New().String()
 	claims := &JwtCustomClaims{
 		StandardClaims: jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Minute * time.Duration(lifetimeMinutes)).Unix()},
@@ -27,7 +50,15 @@ func (u *UserService) GenerateToken(userID int32, lifetimeMinutes int, secret st
 	return uid, token, err
 }
 
-func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
+func (s *TokenService) ValidateAccessToken(tokenString string) (*JwtCustomClaims, error) {
+	return s.validateToken(tokenString, s.cfg.AccessSecret)
+}
+
+func (s *TokenService) ValidateRefreshToken(tokenString string) (*JwtCustomClaims, error) {
+	return s.validateToken(tokenString, s.cfg.RefreshSecret)
+}
+
+func (u *TokenService) validateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(secretString), nil
@@ -46,7 +77,7 @@ func (u *UserService) ValidateToken(tokenString, secretString string) (*JwtCusto
 
 }
 
-func (u *UserService) GetTokenFromBearerString(input string) (string, error) {
+func (u *TokenService) GetTokenFromBearerString(input string) (string, error) {
 
 	if input == "" {
 		return "", errors.New("no token received")
@@ -65,17 +96,18 @@ func (u *UserService) GetTokenFromBearerString(input string) (string, error) {
 	return token, nil
 }
 
-func (u *UserService) CreateUid(userID int32, uid models.CachedTokens) error {
+func (u *TokenService) CreateUid(userID int32, uid models.CachedTokens) error {
 	return u.tokenRepo.CreateUid(userID, uid)
 }
 
-func (u *UserService) UpdateUid(userID int32, uid models.CachedTokens) error {
+func (u *TokenService) GetUidByID(userID int32) (*models.CachedTokens, error) {
+	return u.tokenRepo.GetUidByID(userID)
+}
+
+func (u *TokenService) UpdateUid(userID int32, uid models.CachedTokens) error {
 	return u.tokenRepo.UpdateUid(userID, uid)
 }
 
-func (u *UserService) DeleteUid(userID int32) error {
+func (u *TokenService) DeleteUid(userID int32) error {
 	return u.tokenRepo.DeleteUid(userID)
-}
-func (u *UserService) GetUidByID(userID int32) (*models.CachedTokens, error) {
-	return u.tokenRepo.GetUidByID(userID)
 }

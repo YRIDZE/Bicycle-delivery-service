@@ -18,9 +18,11 @@ type OrderHandler struct {
 	services *services.OrderService
 }
 
-func NewOrderHandler(cfg conf.Config, repo db_repository.OrderRepositoryI) *OrderHandler {
-	s := services.NewOrderService(repo)
-	return &OrderHandler{cfg: &cfg, services: s}
+func NewOrderHandler(cfg *conf.Config, repo db_repository.OrderRepositoryI) *OrderHandler {
+	return &OrderHandler{
+		cfg:      cfg,
+		services: services.NewOrderService(repo),
+	}
 }
 
 func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {

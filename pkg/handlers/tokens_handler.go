@@ -11,7 +11,7 @@ import (
 
 func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
-	err := h.service.DeleteUid(userID)
+	err := h.tokenService.DeleteUid(userID)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
@@ -40,21 +40,21 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	claims, err := h.service.ValidateToken(c.Value, h.cfg.RefreshSecret)
+	claims, err := h.tokenService.ValidateRefreshToken(c.Value)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusUnauthorized)
 		return
 	}
 
-	accessUID, accessString, err := h.service.GenerateToken(claims.ID, h.cfg.AccessLifetimeMinutes, h.cfg.AccessSecret)
+	accessUID, accessString, err := h.tokenService.GenerateAccessToken(claims.ID)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	refreshUID, refreshString, err := h.service.GenerateToken(claims.ID, h.cfg.RefreshLifetimeMinutes, h.cfg.RefreshSecret)
+	refreshUID, refreshString, err := h.tokenService.GenerateRefreshToken(claims.ID)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
@@ -65,7 +65,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 		AccessUID:  accessUID,
 		RefreshUID: refreshUID,
 	}
-	err = h.service.UpdateUid(claims.ID, cachedTokens)
+	err = h.tokenService.UpdateUid(claims.ID, cachedTokens)
 
 	resp := models.LoginResponse{
 		AccessToken:  accessString,
@@ -101,7 +101,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := h.service.GetByEmail(r.Email)
+	user, err := h.userService.GetByEmail(r.Email)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
@@ -114,14 +114,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	accessUID, accessString, err := h.service.GenerateToken(user.ID, h.cfg.AccessLifetimeMinutes, h.cfg.AccessSecret)
+	accessUID, accessString, err := h.tokenService.GenerateAccessToken(user.ID)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	refreshUID, refreshString, err := h.service.GenerateToken(user.ID, h.cfg.RefreshLifetimeMinutes, h.cfg.RefreshSecret)
+	refreshUID, refreshString, err := h.tokenService.GenerateRefreshToken(user.ID)
 	if err != nil {
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
@@ -131,7 +131,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 		AccessUID:  accessUID,
 		RefreshUID: refreshUID,
 	}
-	err = h.service.CreateUid(user.ID, cachedTokens)
+	err = h.tokenService.CreateUid(user.ID, cachedTokens)
 	if err != nil {
 		h.cfg.Logger.Error(err.Error())
 		http.Error(w, "invalid token", http.StatusInternalServerError)

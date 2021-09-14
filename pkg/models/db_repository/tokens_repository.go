@@ -44,23 +44,7 @@ func (u *TokensRepository) CreateUid(userID int32, uid models.CachedTokens) erro
 	}
 	return nil
 }
-func (u *TokensRepository) UpdateUid(userID int32, uid models.CachedTokens) error {
-	query := fmt.Sprintf("update %s set access_uid = ?, refresh_uid = ? where user_id = ?", CacheTokenTable)
-	_, err := u.db.Exec(query, uid.AccessUID, uid.RefreshUID, userID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
-func (u *TokensRepository) DeleteUid(userID int32) error {
-	query := fmt.Sprintf("delete from %s where user_id = ?", CacheTokenTable)
-	_, err := u.db.Exec(query, userID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 func (u *TokensRepository) GetUidByID(userID int32) (*models.CachedTokens, error) {
 	cachedT := new(models.CachedTokens)
 	query := fmt.Sprintf("select access_uid, refresh_uid from %s where user_id = ?", CacheTokenTable)
@@ -70,4 +54,21 @@ func (u *TokensRepository) GetUidByID(userID int32) (*models.CachedTokens, error
 		return nil, err
 	}
 	return cachedT, nil
+}
+
+func (u *TokensRepository) UpdateUid(userID int32, uid models.CachedTokens) error {
+	query := fmt.Sprintf("update %s set access_uid = ?, refresh_uid = ? where user_id = ?", CacheTokenTable)
+	_, err := u.db.Exec(query, uid.AccessUID, uid.RefreshUID, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (u *TokensRepository) DeleteUid(userID int32) error {
+	query := fmt.Sprintf("delete from %s where user_id = ?", CacheTokenTable)
+	_, err := u.db.Exec(query, userID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
