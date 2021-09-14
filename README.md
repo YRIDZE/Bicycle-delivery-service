@@ -2,21 +2,44 @@
 
 ... is a marketplace for dishes from different restaurants.
 
-Bicycle is designed as a platform to meet the demand and supply between consumers and sellers by bringing them to a common platform.
+Bicycle is designed as a platform to meet the demand and supply between consumers and sellers by bringing them to a
+common platform.
 
+At this first phase, we haven't implemented the delivery service and has built platform with the consideration that the
+delivery will be managed by the seller.
 
+## Requirements for development
 
-At this first phase, we haven't implemented the delivery service and has built platform with the consideration that the delivery will be managed by the seller.
+Application works with Go 1.16.6 and MySQL 8.0.26
 
+## Installation
 
-**Get the project:**
+1. Get Demo application source files from Git repository:
 
 ```
-$ go get github.com/YRIDZE/Bicycle-delivery-service
+$ git clone https://github.com/YRIDZE/Bicycle-delivery-service.git
 ```
 
-**Use the project:**
+2. Create `logs` directory
 
-```go
-import "github.com/YRIDZE/Bicycle-delivery-services"
 ```
+$ mkdir logs
+```
+
+3. Add project configs:
+
+- Create the `.evn` file; add and fill fields as suggested in the `.env.dist` file.
+- Open `conf/config.yml` and replace **_port_** and **_db_** with you own data.
+
+
+4. Migrate db
+
+```
+$ cd Bicycle-delivery-service
+$ go build -o cli cmd/migrate/main.go
+$ ./cli migrate up
+```
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.

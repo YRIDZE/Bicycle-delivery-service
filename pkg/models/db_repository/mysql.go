@@ -6,6 +6,7 @@ import (
 
 	log "github.com/YRIDZE/yolo-log"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 const (
@@ -28,7 +29,7 @@ type Config struct {
 func NewDB(logger *log.Logger, cfg Config) (*sql.DB, error) {
 	db, err := sql.Open(
 		"mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName),
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName),
 	)
 	if err != nil {
 		logger.Fatalf("database error: %v", err)
@@ -40,6 +41,6 @@ func NewDB(logger *log.Logger, cfg Config) (*sql.DB, error) {
 		logger.Fatalf("database error: %v", err)
 		return nil, err
 	}
-
+	
 	return db, nil
 }
