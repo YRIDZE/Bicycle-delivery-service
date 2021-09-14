@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -38,6 +39,12 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	order.UserID = req.Context().Value("user").(*models.User).ID
+	if err := order.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
 	o, err := h.services.Create(order)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -52,7 +59,12 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	orderID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || orderID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
+		return
+	}
 
 	o, err := h.services.GetByID(orderID)
 	if err != nil {
@@ -98,6 +110,12 @@ func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 
 	order.UserID = req.Context().Value("user").(*models.User).ID
+	if err := order.Validate(); err != nil {
+		h.logger.Error(err)
+		requests.ValidationErrorResponse(w, err)
+		return
+	}
+
 	o, err := h.services.Update(order)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -112,9 +130,14 @@ func (h *OrderHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *OrderHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	orderID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
+	if err != nil || orderID < 1 {
+		h.logger.Error(errors.New("invalid id parameter"))
+		http.Error(w, "invalid id parameter", http.StatusNotFound)
+		return
+	}
 
-	err := h.services.Delete(orderID)
+	err = h.services.Delete(orderID)
 	if err != nil {
 		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)

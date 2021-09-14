@@ -1,4 +1,4 @@
-package Bicycle_delivery_service
+package server
 
 import (
 	"context"

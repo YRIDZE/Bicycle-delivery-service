@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	app "github.com/YRIDZE/Bicycle-delivery-service"
-	"github.com/YRIDZE/Bicycle-delivery-service/cmd/parser"
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/parser"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	"github.com/YRIDZE/Bicycle-delivery-service/server"
 	log "github.com/YRIDZE/yolo-log"
 	"github.com/spf13/viper"
 )
@@ -63,7 +63,7 @@ func main() {
 	productHandler := handlers.NewProductHandler(logger, productRepository)
 	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler)
 
-	srv := new(app.Server)
+	srv := new(server.Server)
 	go func() {
 		if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
 			logger.Fatalf("error occurred while running http server: %s", err.Error())

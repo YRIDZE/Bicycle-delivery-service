@@ -103,8 +103,8 @@ func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 		go func(ctx context.Context, i int) {
 			defer wg.Done()
 
-			supplierMenu, err2 := h.GetSupplierProductsByID(i + 1)
-			if err2 != nil {
+			supplierMenu, err := h.GetSupplierProductsByID(i + 1)
+			if err != nil {
 				return
 			}
 			suppliersList[i].Menu = supplierMenu
