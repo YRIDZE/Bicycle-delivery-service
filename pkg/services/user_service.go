@@ -5,17 +5,20 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
+	yolo_log "github.com/YRIDZE/yolo-log"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-	cfg      conf.Config
+	cfg      conf.ConfigToken
+	logger   *yolo_log.Logger
 	userRepo db_repository.UserRepositoryI
 }
 
-func NewUserService(cfg *conf.Config, userRepo *db_repository.UserRepositoryI) *UserService {
+func NewUserService(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo *db_repository.UserRepositoryI) *UserService {
 	return &UserService{
 		cfg:      *cfg,
+		logger:   logger,
 		userRepo: *userRepo,
 	}
 }

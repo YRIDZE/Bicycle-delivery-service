@@ -9,20 +9,29 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type ConfigDB struct {
+	Host       string
+	Port       string
+	Username   string
+	DBName     string
+	DbPassword string
+}
+
+type ConfigServer struct {
+	Port string
+}
+
+type ConfigToken struct {
 	AccessSecret           string
 	RefreshSecret          string
 	AccessLifetimeMinutes  int
 	RefreshLifetimeMinutes int
+}
 
-	Port string
-
-	Host       string
-	DBPort     string
-	Username   string
-	DBName     string
-	DbPassword string
-
+type Config struct {
+	ConfigServer
+	ConfigToken
+	ConfigDB
 	Logger *log.Logger
 }
 
@@ -53,22 +62,24 @@ func NewConfig() *Config {
 	refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("REFRESH_LIFETIME_MINUTES"))
 
 	return &Config{
-		Port: viper.GetString("port"),
-
-		AccessSecret:           os.Getenv("ACCESS_SECRET"),
-		RefreshSecret:          os.Getenv("REFRESH_SECRET"),
-		AccessLifetimeMinutes:  accessLifetimeMinutes,
-		RefreshLifetimeMinutes: refreshLifetimeMinutes,
-
-		Host:       viper.GetString("db.host"),
-		DBPort:     viper.GetString("db.port"),
-		Username:   viper.GetString("db.username"),
-		DBName:     viper.GetString("db.dbname"),
-		DbPassword: os.Getenv("DB_PASSWORD"),
-
+		ConfigServer: ConfigServer{
+			Port: viper.GetString("port"),
+		},
+		ConfigToken: ConfigToken{
+			AccessSecret:           os.Getenv("ACCESS_SECRET"),
+			RefreshSecret:          os.Getenv("REFRESH_SECRET"),
+			AccessLifetimeMinutes:  accessLifetimeMinutes,
+			RefreshLifetimeMinutes: refreshLifetimeMinutes,
+		},
+		ConfigDB: ConfigDB{
+			Host:       viper.GetString("db.host"),
+			Port:       viper.GetString("db.port"),
+			Username:   viper.GetString("db.username"),
+			DBName:     viper.GetString("db.dbname"),
+			DbPassword: os.Getenv("DB_PASSWORD"),
+		},
 		Logger: logger,
 	}
-
 }
 
 func InitConfig() error {

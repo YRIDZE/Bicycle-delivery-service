@@ -9,19 +9,22 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/requests"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/services"
+	yolo_log "github.com/YRIDZE/yolo-log"
 )
 
 type UserHandler struct {
-	cfg          *conf.Config
+	cfg          *conf.ConfigToken
+	logger       *yolo_log.Logger
 	userService  *services.UserService
 	tokenService *services.TokenService
 }
 
-func NewUserHandler(cfg *conf.Config, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
+func NewUserHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo db_repository.UserRepositoryI, tokenRepo db_repository.TokensRepositoryI) *UserHandler {
 	return &UserHandler{
 		cfg:          cfg,
-		userService:  services.NewUserService(cfg, &userRepo),
-		tokenService: services.NewTokenService(cfg, &tokenRepo),
+		logger:       logger,
+		userService:  services.NewUserService(cfg, logger, &userRepo),
+		tokenService: services.NewTokenService(cfg, logger, &tokenRepo),
 	}
 }
 
@@ -42,33 +45,33 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	if err := user.Validate(); err != nil {
-		h.cfg.Logger.Error(err)
+		h.logger.Error(err.Error())
 		requests.ValidationErrorResponse(w, err)
 		return
 	}
 
 	u, err := h.userService.Create(user)
 	if err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
-	h.cfg.Logger.Infof("user %d successfully created", u.ID)
+	h.logger.Infof("user %d successfully created", u.ID)
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	u, err := h.userService.GetAll()
 	if err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
@@ -80,7 +83,7 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
-	h.cfg.Logger.Infof("users successfully extracted")
+	h.logger.Infof("users successfully extracted")
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
@@ -88,13 +91,13 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
 	if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
 
 	if err := user.Validate(); err != nil {
-		h.cfg.Logger.Error(err)
+		h.logger.Error(err.Error())
 		requests.ValidationErrorResponse(w, err)
 		return
 	}
@@ -102,14 +105,14 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	userID := req.Context().Value("user").(*models.User).ID
 	u, err := h.userService.Update(user)
 	if err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "Invalid data", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.UserResponse{ID: u.ID, FirstName: u.FirstName, LastName: u.LastName, Email: u.Email})
-	h.cfg.Logger.Infof("user %d successfully updated", userID)
+	h.logger.Infof("user %d successfully updated", userID)
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
@@ -117,14 +120,14 @@ func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 
 	err := h.userService.Delete(userID)
 	if err != nil {
-		h.cfg.Logger.Error(err.Error())
+		h.logger.Error(err.Error())
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("user successfully deleted"))
-	h.cfg.Logger.Infof("user %d successfully deleted", userID)
+	h.logger.Infof("user %d successfully deleted", userID)
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
@@ -132,5 +135,5 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.UserResponse{ID: user.ID, FirstName: user.FirstName, LastName: user.LastName, Email: user.Email})
-	h.cfg.Logger.Infof("user %d successfully fetched profile", user.ID)
+	h.logger.Infof("user %d successfully fetched profile", user.ID)
 }

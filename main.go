@@ -21,11 +21,11 @@ func main() {
 	db, err := db_repository.NewDB(
 		cfg.Logger,
 		db_repository.Config{
-			Host:     cfg.Host,
-			Port:     cfg.DBPort,
-			Username: cfg.Username,
-			DBName:   cfg.DBName,
-			Password: cfg.DbPassword,
+			Host:     cfg.ConfigDB.Host,
+			Port:     cfg.ConfigDB.Port,
+			Username: cfg.ConfigDB.Username,
+			DBName:   cfg.ConfigDB.DBName,
+			Password: cfg.ConfigDB.DbPassword,
 		},
 	)
 	if err != nil {
@@ -43,16 +43,16 @@ func main() {
 	p := parser.NewParser(cfg, supplierRepository, productRepository)
 	go p.Parse(ctx)
 
-	userHandler := handlers.NewUserHandler(cfg, userRepository, tokenRepository)
-	orderHandler := handlers.NewOrderHandler(cfg, orderRepository)
-	supplierHandler := handlers.NewSupplierHandler(cfg, supplierRepository)
-	productHandler := handlers.NewProductHandler(cfg, productRepository)
-	cartHandler := handlers.NewCartHandler(cfg, cartRepository)
+	userHandler := handlers.NewUserHandler(&cfg.ConfigToken, cfg.Logger, userRepository, tokenRepository)
+	orderHandler := handlers.NewOrderHandler(&cfg.ConfigToken, cfg.Logger, orderRepository)
+	supplierHandler := handlers.NewSupplierHandler(cfg.Logger, supplierRepository)
+	productHandler := handlers.NewProductHandler(cfg.Logger, productRepository)
+	cartHandler := handlers.NewCartHandler(&cfg.ConfigToken, cfg.Logger, cartRepository)
 	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler, cartHandler)
 
 	srv := new(server.Server)
 	go func() {
-		if err := srv.Run(cfg.Port, h.InitRoutes()); err != nil {
+		if err := srv.Run(cfg.ConfigServer.Port, h.InitRoutes()); err != nil {
 			cfg.Logger.Fatalf("error occurred while running http server: %s", err.Error())
 			return
 		}

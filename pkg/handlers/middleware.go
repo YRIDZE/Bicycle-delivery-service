@@ -12,14 +12,14 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 			bearerString := req.Header.Get("Authorization")
 			tokenString, err := h.tokenService.GetTokenFromBearerString(bearerString)
 			if err != nil {
-				h.cfg.Logger.Error(err.Error())
+				h.logger.Error(err.Error())
 				http.Error(w, fmt.Sprint("bad token: ", err.Error()), http.StatusUnauthorized)
 				return
 			}
 
 			claims, err := h.tokenService.ValidateAccessToken(tokenString)
 			if err != nil {
-				h.cfg.Logger.Error(err.Error())
+				h.logger.Error(err.Error())
 				http.Error(w, fmt.Sprint("bad token: ", err.Error()), http.StatusUnauthorized)
 				return
 			}
@@ -31,7 +31,7 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 
 			user, err := h.userService.GetByID(claims.ID)
 			if err != nil {
-				h.cfg.Logger.Error(err.Error())
+				h.logger.Error(err.Error())
 				http.Error(w, "invalid credentials", http.StatusBadRequest)
 				return
 			}

@@ -8,6 +8,7 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
+	yolo_log "github.com/YRIDZE/yolo-log"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 )
@@ -19,13 +20,15 @@ type JwtCustomClaims struct {
 }
 
 type TokenService struct {
-	cfg       *conf.Config
+	cfg       *conf.ConfigToken
+	logger    *yolo_log.Logger
 	tokenRepo db_repository.TokensRepositoryI
 }
 
-func NewTokenService(cfg *conf.Config, tokenRepo *db_repository.TokensRepositoryI) *TokenService {
+func NewTokenService(cfg *conf.ConfigToken, logger *yolo_log.Logger, tokenRepo *db_repository.TokensRepositoryI) *TokenService {
 	return &TokenService{
 		cfg:       cfg,
+		logger:    logger,
 		tokenRepo: *tokenRepo,
 	}
 }

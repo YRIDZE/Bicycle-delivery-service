@@ -35,11 +35,11 @@ var migrateUpCmd = &cobra.Command{
 		db, err := db_repository.NewDB(
 			cfg.Logger,
 			db_repository.Config{
-				Host:     cfg.Host,
-				Port:     cfg.DBPort,
-				Username: cfg.Username,
-				DBName:   cfg.DBName,
-				Password: cfg.DbPassword,
+				Host:     cfg.ConfigDB.Host,
+				Port:     cfg.ConfigDB.Port,
+				Username: cfg.ConfigDB.Username,
+				DBName:   cfg.ConfigDB.DBName,
+				Password: cfg.ConfigDB.DbPassword,
 			},
 		)
 		if err != nil {
@@ -81,11 +81,11 @@ var migrateDownCmd = &cobra.Command{
 		db, err := db_repository.NewDB(
 			cfg.Logger,
 			db_repository.Config{
-				Host:     cfg.Host,
-				Port:     cfg.DBPort,
-				Username: cfg.Username,
-				DBName:   cfg.DBName,
-				Password: cfg.DbPassword,
+				Host:     cfg.ConfigDB.Host,
+				Port:     cfg.ConfigDB.Port,
+				Username: cfg.ConfigDB.Username,
+				DBName:   cfg.ConfigDB.DBName,
+				Password: cfg.ConfigDB.DbPassword,
 			},
 		)
 		if err != nil {
