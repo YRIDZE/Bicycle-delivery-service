@@ -30,7 +30,6 @@ func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/getSupplierById", h.GetByID)
 	r.HandleFunc("/getSuppliers", h.GetAll)
 	r.HandleFunc("/updateSupplier", h.Update)
-	r.HandleFunc("/deleteSupplier", h.Delete)
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -56,7 +55,18 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image})
+	json.NewEncoder(w).Encode(
+		&models.SupplierResponse{
+			ID:    s.ID,
+			Name:  s.Name,
+			Type:  s.Type,
+			Image: s.Image,
+			WorkHours: models.WorkingHours{
+				Opening: s.WorkHours.Opening,
+				Closing: s.WorkHours.Closing,
+			},
+		},
+	)
 	h.logger.Infof("supplier %d successfully created", s.ID)
 }
 
@@ -77,7 +87,19 @@ func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image, Deleted: s.Deleted})
+	json.NewEncoder(w).Encode(
+		&models.SupplierResponse{
+			ID:    s.ID,
+			Name:  s.Name,
+			Type:  s.Type,
+			Image: s.Image,
+			WorkHours: models.WorkingHours{
+				Opening: s.WorkHours.Opening,
+				Closing: s.WorkHours.Closing,
+			},
+			Deleted: s.Deleted,
+		},
+	)
 	h.logger.Infof("user successfully fetched supplier %d", supplierID)
 }
 
@@ -91,7 +113,20 @@ func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 
 	var resp []models.SupplierResponse
 	for _, x := range *s {
-		resp = append(resp, models.SupplierResponse{ID: x.ID, Name: x.Name, Image: x.Image, Deleted: x.Deleted})
+		resp = append(
+			resp,
+			models.SupplierResponse{
+				ID:    x.ID,
+				Name:  x.Name,
+				Type:  x.Type,
+				Image: x.Image,
+				WorkHours: models.WorkingHours{
+					Opening: x.WorkHours.Opening,
+					Closing: x.WorkHours.Closing,
+				},
+				Deleted: x.Deleted,
+			},
+		)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -123,26 +158,18 @@ func (h *SupplierHandler) Update(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&models.SupplierResponse{ID: s.ID, Name: s.Name, Image: s.Image, Deleted: s.Deleted})
+	json.NewEncoder(w).Encode(
+		&models.SupplierResponse{
+			ID:    s.ID,
+			Name:  s.Name,
+			Type:  s.Type,
+			Image: s.Image,
+			WorkHours: models.WorkingHours{
+				Opening: s.WorkHours.Opening,
+				Closing: s.WorkHours.Closing,
+			},
+			Deleted: s.Deleted,
+		},
+	)
 	h.logger.Infof("supplier %d successfully updated", supplier.ID)
-}
-
-func (h *SupplierHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	supplierID, err := strconv.Atoi(req.URL.Query().Get("id"))
-	if err != nil || supplierID < 1 {
-		h.logger.Error(errors.New("invalid id parameter"))
-		http.Error(w, "invalid id parameter", http.StatusNotFound)
-		return
-	}
-
-	err = h.services.Delete(int32(supplierID))
-	if err != nil {
-		h.logger.Error(err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("supplier successfully deleted"))
-	h.logger.Infof("supplier %d successfully deleted", supplierID)
 }

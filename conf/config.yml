@@ -7,5 +7,5 @@ db:
   dbname: "delivery_db"
 
 parser:
-  url: "http://foodapi.true-tech.php.nixdev.co/restaurants"
+  url: "http://foodapi.true-tech.php.nixdev.co/suppliers"
   delay: 10

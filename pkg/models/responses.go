@@ -30,14 +30,16 @@ type OrderResponse struct {
 }
 
 type SuppliersResponse struct {
-	Suppliers []Supplier `json:"restaurants"`
+	Suppliers []Supplier `json:"suppliers"`
 }
 
 type SupplierResponse struct {
-	ID      int32  `json:"id"`
-	Name    string `json:"name"`
-	Image   string `json:"image"`
-	Deleted string `json:"deleted"`
+	ID        int32        `json:"id"`
+	Name      string       `json:"name"`
+	Type      string       `json:"type"`
+	Image     string       `json:"image"`
+	WorkHours WorkingHours `json:"workingHours"`
+	Deleted   string       `json:"deleted"`
 }
 
 type ProductsResponse struct {

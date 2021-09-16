@@ -14,7 +14,6 @@ type SupplierRepositoryI interface {
 	GetAll() (*[]models.Supplier, error)
 	GetByName(name string) (int32, error)
 	Update(supplier *models.Supplier) (*models.Supplier, error)
-	Delete(id int32) error
 	DeleteUnnecessary(period int) error
 }
 
@@ -27,9 +26,11 @@ func NewSupplierRepository(db *sql.DB) *SupplierRepository {
 }
 
 func (s SupplierRepository) Create(supplier *models.Supplier) (*models.Supplier, error) {
-	query := fmt.Sprintf("insert into %s (name, image) value (?, ?)", SuppliersTable)
+	query := fmt.Sprintf("insert into %s (name, type, image, opening, closing) value (?, ?, ?, ?, ?)", SuppliersTable)
 
-	res, err := s.db.Exec(query, supplier.Name, supplier.Image)
+	res, err := s.db.Exec(
+		query, supplier.Name, supplier.Type, supplier.Image, supplier.WorkHours.Opening, supplier.WorkHours.Closing,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +48,11 @@ func (s SupplierRepository) GetByID(id int) (*models.Supplier, error) {
 	var deletedV sql.NullString
 	supplier := new(models.Supplier)
 
-	query := fmt.Sprintf("select id, name, image, deleted from %s where id = ?", SuppliersTable)
-	err := s.db.QueryRow(query, id).Scan(&supplier.ID, &supplier.Name, &supplier.Image, &deletedV)
+	query := fmt.Sprintf("select id, name, type, image, opening, closing, deleted from %s where id = ?", SuppliersTable)
+	err := s.db.QueryRow(query, id).Scan(
+		&supplier.ID, &supplier.Name, &supplier.Type, &supplier.Image, &supplier.WorkHours.Opening, &supplier.WorkHours.Closing,
+		&deletedV,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +79,7 @@ func (s SupplierRepository) GetByName(name string) (int32, error) {
 func (s SupplierRepository) GetAll() (*[]models.Supplier, error) {
 	var suppliers []models.Supplier
 	var supplier models.Supplier
-	query := fmt.Sprintf("select id, name, image from %s where deleted is null", SuppliersTable)
+	query := fmt.Sprintf("select id, name, type, image, opening, closing from %s where deleted is null", SuppliersTable)
 	pr, err := s.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -88,7 +92,10 @@ func (s SupplierRepository) GetAll() (*[]models.Supplier, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&supplier.ID, &supplier.Name, &supplier.Image)
+		err := rows.Scan(
+			&supplier.ID, &supplier.Name, &supplier.Type, &supplier.Image, &supplier.WorkHours.Opening,
+			&supplier.WorkHours.Closing,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -101,26 +108,19 @@ func (s SupplierRepository) GetAll() (*[]models.Supplier, error) {
 }
 
 func (s SupplierRepository) Update(supplier *models.Supplier) (*models.Supplier, error) {
-	query := fmt.Sprintf("update %s set name = ?, image = ? where id = ?", SuppliersTable)
-	_, err := s.db.Exec(query, &supplier.Name, &supplier.Image, supplier.ID)
+	query := fmt.Sprintf("update %s set name = ?, type = ?, image = ?, opening = ?, closing = ? where id = ?", SuppliersTable)
+	_, err := s.db.Exec(
+		query, supplier.Name, supplier.Type, supplier.Image, supplier.WorkHours.Opening, supplier.WorkHours.Closing, supplier.ID,
+	)
 	if err != nil {
 		return nil, err
 	}
 	return supplier, nil
 }
 
-func (s SupplierRepository) Delete(id int32) error {
-	query := fmt.Sprintf("update %s set deleted = ? where id = ?", SuppliersTable)
-	_, err := s.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s SupplierRepository) DeleteUnnecessary(period int) error {
 	query := fmt.Sprintf(
-		"update %s set deleted = ? where (current_timestamp - created_at) > ? and deleted is null", SuppliersTable,
+		"update %s set deleted = ? where (current_timestamp - updated_at) > ? and deleted is null", SuppliersTable,
 	)
 	_, err := s.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), period)
 	if err != nil {
