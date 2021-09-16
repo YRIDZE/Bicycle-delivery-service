@@ -50,7 +50,7 @@ func NewConfig() *Config {
 	}
 
 	if err := godotenv.Load(); err != nil {
-		logger.Fatalf("Could not load .env file. Returned error was: ", err.Error())
+		logger.Fatalf("Could not load .env file. Returned error was: %v", err.Error())
 		panic(err.Error())
 	}
 

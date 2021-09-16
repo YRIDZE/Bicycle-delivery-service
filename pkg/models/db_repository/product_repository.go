@@ -154,12 +154,8 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 }
 
 func (p ProductRepository) Update(product *models.Product) (*models.Product, error) {
-
-	ingredientsJson, _ := json.Marshal(product.Ingredients)
-	productQuery := fmt.Sprintf(
-		"update %s set name = ?, price = ?, type = ?, ingredients = ?, image = ? where id = ?", ProductsTable,
-	)
-	_, err := p.db.Exec(productQuery, product.Name, product.Price, product.Type, ingredientsJson, product.Image, product.ID)
+	productQuery := fmt.Sprintf("update %s set price = ? where id = ?", ProductsTable)
+	_, err := p.db.Exec(productQuery, product.Price, product.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -15,11 +15,11 @@ type UserService struct {
 	userRepo db_repository.UserRepositoryI
 }
 
-func NewUserService(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo *db_repository.UserRepositoryI) *UserService {
+func NewUserService(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo db_repository.UserRepositoryI) *UserService {
 	return &UserService{
 		cfg:      *cfg,
 		logger:   logger,
-		userRepo: *userRepo,
+		userRepo: userRepo,
 	}
 }
 

@@ -24,7 +24,7 @@ func NewCartHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_repo
 	return &CartHandler{
 		cfg:     cfg,
 		logger:  logger,
-		service: services.NewCartService(&repo),
+		service: services.NewCartService(repo),
 	}
 }
 

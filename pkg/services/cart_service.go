@@ -10,8 +10,8 @@ type CartService struct {
 	repo db_repository.CartRepositoryI
 }
 
-func NewCartService(repo *db_repository.CartRepositoryI) *CartService {
-	return &CartService{repo: *repo}
+func NewCartService(repo db_repository.CartRepositoryI) *CartService {
+	return &CartService{repo: repo}
 }
 
 func (c CartService) Create(cart *requests.CartRequest) (*models.Cart, error) {

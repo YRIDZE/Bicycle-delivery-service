@@ -114,7 +114,7 @@ func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 
 	delay := viper.GetInt("parser.delay")
 	if err = h.supplierRepo.DeleteUnnecessary(delay); err != nil {
-		h.cfg.Logger.Errorf("error delete unnecessary suppliers: ", err.Error())
+		h.cfg.Logger.Errorf("error delete unnecessary suppliers: %v", err.Error())
 		return
 	}
 
@@ -128,7 +128,7 @@ func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 
 	jsonBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		h.cfg.Logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body: %v", err)
 	}
 
 	var suppliersList models.SuppliersResponse
@@ -151,7 +151,7 @@ func (h *SupplierProductsParser) GetSupplierProductsByID(id int) ([]models.Produ
 	jsonBytes, err := io.ReadAll(response.Body)
 	err = response.Body.Close()
 	if err != nil {
-		h.cfg.Logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body: %v", err)
 	}
 
 	supplierProducts := new(models.ProductsResponse)
