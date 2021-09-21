@@ -20,8 +20,16 @@ type TestCaseValidateToken struct {
 
 type TestCaseUserCreate struct {
 	TestName     string
-	User         models.User
-	Want         models.User
+	User         *models.User
+	Want         *models.User
+	WantErr      bool
+	WantErrorMsg string
+}
+
+type TestCaseUserGetByID struct {
+	TestName     string
+	UserID       int32
+	Want         *models.User
 	WantErr      bool
 	WantErrorMsg string
 }
