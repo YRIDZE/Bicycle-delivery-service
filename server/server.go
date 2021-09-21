@@ -1,27 +1,21 @@
 package server
 
 import (
-	"context"
 	"net/http"
 	"time"
+
+	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 )
 
-type Server struct {
-	httpServer *http.Server
-}
-
-func (s *Server) Run(port string, handler http.Handler) error {
-	s.httpServer = &http.Server{
-		Addr:           ":" + port,
-		Handler:        handler,
+func InitServer(cfg *conf.Config, h *handlers.AppHandlers) *http.Server {
+	srv := &http.Server{
+		Addr:           ":" + cfg.ConfigServer.Port,
+		Handler:        h.InitRoutes(),
 		MaxHeaderBytes: 1 << 20, // 1 MB
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 	}
 
-	return s.httpServer.ListenAndServe()
-}
-
-func (s *Server) Shutdown(ctx context.Context) error {
-	return s.httpServer.Shutdown(ctx)
+	return srv
 }

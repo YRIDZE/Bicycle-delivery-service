@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
-	"github.com/YRIDZE/Bicycle-delivery-service/parser"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/handlers"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/server"
@@ -18,41 +17,12 @@ func main() {
 	ctx := context.Background()
 	cfg := conf.NewConfig()
 
-	db, err := db_repository.NewDB(
-		cfg.Logger,
-		db_repository.Config{
-			Host:     cfg.ConfigDB.Host,
-			Port:     cfg.ConfigDB.Port,
-			Username: cfg.ConfigDB.Username,
-			DBName:   cfg.ConfigDB.DBName,
-			Password: cfg.ConfigDB.DbPassword,
-		},
-	)
-	if err != nil {
-		cfg.Logger.Fatal("Could not connected to database. Panic!")
-		panic(err.Error())
-	}
+	db := db_repository.InitDB(cfg)
+	h := handlers.InitHandlers(ctx, cfg, db)
+	srv := server.InitServer(cfg, h)
 
-	userRepository := db_repository.NewUserRepository(db)
-	tokenRepository := db_repository.NewTokensRepository(db)
-	orderRepository := db_repository.NewOrderRepository(db)
-	cartRepository := db_repository.NewCartRepository(db)
-	supplierRepository := db_repository.NewSupplierRepository(db)
-	productRepository := db_repository.NewProductRepository(db)
-
-	p := parser.NewParser(cfg, supplierRepository, productRepository)
-	go p.Parse(ctx)
-
-	userHandler := handlers.NewUserHandler(&cfg.ConfigToken, cfg.Logger, userRepository, tokenRepository)
-	orderHandler := handlers.NewOrderHandler(&cfg.ConfigToken, cfg.Logger, orderRepository)
-	cartHandler := handlers.NewCartHandler(&cfg.ConfigToken, cfg.Logger, cartRepository)
-	supplierHandler := handlers.NewSupplierHandler(cfg.Logger, supplierRepository)
-	productHandler := handlers.NewProductHandler(cfg.Logger, productRepository)
-	h := handlers.NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler, cartHandler)
-
-	srv := new(server.Server)
 	go func() {
-		if err := srv.Run(cfg.ConfigServer.Port, h.InitRoutes()); err != nil {
+		if err := srv.ListenAndServe(); err != nil {
 			cfg.Logger.Fatalf("error occurred while running http server: %s", err.Error())
 			return
 		}
