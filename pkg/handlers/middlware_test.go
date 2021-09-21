@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -13,19 +14,9 @@ import (
 	"github.com/YRIDZE/Bicycle-delivery-service/tests/helpers"
 	log "github.com/YRIDZE/yolo-log"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 )
 
-const userID = 1
-
-type UserHandlerTestSuite struct {
-	suite.Suite
-	accessToken string
-	userHandler *UserHandler
-	h           *AppHandlers
-}
-
-func (suite *UserHandlerTestSuite) SetupSuite() {
+func TestUserHandler_AuthMiddleware(t *testing.T) {
 	logger, _ := log.NewLogger(log.LoggerParams{})
 	db, _, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -39,44 +30,40 @@ func (suite *UserHandlerTestSuite) SetupSuite() {
 	}
 
 	tokenService := services.NewTokenService(cfg, logger, db_repository.NewTokensRepositoryMock(db))
-	suite.userHandler = NewUserHandler(cfg, logger, db_repository.NewUserRepositoryMock(db), db_repository.NewTokensRepositoryMock(db))
-	_, suite.accessToken, _ = tokenService.GenerateAccessToken(userID)
+	userHandler := NewUserHandlerMock(cfg, logger, db_repository.NewUserRepositoryMock(db), db_repository.NewTokensRepositoryMock(db))
+	_, accessToken, _ := tokenService.GenerateAccessToken(userID)
 
-	suite.h = NewAppHandlers(suite.userHandler)
-}
+	h := NewAppHandlers((*UserHandler)(userHandler))
 
-func TestUserHandlerTestSuite(t *testing.T) {
-	suite.Run(t, new(UserHandlerTestSuite))
-}
-
-func (suite *UserHandlerTestSuite) TestUserHandler_GetProfile() {
-	t := suite.T()
-	handlerFunc := suite.userHandler.GetProfile
 	cases := []helpers.TestCaseHandler{
 		{
 			TestName: "Successfully get user profile",
 			Request: helpers.Request{
-				Method: http.MethodGet,
-				Url:    "/getUser",
-				Token:  suite.accessToken,
+				Token: accessToken,
+				Url:   "/getUser",
 			},
-			HandlerFunc: handlerFunc,
 			Want: helpers.ExpectedResponse{
 				StatusCode: 200,
-				BodyPart:   "",
 			},
 		},
 		{
 			TestName: "Unauthorized getting user profile",
 			Request: helpers.Request{
-				Method: http.MethodGet,
-				Url:    "/getUser",
-				Token:  "",
+				Token: "",
+				Url:   "/getUser",
 			},
-			HandlerFunc: handlerFunc,
 			Want: helpers.ExpectedResponse{
 				StatusCode: 401,
-				BodyPart:   "bad token",
+			},
+		},
+		{
+			TestName: "Unauthorized getting user profile",
+			Request: helpers.Request{
+				Token: fmt.Sprintf("%s.%s", strings.Split(accessToken, ".")[0], strings.Split(accessToken, ".")[1]),
+				Url:   "/getUser",
+			},
+			Want: helpers.ExpectedResponse{
+				StatusCode: 401,
 			},
 		},
 	}
@@ -85,15 +72,10 @@ func (suite *UserHandlerTestSuite) TestUserHandler_GetProfile() {
 		t.Run(
 			test.TestName, func(t *testing.T) {
 				request, recorder := helpers.PrepareHandlerTestCase(test)
-				handler := suite.h.UserHandler.AuthMiddleware(http.HandlerFunc(test.HandlerFunc))
+				handler := h.UserHandler.AuthMiddleware(http.HandlerFunc(userHandler.GetProfile))
 				handler.ServeHTTP(recorder, request)
 
-				assert.Contains(t, recorder.Body.String(), test.Want.BodyPart)
-				if assert.Equal(t, test.Want.StatusCode, recorder.Code) {
-					if recorder.Code == http.StatusOK {
-						helpers.AssertUserProfileResponse(t, recorder)
-					}
-				}
+				assert.Equal(t, test.Want.StatusCode, recorder.Code)
 			},
 		)
 	}

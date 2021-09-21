@@ -11,8 +11,8 @@ import (
 )
 
 type AppHandlers struct {
-	handlers    []HandlerI
-	userHandler *UserHandler
+	Handlers    []HandlerI
+	UserHandler *UserHandler
 }
 
 type HandlerI interface {
@@ -21,15 +21,15 @@ type HandlerI interface {
 
 func NewAppHandlers(userHandler *UserHandler, handlers ...HandlerI) *AppHandlers {
 	return &AppHandlers{
-		handlers:    append(handlers, userHandler),
-		userHandler: userHandler,
+		Handlers:    append(handlers, userHandler),
+		UserHandler: userHandler,
 	}
 }
 
 func (h *AppHandlers) InitRoutes() http.Handler {
 	router := http.NewServeMux()
 
-	for _, x := range h.handlers {
+	for _, x := range h.Handlers {
 		x.RegisterRoutes(router, h)
 	}
 

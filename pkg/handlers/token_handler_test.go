@@ -24,7 +24,6 @@ import (
 type TokenHandlerTestSuite struct {
 	suite.Suite
 	userHandler  *UserHandler
-	testSrv      *httptest.Server
 	h            *AppHandlers
 	tokenService *services.TokenService
 }
@@ -44,11 +43,9 @@ func (suite *TokenHandlerTestSuite) SetupSuite() {
 		RefreshLifetimeMinutes: 5,
 	}
 
-	suite.tokenService = services.NewTokenService(cfg, logger, db_repository.NewTokensRepository(db))
-
 	userHandler := NewUserHandler(cfg, logger, db_repository.NewUserRepositoryMock(db), db_repository.NewTokensRepositoryMock(db))
+	suite.tokenService = services.NewTokenService(cfg, logger, db_repository.NewTokensRepository(db))
 	suite.h = NewAppHandlers(userHandler)
-	suite.testSrv = httptest.NewServer(suite.h.InitRoutes())
 }
 
 func TestTokenHandlerTestSuite(t *testing.T) {
@@ -57,7 +54,7 @@ func TestTokenHandlerTestSuite(t *testing.T) {
 
 func (suite *TokenHandlerTestSuite) TestTokenHandler_Login() {
 	t := suite.T()
-	handlerFunc := suite.h.userHandler.Login
+	handlerFunc := suite.h.UserHandler.Login
 	cases := []helpers.TestCaseTokenHandler{
 		{
 			TestName: "Successfully logged in",
@@ -120,7 +117,7 @@ func (suite *TokenHandlerTestSuite) TestTokenHandler_Login() {
 
 func (suite *TokenHandlerTestSuite) TestTokenHandler_Refresh() {
 	t := suite.T()
-	handlerFunc := suite.h.userHandler.Refresh
+	handlerFunc := suite.h.UserHandler.Refresh
 
 	_, refreshToken, _ := suite.tokenService.GenerateRefreshToken(userID)
 
@@ -156,7 +153,6 @@ func (suite *TokenHandlerTestSuite) TestTokenHandler_Refresh() {
 	for _, test := range cases {
 		t.Run(
 			test.TestName, func(t *testing.T) {
-
 				request := httptest.NewRequest(test.Request.Method, test.Request.Url, nil)
 				request.Header.Set("Cookie", fmt.Sprintf("refresh-token=%s", test.Request.Token))
 				recorder := httptest.NewRecorder()

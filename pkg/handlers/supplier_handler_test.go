@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	"github.com/YRIDZE/Bicycle-delivery-service/tests/helpers"
 	log "github.com/YRIDZE/yolo-log"
@@ -20,7 +19,6 @@ import (
 type SupplierHandlerTestSuite struct {
 	suite.Suite
 	supplierHandler *SupplierHandler
-	testSrv         *httptest.Server
 }
 
 func (suite *SupplierHandlerTestSuite) SetupSuite() {
@@ -31,13 +29,8 @@ func (suite *SupplierHandlerTestSuite) SetupSuite() {
 		os.Exit(1)
 	}
 
-	userHandler := NewUserHandler(&conf.ConfigToken{}, logger, db_repository.NewUserRepositoryMock(db), db_repository.NewTokensRepository(db))
-
 	supplierRepo := db_repository.NewSupplierRepositoryMock(db)
 	suite.supplierHandler = NewSupplierHandler(logger, supplierRepo)
-	h := NewAppHandlers(userHandler, suite.supplierHandler)
-
-	suite.testSrv = httptest.NewServer(h.InitRoutes())
 }
 
 func TestSupplierHandlerTestSuite(t *testing.T) {

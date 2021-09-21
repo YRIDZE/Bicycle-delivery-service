@@ -15,6 +15,7 @@ func NewSupplierRepositoryMock(db *sql.DB) *SupplierRepositoryMock {
 }
 
 func (s SupplierRepositoryMock) Create(supplier *models.Supplier) (*models.Supplier, error) {
+	supplier.ID = 1
 	return supplier, nil
 }
 
@@ -54,6 +55,7 @@ func (s SupplierRepositoryMock) GetAll() (*[]models.Supplier, error) {
 }
 
 func (s SupplierRepositoryMock) Update(supplier *models.Supplier) (*models.Supplier, error) {
+	supplier.ID = 1
 	return supplier, nil
 }
 
