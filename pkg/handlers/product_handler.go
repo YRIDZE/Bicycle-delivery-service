@@ -30,7 +30,6 @@ func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/getProducts", h.GetAll)
 	r.HandleFunc("/getProductBySupplier", h.GetBySupplier)
 	r.HandleFunc("/updateProduct", h.Update)
-	r.HandleFunc("/deleteProduct", h.Delete)
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -110,21 +109,6 @@ func (h *ProductHandler) Update(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
 	h.logger.Infof("product %d successfully updated", p.ID)
-}
-
-func (h *ProductHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	productID, _ := strconv.Atoi(req.URL.Query().Get("id"))
-
-	err := h.services.Delete(productID)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("product successfully deleted"))
-	h.logger.Infof("product %d successfully deleted", productID)
 }
 
 func (h *ProductHandler) GetBySupplier(w http.ResponseWriter, req *http.Request) {

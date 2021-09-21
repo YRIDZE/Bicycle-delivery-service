@@ -30,9 +30,12 @@ CREATE TABLE suppliers
 (
     id         INT         NOT NULL AUTO_INCREMENT,
     name       VARCHAR(64) NOT NULL,
+    type       VARCHAR(64) NOT NULL,
     image      VARCHAR(256),
-    deleted    TIMESTAMP DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    opening    TIME DEFAULT NULL,
+    closing    TIME DEFAULT NULL,
+    deleted    TIMESTAMP   DEFAULT NULL,
+    created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );

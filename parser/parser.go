@@ -40,43 +40,47 @@ type MenuParserI interface {
 }
 
 func (h *SupplierProductsParser) Save(suppliersList *[]models.Supplier) {
+	var newSupplierID int32
 	for _, s := range *suppliersList {
 		oldSupplierID, _ := h.supplierRepo.GetByName(s.Name)
 
 		if oldSupplierID != 0 {
-			err := h.supplierRepo.Delete(oldSupplierID)
+			newSupplierID = oldSupplierID
+			_, err := h.supplierRepo.Update(&s)
 			if err != nil {
-				h.cfg.Logger.Errorf("supplier %d and supplier-menu didn't removed: %s", oldSupplierID, err.Error())
+				h.cfg.Logger.Errorf("supplier %d and supplier-menu didn't updated: %s", oldSupplierID, err.Error())
 				return
 			}
-			h.cfg.Logger.Debugf("supplier %d and supplier-menu removed", oldSupplierID)
+			h.cfg.Logger.Debugf("supplier %d and supplier-menu updated", oldSupplierID)
+		} else {
+			supplier, err := h.supplierRepo.Create(&s)
+			if err != nil {
+				h.cfg.Logger.Errorf("supplier didn't created: %s", err.Error())
+				return
+			}
+			h.cfg.Logger.Debugf("supplier %d created", supplier.ID)
+			newSupplierID = supplier.ID
 		}
-		supplier, err := h.supplierRepo.Create(&s)
-		if err != nil {
-			h.cfg.Logger.Errorf("supplier didn't created: %s", err.Error())
-			return
-		}
-		h.cfg.Logger.Debugf("supplier %d created", supplier.ID)
-
 		for _, m := range s.Menu {
-			m.SupplierID = supplier.ID
+			m.SupplierID = newSupplierID
 
 			oldProductID, _ := h.productsRepo.GetByName(m.Name)
 			if oldProductID != 0 {
-				err := h.productsRepo.Delete(int(oldProductID))
+				_, err := h.productsRepo.Update(&m)
 				if err != nil {
 					return
 				}
+				h.cfg.Logger.Debugf("supplier %d menu updated", newSupplierID)
+			} else {
+				_, err := h.productsRepo.Create(&m)
+				if err != nil {
+					h.cfg.Logger.Errorf("supplier %d menu didn't created: %s", newSupplierID, err.Error())
+					return
+				}
+				h.cfg.Logger.Debugf("supplier %d menu created", newSupplierID)
 			}
-			_, err = h.productsRepo.Create(&m)
-			if err != nil {
-				h.cfg.Logger.Errorf("supplier %d menu didn't created: %s", supplier.ID, err.Error())
-				return
-			}
-			h.cfg.Logger.Debugf("supplier %d menu created", supplier.ID)
 		}
 	}
-	return
 }
 
 func (h *SupplierProductsParser) Parse(ctx context.Context) {
@@ -114,7 +118,7 @@ func (h *SupplierProductsParser) ParseIteration(ctx context.Context) {
 
 	delay := viper.GetInt("parser.delay")
 	if err = h.supplierRepo.DeleteUnnecessary(delay); err != nil {
-		h.cfg.Logger.Errorf("error delete unnecessary suppliers: ", err.Error())
+		h.cfg.Logger.Errorf("error delete unnecessary suppliers: %v", err.Error())
 		return
 	}
 
@@ -128,7 +132,7 @@ func (h *SupplierProductsParser) GetSuppliers() ([]models.Supplier, error) {
 
 	jsonBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		h.cfg.Logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body: %v", err)
 	}
 
 	var suppliersList models.SuppliersResponse
@@ -151,7 +155,7 @@ func (h *SupplierProductsParser) GetSupplierProductsByID(id int) ([]models.Produ
 	jsonBytes, err := io.ReadAll(response.Body)
 	err = response.Body.Close()
 	if err != nil {
-		h.cfg.Logger.Errorf("error close body", err)
+		h.cfg.Logger.Errorf("error close body: %v", err)
 	}
 
 	supplierProducts := new(models.ProductsResponse)

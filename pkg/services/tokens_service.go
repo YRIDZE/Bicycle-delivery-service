@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
+	"github.com/YRIDZE/Bicycle-delivery-service/helper"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
 	yolo_log "github.com/YRIDZE/yolo-log"
@@ -13,37 +14,31 @@ import (
 	"github.com/google/uuid"
 )
 
-type JwtCustomClaims struct {
-	jwt.StandardClaims
-	ID  int32  `json:"id"`
-	UID string `json:"uid"`
-}
-
 type TokenService struct {
 	cfg       *conf.ConfigToken
 	logger    *yolo_log.Logger
 	tokenRepo db_repository.TokensRepositoryI
 }
 
-func NewTokenService(cfg *conf.ConfigToken, logger *yolo_log.Logger, tokenRepo *db_repository.TokensRepositoryI) *TokenService {
+func NewTokenService(cfg *conf.ConfigToken, logger *yolo_log.Logger, tokenRepo db_repository.TokensRepositoryI) *TokenService {
 	return &TokenService{
 		cfg:       cfg,
 		logger:    logger,
-		tokenRepo: *tokenRepo,
+		tokenRepo: tokenRepo,
 	}
 }
 
-func (s *TokenService) GenerateAccessToken(userID int32) (string, string, error) {
-	return s.generateToken(userID, s.cfg.AccessLifetimeMinutes, s.cfg.AccessSecret)
+func (t *TokenService) GenerateAccessToken(userID int32) (string, string, error) {
+	return t.generateToken(userID, t.cfg.AccessLifetimeMinutes, t.cfg.AccessSecret)
 }
 
-func (s *TokenService) GenerateRefreshToken(userID int32) (string, string, error) {
-	return s.generateToken(userID, s.cfg.RefreshLifetimeMinutes, s.cfg.RefreshSecret)
+func (t *TokenService) GenerateRefreshToken(userID int32) (string, string, error) {
+	return t.generateToken(userID, t.cfg.RefreshLifetimeMinutes, t.cfg.RefreshSecret)
 }
 
-func (u *TokenService) generateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
+func (t *TokenService) generateToken(userID int32, lifetimeMinutes int, secret string) (string, string, error) {
 	uid := uuid.New().String()
-	claims := &JwtCustomClaims{
+	claims := &helper.JwtCustomClaims{
 		StandardClaims: jwt.StandardClaims{ExpiresAt: time.Now().Add(time.Minute * time.Duration(lifetimeMinutes)).Unix()},
 		ID:             userID,
 		UID:            uid,
@@ -53,17 +48,17 @@ func (u *TokenService) generateToken(userID int32, lifetimeMinutes int, secret s
 	return uid, token, err
 }
 
-func (s *TokenService) ValidateAccessToken(tokenString string) (*JwtCustomClaims, error) {
-	return s.validateToken(tokenString, s.cfg.AccessSecret)
+func (t *TokenService) ValidateAccessToken(tokenString string) (*helper.JwtCustomClaims, error) {
+	return t.validateToken(tokenString, t.cfg.AccessSecret)
 }
 
-func (s *TokenService) ValidateRefreshToken(tokenString string) (*JwtCustomClaims, error) {
-	return s.validateToken(tokenString, s.cfg.RefreshSecret)
+func (t *TokenService) ValidateRefreshToken(tokenString string) (*helper.JwtCustomClaims, error) {
+	return t.validateToken(tokenString, t.cfg.RefreshSecret)
 }
 
-func (u *TokenService) validateToken(tokenString, secretString string) (*JwtCustomClaims, error) {
+func (t *TokenService) validateToken(tokenString, secretString string) (*helper.JwtCustomClaims, error) {
 	token, err := jwt.ParseWithClaims(
-		tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		tokenString, &helper.JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(secretString), nil
 		},
 	)
@@ -71,7 +66,7 @@ func (u *TokenService) validateToken(tokenString, secretString string) (*JwtCust
 		return nil, err
 	}
 
-	claims, ok := token.Claims.(*JwtCustomClaims)
+	claims, ok := token.Claims.(*helper.JwtCustomClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("failed to parse token claims")
 	}
@@ -80,7 +75,7 @@ func (u *TokenService) validateToken(tokenString, secretString string) (*JwtCust
 
 }
 
-func (u *TokenService) GetTokenFromBearerString(input string) (string, error) {
+func (t *TokenService) GetTokenFromBearerString(input string) (string, error) {
 
 	if input == "" {
 		return "", errors.New("no token received")
@@ -99,18 +94,18 @@ func (u *TokenService) GetTokenFromBearerString(input string) (string, error) {
 	return token, nil
 }
 
-func (u *TokenService) CreateUid(userID int32, uid models.CachedTokens) error {
-	return u.tokenRepo.CreateUid(userID, uid)
+func (t *TokenService) CreateUid(userID int32, uid models.CachedTokens) error {
+	return t.tokenRepo.CreateUid(userID, uid)
 }
 
-func (u *TokenService) GetUidByID(userID int32) (*models.CachedTokens, error) {
-	return u.tokenRepo.GetUidByID(userID)
+func (t *TokenService) GetUidByID(userID int32) (*models.CachedTokens, error) {
+	return t.tokenRepo.GetUidByID(userID)
 }
 
-func (u *TokenService) UpdateUid(userID int32, uid models.CachedTokens) error {
-	return u.tokenRepo.UpdateUid(userID, uid)
+func (t *TokenService) UpdateUid(userID int32, uid models.CachedTokens) error {
+	return t.tokenRepo.UpdateUid(userID, uid)
 }
 
-func (u *TokenService) DeleteUid(userID int32) error {
-	return u.tokenRepo.DeleteUid(userID)
+func (t *TokenService) DeleteUid(userID int32) error {
+	return t.tokenRepo.DeleteUid(userID)
 }

@@ -29,9 +29,9 @@ type ConfigToken struct {
 }
 
 type Config struct {
-	ConfigServer
-	ConfigToken
-	ConfigDB
+	*ConfigServer
+	*ConfigToken
+	*ConfigDB
 	Logger *log.Logger
 }
 
@@ -50,7 +50,7 @@ func NewConfig() *Config {
 	}
 
 	if err := godotenv.Load(); err != nil {
-		logger.Fatalf("Could not load .env file. Returned error was: ", err.Error())
+		logger.Fatalf("Could not load .env file. Returned error was: %v", err.Error())
 		panic(err.Error())
 	}
 
@@ -62,16 +62,16 @@ func NewConfig() *Config {
 	refreshLifetimeMinutes, _ := strconv.Atoi(os.Getenv("REFRESH_LIFETIME_MINUTES"))
 
 	return &Config{
-		ConfigServer: ConfigServer{
+		ConfigServer: &ConfigServer{
 			Port: viper.GetString("port"),
 		},
-		ConfigToken: ConfigToken{
+		ConfigToken: &ConfigToken{
 			AccessSecret:           os.Getenv("ACCESS_SECRET"),
 			RefreshSecret:          os.Getenv("REFRESH_SECRET"),
 			AccessLifetimeMinutes:  accessLifetimeMinutes,
 			RefreshLifetimeMinutes: refreshLifetimeMinutes,
 		},
-		ConfigDB: ConfigDB{
+		ConfigDB: &ConfigDB{
 			Host:       viper.GetString("db.host"),
 			Port:       viper.GetString("db.port"),
 			Username:   viper.GetString("db.username"),

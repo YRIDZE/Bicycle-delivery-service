@@ -45,7 +45,3 @@ func (s SupplierService) Update(supplier *requests.SupplierRequest) (*models.Sup
 		},
 	)
 }
-
-func (s SupplierService) Delete(id int32) error {
-	return s.repo.Delete(id)
-}

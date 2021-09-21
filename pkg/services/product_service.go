@@ -50,10 +50,6 @@ func (p ProductService) Update(product *requests.ProductRequest) (*models.Produc
 	)
 }
 
-func (p ProductService) Delete(id int) error {
-	return p.repo.Delete(id)
-}
-
 func (p ProductService) GetByName(name string) (int32, error) {
 	return p.repo.GetByName(name)
 }

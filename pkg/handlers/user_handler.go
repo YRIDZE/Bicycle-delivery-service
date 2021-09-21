@@ -23,8 +23,8 @@ func NewUserHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo db_
 	return &UserHandler{
 		cfg:          cfg,
 		logger:       logger,
-		userService:  services.NewUserService(cfg, logger, &userRepo),
-		tokenService: services.NewTokenService(cfg, logger, &tokenRepo),
+		userService:  services.NewUserService(cfg, logger, userRepo),
+		tokenService: services.NewTokenService(cfg, logger, tokenRepo),
 	}
 }
 

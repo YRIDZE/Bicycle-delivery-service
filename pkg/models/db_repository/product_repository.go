@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
@@ -14,7 +13,6 @@ type ProductRepositoryI interface {
 	GetByID(id int) (*models.Product, error)
 	GetAll() (*[]models.Product, error)
 	Update(product *models.Product) (*models.Product, error)
-	Delete(id int) error
 	GetByName(name string) (int32, error)
 	GetBySupplier(id int32) (*[]models.Product, error)
 }
@@ -154,25 +152,11 @@ func (p ProductRepository) GetAll() (*[]models.Product, error) {
 }
 
 func (p ProductRepository) Update(product *models.Product) (*models.Product, error) {
-
-	ingredientsJson, _ := json.Marshal(product.Ingredients)
-	productQuery := fmt.Sprintf(
-		"update %s set name = ?, price = ?, type = ?, ingredients = ?, image = ? where id = ?", ProductsTable,
-	)
-	_, err := p.db.Exec(productQuery, product.Name, product.Price, product.Type, ingredientsJson, product.Image, product.ID)
+	productQuery := fmt.Sprintf("update %s set price = ? where id = ?", ProductsTable)
+	_, err := p.db.Exec(productQuery, product.Price, product.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return product, nil
-}
-
-func (p ProductRepository) Delete(id int) error {
-	query := fmt.Sprintf("update %s set deleted = ? where id = ?", ProductsTable)
-	_, err := p.db.Exec(query, (time.Now().UTC()).Format("2006-01-02 15:04:05.999999"), id)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
