@@ -3,6 +3,7 @@ module github.com/YRIDZE/Bicycle-delivery-service
 go 1.16
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/YRIDZE/yolo-log v1.0.3
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -13,6 +14,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/text v0.3.6 // indirect
 )
