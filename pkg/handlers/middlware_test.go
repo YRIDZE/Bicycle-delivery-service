@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
@@ -35,35 +36,61 @@ func TestUserHandler_AuthMiddleware(t *testing.T) {
 
 	h := NewAppHandlers((*UserHandler)(userHandler))
 
-	cases := []helpers.TestCaseHandler{
+	cases := []helpers.TestCaseMiddleware{
 		{
-			TestName: "Successfully get user profile",
+			TestName:    "Ok",
+			HeaderName:  "Authorization",
+			HeaderValue: "Bearer ",
 			Request: helpers.Request{
-				Token: accessToken,
-				Url:   "/getUser",
+				Method: "GET",
+				Url:    "/getUser",
+				Token:  accessToken,
 			},
 			Want: helpers.ExpectedResponse{
 				StatusCode: 200,
+				BodyPart:   "",
 			},
 		},
 		{
-			TestName: "Unauthorized getting user profile",
+			TestName:    "Invalid Header Name",
+			HeaderName:  "",
+			HeaderValue: "Bearer ",
 			Request: helpers.Request{
-				Token: "",
-				Url:   "/getUser",
+				Method: "GET",
+				Url:    "/getUser",
+				Token:  accessToken,
 			},
 			Want: helpers.ExpectedResponse{
 				StatusCode: 401,
+				BodyPart:   "bad token",
 			},
 		},
 		{
-			TestName: "Unauthorized getting user profile",
+			TestName:    "Invalid Header Value",
+			HeaderName:  "Authorization",
+			HeaderValue: "Bearr ",
 			Request: helpers.Request{
-				Token: fmt.Sprintf("%s.%s", strings.Split(accessToken, ".")[0], strings.Split(accessToken, ".")[1]),
-				Url:   "/getUser",
+				Method: "GET",
+				Url:    "/getUser",
+				Token:  accessToken,
 			},
 			Want: helpers.ExpectedResponse{
 				StatusCode: 401,
+				BodyPart:   "bad token",
+			},
+		},
+		{
+			TestName:    "Empty Token",
+			HeaderName:  "Authorization",
+			HeaderValue: "Bearer ",
+			Request: helpers.Request{
+				Method: "GET",
+				Url:    "/getUser",
+				Token:  "",
+			},
+			Want: helpers.ExpectedResponse{
+				StatusCode: 401,
+				BodyPart:   "bad token",
 			},
 		},
 	}
@@ -71,11 +98,15 @@ func TestUserHandler_AuthMiddleware(t *testing.T) {
 	for _, test := range cases {
 		t.Run(
 			test.TestName, func(t *testing.T) {
-				request, recorder := helpers.PrepareHandlerTestCase(test)
-				handler := h.UserHandler.AuthMiddleware(http.HandlerFunc(userHandler.GetProfile))
-				handler.ServeHTTP(recorder, request)
+				w := httptest.NewRecorder()
+				req := httptest.NewRequest("GET", "/getUser", strings.NewReader(""))
 
-				assert.Equal(t, test.Want.StatusCode, recorder.Code)
+				req.Header.Set(test.HeaderName, test.HeaderValue+test.Request.Token)
+				res := h.UserHandler.AuthMiddleware(http.HandlerFunc(userHandler.GetProfile))
+				res.ServeHTTP(w, req)
+
+				assert.Equal(t, test.Want.StatusCode, w.Code)
+				assert.Contains(t, w.Body.String(), test.Want.BodyPart)
 			},
 		)
 	}

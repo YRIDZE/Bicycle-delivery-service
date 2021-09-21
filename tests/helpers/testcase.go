@@ -66,6 +66,14 @@ type TestCaseTokenHandler struct {
 	Want        ExpectedResponse
 }
 
+type TestCaseMiddleware struct {
+	TestName    string
+	Request     Request
+	HeaderName  string
+	HeaderValue string
+	Want        ExpectedResponse
+}
+
 func PrepareHandlerTestCase(test TestCaseHandler) (request *http.Request, recorder *httptest.ResponseRecorder) {
 	request = httptest.NewRequest(test.Request.Method, test.Request.Url, strings.NewReader(""))
 
