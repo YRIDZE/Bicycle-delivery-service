@@ -28,15 +28,7 @@ type TokenServiceTestSuite struct {
 }
 
 func (suite *TokenServiceTestSuite) SetupSuite() {
-	logger, _ := log.NewLogger(
-		log.LoggerParams{
-			ConsoleOutputStream: os.Stdout,
-			ConsoleLogLevel:     log.INFO,
-			LogFileName:         "logs/all.log",
-			FileLogLevel:        log.DEBUG,
-		},
-	)
-
+	logger, _ := log.NewLogger(log.LoggerParams{})
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		fmt.Printf("an error '%s' was not expected when opening a stub database connection", err)
