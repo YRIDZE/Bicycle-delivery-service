@@ -31,13 +31,13 @@ func NewUserHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo db_
 func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/login", h.Login)
 	r.HandleFunc("/refresh", h.Refresh)
-	r.Handle("/logout", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
+	r.Handle("/logout", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
 
-	r.HandleFunc("/createUser", appH.userHandler.Create)
-	r.HandleFunc("/getUsers", appH.userHandler.GetAll)
-	r.Handle("/getUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
-	r.Handle("/updateUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/deleteUser", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.HandleFunc("/createUser", appH.UserHandler.Create)
+	r.HandleFunc("/getUsers", appH.UserHandler.GetAll)
+	r.Handle("/getUser", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
+	r.Handle("/updateUser", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteUser", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {

@@ -29,11 +29,11 @@ func NewOrderHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_rep
 }
 
 func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/createOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
-	r.Handle("/getOrderById", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
-	r.Handle("/getOrders", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
-	r.Handle("/updateOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/deleteOrder", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.Handle("/createOrder", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.Handle("/getOrderById", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
+	r.Handle("/getOrders", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	r.Handle("/updateOrder", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteOrder", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {

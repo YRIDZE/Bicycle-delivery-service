@@ -98,8 +98,8 @@ func (t *TokenService) CreateUid(userID int32, uid models.CachedTokens) error {
 	return t.tokenRepo.CreateUid(userID, uid)
 }
 
-func (t *TokenService) GetUidByID(userID int32) (*models.CachedTokens, error) {
-	return t.tokenRepo.GetUidByID(userID)
+func (t *TokenService) GetUidByID(claims *helper.JwtCustomClaims) (*models.CachedTokens, error) {
+	return t.tokenRepo.GetUidByID(claims)
 }
 
 func (t *TokenService) UpdateUid(userID int32, uid models.CachedTokens) error {

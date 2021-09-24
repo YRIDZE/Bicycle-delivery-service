@@ -14,17 +14,18 @@ import (
 
 var cfg = conf.NewConfig()
 
+var rootCmd = &cobra.Command{
+	Use:   "cli",
+	Short: "Root command for our app",
+	Long:  `Root command for our app, the main purpose is to help setup subcommands`,
+}
+
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "migrate cmd is used for database migration",
 	Long:  `migrate cmd is used for database migration: migrate < up | down >`,
 }
 
-var rootCmd = &cobra.Command{
-	Use:   "cli",
-	Short: "Root command for our app",
-	Long:  `Root command for our app, the main purpose is to help setup subcommands`,
-}
 var migrateUpCmd = &cobra.Command{
 	Use:   "up",
 	Short: "migrate to v1 command",
@@ -32,21 +33,7 @@ var migrateUpCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running migrate up command")
 
-		db, err := db_repository.NewDB(
-			cfg.Logger,
-			db_repository.Config{
-				Host:     cfg.ConfigDB.Host,
-				Port:     cfg.ConfigDB.Port,
-				Username: cfg.ConfigDB.Username,
-				DBName:   cfg.ConfigDB.DBName,
-				Password: cfg.ConfigDB.DbPassword,
-			},
-		)
-		if err != nil {
-			cfg.Logger.Fatal("Could not connected to database. Panic!")
-			panic(err.Error())
-		}
-
+		db := db_repository.InitDB(cfg)
 		dbDriver, err := mysql.WithInstance(db, &mysql.Config{})
 		if err != nil {
 			fmt.Printf("instance error: %v \n", err)
@@ -78,20 +65,7 @@ var migrateDownCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running migrate down command")
 
-		db, err := db_repository.NewDB(
-			cfg.Logger,
-			db_repository.Config{
-				Host:     cfg.ConfigDB.Host,
-				Port:     cfg.ConfigDB.Port,
-				Username: cfg.ConfigDB.Username,
-				DBName:   cfg.ConfigDB.DBName,
-				Password: cfg.ConfigDB.DbPassword,
-			},
-		)
-		if err != nil {
-			cfg.Logger.Fatal("Could not connected to database. Panic!")
-			panic(err.Error())
-		}
+		db := db_repository.InitDB(cfg)
 		dbDriver, err := mysql.WithInstance(db, &mysql.Config{})
 		if err != nil {
 			fmt.Printf("instance error: %v \n", err)

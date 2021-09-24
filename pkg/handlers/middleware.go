@@ -24,7 +24,7 @@ func (h *UserHandler) AuthMiddleware(handler http.Handler) http.Handler {
 				return
 			}
 
-			if cachedTokens, ok := h.tokenService.GetUidByID(claims.ID); ok != nil || cachedTokens.AccessUID != claims.UID {
+			if cachedTokens, ok := h.tokenService.GetUidByID(claims); ok != nil || cachedTokens.AccessUID != claims.UID {
 				http.Error(w, "invalid token", http.StatusUnauthorized)
 				return
 			}

@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/YRIDZE/Bicycle-delivery-service/helper"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
 
 type TokensRepositoryI interface {
 	CreateUid(userID int32, uid models.CachedTokens) error
-	GetUidByID(userID int32) (*models.CachedTokens, error)
+	GetUidByID(claims *helper.JwtCustomClaims) (*models.CachedTokens, error)
 	UpdateUid(userID int32, uid models.CachedTokens) error
 	DeleteUid(userID int32) error
 }
@@ -45,11 +46,11 @@ func (u *TokensRepository) CreateUid(userID int32, uid models.CachedTokens) erro
 	return nil
 }
 
-func (u *TokensRepository) GetUidByID(userID int32) (*models.CachedTokens, error) {
+func (u *TokensRepository) GetUidByID(claims *helper.JwtCustomClaims) (*models.CachedTokens, error) {
 	cachedT := new(models.CachedTokens)
 	query := fmt.Sprintf("select access_uid, refresh_uid from %s where user_id = ?", CacheTokenTable)
 
-	err := u.db.QueryRow(query, userID).Scan(&cachedT.AccessUID, &cachedT.RefreshUID)
+	err := u.db.QueryRow(query, claims.ID).Scan(&cachedT.AccessUID, &cachedT.RefreshUID)
 	if err != nil {
 		return nil, err
 	}

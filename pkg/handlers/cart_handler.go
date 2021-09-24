@@ -29,12 +29,12 @@ func NewCartHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_repo
 }
 
 func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/createCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
-	r.Handle("/createCartProduct", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
-	r.Handle("/getCartProducts", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
-	r.Handle("/updateCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/deleteCart", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
-	r.Handle("/deleteCartProduct", appH.userHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
+	r.Handle("/createCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.Handle("/createCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
+	r.Handle("/getCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	r.Handle("/updateCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
+	r.Handle("/deleteCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.Handle("/deleteCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
 }
 
 func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
