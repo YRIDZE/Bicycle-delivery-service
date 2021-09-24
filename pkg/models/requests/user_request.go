@@ -12,8 +12,8 @@ type LoginRequest struct {
 
 type UserRequest struct {
 	ID        int32  `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
@@ -21,8 +21,8 @@ type UserRequest struct {
 func (c UserRequest) Validate() error {
 	return validation.ValidateStruct(
 		&c,
-		validation.Field(&c.FirstName, validation.Required, validation.Length(1, 30)),
-		validation.Field(&c.LastName, validation.Required, validation.Length(1, 30)),
+		validation.Field(&c.FirstName, validation.Required, validation.Length(1, 64)),
+		validation.Field(&c.LastName, validation.Required, validation.Length(1, 64)),
 		validation.Field(&c.Email, validation.Required, is.Email, validation.Length(7, 30)),
 		validation.Field(&c.Password, validation.Required, validation.Length(7, 20)),
 	)

@@ -6,11 +6,14 @@ import (
 )
 
 type OrderRequest struct {
-	ID       int32                  `json:"id"`
-	UserID   int32                  `json:"user_id"`
-	Address  string                 `json:"address"`
-	Status   string                 `json:"status"`
-	Products []models.OrderProducts `json:"products"`
+	ID               int32                  `json:"id"`
+	UserID           int32                  `json:"user_id"`
+	Address          string                 `json:"address"`
+	PhoneNumber      string                 `json:"phone_number"`
+	CustomerName     string                 `json:"customer_name"`
+	CustomerLastname string                 `json:"customer_lastname"`
+	Status           string                 `json:"status"`
+	Products         []models.OrderProducts `json:"products"`
 }
 
 func (c OrderRequest) Validate() error {
@@ -18,5 +21,8 @@ func (c OrderRequest) Validate() error {
 		&c,
 		validation.Field(&c.Address, validation.Required),
 		validation.Field(&c.Products, validation.Required),
+		validation.Field(&c.PhoneNumber, validation.Required),
+		validation.Field(&c.CustomerName, validation.Required, validation.Length(1, 64)),
+		validation.Field(&c.CustomerLastname, validation.Required, validation.Length(1, 64)),
 	)
 }

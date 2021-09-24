@@ -34,8 +34,8 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 		return nil, err
 	}
 
-	query := fmt.Sprintf("insert into %s (address, user_id) values (?, ?)", OrdersTable)
-	res, err := tx.ExecContext(ctx, query, order.Address, order.UserID)
+	query := fmt.Sprintf("insert into %s (address, user_id, phone_number, customer_name, customer_lastname) values (?, ?)", OrdersTable)
+	res, err := tx.ExecContext(ctx, query, order.Address, order.UserID, order.PhoneNumber, order.CustomerName, order.CustomerLastname)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err
@@ -66,8 +66,10 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 
 func (o OrderRepository) GetByID(id int) (*models.Order, error) {
 	order := new(models.Order)
-	query := fmt.Sprintf("select id, user_id, address, status from %s where id = ?", OrdersTable)
-	err := o.db.QueryRow(query, id).Scan(&order.ID, &order.UserID, &order.Address, &order.Status)
+	query := fmt.Sprintf("select id, user_id, address, phone_number, customer_name, customer_lastname, status from %s where id = ?", OrdersTable)
+	err := o.db.QueryRow(query, id).Scan(
+		&order.ID, &order.UserID, &order.Address, &order.PhoneNumber, &order.CustomerName, &order.CustomerLastname, &order.Status,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +103,10 @@ func (o OrderRepository) GetByID(id int) (*models.Order, error) {
 
 func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 	var orders []models.Order
-	query := fmt.Sprintf("select id, user_id, address, status from %s where user_id=? and deleted is null", OrdersTable)
+	query := fmt.Sprintf(
+		"select id, user_id, address, phone_number, customer_name, customer_lastname, status from %s where user_id=? and deleted is null",
+		OrdersTable,
+	)
 	pr, err := o.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -115,7 +120,7 @@ func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 
 	for rows.Next() {
 		var order models.Order
-		err := rows.Scan(&order.ID, &order.UserID, &order.Address, &order.Status)
+		err := rows.Scan(&order.ID, &order.UserID, &order.Address, &order.PhoneNumber, &order.CustomerName, &order.CustomerLastname, &order.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +150,6 @@ func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.
 	if err != nil {
 		return nil, err
 	}
-
 	rows, err := pr.Query(id)
 	if err != nil {
 		return nil, err
@@ -174,8 +178,10 @@ func (o OrderRepository) Update(order *models.Order) (*models.Order, error) {
 		return nil, err
 	}
 
-	query := fmt.Sprintf("update %s set address = ?, status = ? where id = ?", OrdersTable)
-	_, err = tx.ExecContext(ctx, query, order.Address, order.Status, order.ID)
+	query := fmt.Sprintf(
+		"update %s set address = ?, phone_number = ?, customer_name = ?, customer_lastname = ?, status = ? where id = ?", OrdersTable,
+	)
+	_, err = tx.ExecContext(ctx, query, order.Address, order.PhoneNumber, order.CustomerName, order.CustomerLastname, order.Status, order.ID)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err

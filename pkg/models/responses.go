@@ -22,11 +22,14 @@ type CachedTokens struct {
 }
 
 type OrderResponse struct {
-	ID       int32           `json:"id"`
-	UserID   int32           `json:"user_id"`
-	Address  string          `json:"address"`
-	Status   string          `json:"status"`
-	Products []OrderProducts `json:"products"`
+	ID               int32           `json:"id"`
+	UserID           int32           `json:"user_id"`
+	Address          string          `json:"address"`
+	PhoneNumber      string          `json:"phone_number"`
+	CustomerName     string          `json:"customer_name"`
+	CustomerLastname string          `json:"customer_lastname"`
+	Status           string          `json:"status"`
+	Products         []OrderProducts `json:"products"`
 }
 
 type SuppliersResponse struct {

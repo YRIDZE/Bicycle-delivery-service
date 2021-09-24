@@ -1,19 +1,3 @@
-DROP TABLE IF EXISTS cart_products;
-
-DROP TABLE IF EXISTS cart;
-
-DROP TABLE IF EXISTS uid_token;
-
-DROP TABLE IF EXISTS order_products;
-
-DROP TABLE IF EXISTS orders;
-
-DROP TABLE IF EXISTS products;
-
-DROP TABLE IF EXISTS suppliers;
-
-DROP TABLE IF EXISTS users;
-
 CREATE TABLE users
 (
     id         INT          NOT NULL AUTO_INCREMENT,
@@ -32,10 +16,10 @@ CREATE TABLE suppliers
     name       VARCHAR(64) NOT NULL,
     type       VARCHAR(64) NOT NULL,
     image      VARCHAR(256),
-    opening    TIME DEFAULT NULL,
-    closing    TIME DEFAULT NULL,
-    deleted    TIMESTAMP   DEFAULT NULL,
-    created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    opening    TIME      DEFAULT NULL,
+    closing    TIME      DEFAULT NULL,
+    deleted    TIMESTAMP DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
@@ -58,13 +42,16 @@ CREATE TABLE products
 
 CREATE TABLE orders
 (
-    id         INT                          NOT NULL AUTO_INCREMENT,
-    user_id    INT,
-    address    VARCHAR(128)                 NOT NULL,
-    status     ENUM ('in progress', 'done') NOT NULL,
-    deleted    TIMESTAMP DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id                INT                          NOT NULL AUTO_INCREMENT,
+    user_id           INT,
+    address           VARCHAR(128)                 NOT NULL,
+    phone_number      VARCHAR(16)                  NOT NULL,
+    customer_name     VARCHAR(64)                  NOT NULL,
+    customer_lastname VARCHAR(64)                  NOT NULL,
+    status            ENUM ('in progress', 'done') NOT NULL,
+    deleted           TIMESTAMP DEFAULT NULL,
+    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
