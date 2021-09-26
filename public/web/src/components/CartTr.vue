@@ -3,7 +3,7 @@
     <td>{{ index + 1 }}</td>
     <td>{{ i.title }}</td>
     <td>{{ f.title }}</td>
-    <td>{{ i.price }}</td>
+    <td>{{ i.price }}$</td>
     <td>
       <a style="color: #3b3b3b" @click="reduce()" :disable="item.quantity === 1">
         <font-awesome-icon :icon="['fas', 'minus-circle']"/>

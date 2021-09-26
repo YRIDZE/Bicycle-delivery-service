@@ -3,6 +3,7 @@ import {createStore} from 'vuex'
 
 import App from './App.vue'
 import router from './router'
+import VueFinalModal from "vue-final-modal";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -10,7 +11,16 @@ import "bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {library} from "@fortawesome/fontawesome-svg-core";
 import {faFacebookF, faInstagram, faLinkedinIn, faTwitter} from "@fortawesome/free-brands-svg-icons"
-import {faMinusCircle, faPlusCircle, faShoppingBasket, faTrash, faUser, faBicycle, faChevronCircleLeft, faChevronUp} from "@fortawesome/free-solid-svg-icons";
+import {
+    faBicycle,
+    faChevronCircleLeft,
+    faChevronUp,
+    faMinusCircle,
+    faPlusCircle,
+    faShoppingBasket,
+    faTrash,
+    faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 library.add(faTwitter, faInstagram, faFacebookF, faLinkedinIn, faShoppingBasket, faUser, faPlusCircle, faMinusCircle, faTrash, faBicycle, faChevronCircleLeft, faChevronUp);
 
@@ -108,5 +118,5 @@ const store = createStore({
 
 createApp(App)
     .component("font-awesome-icon", FontAwesomeIcon)
-    .use(router).use(store)
+    .use(router).use(store).use(VueFinalModal)
     .mount('#app');

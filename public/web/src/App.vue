@@ -21,14 +21,10 @@
           <div class="collapse navbar-collapse" id="toggleMenu">
             <ul class="navbar-nav ms-auto text-center" style="padding:0 30px">
               <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-              <li class="nav-item"><a class="nav-link" id="login" href="#" @click="showLogin = true" type="button"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#login-modal">
+              <li class="nav-item"><a class="nav-link" id="login" @click="openL" href="#" type="button">
                 <font-awesome-icon :icon="['fas', 'user']"/>
                 Login</a></li>
-              <li class="nav-item"><a class="nav-link" id="cart" href="#" @click="showCart = true" type="button"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#cart-modal">
+              <li class="nav-item"><a class="nav-link" id="cart" href="#" @click="openC" type="button">
                 <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
                 Cart</a></li>
             </ul>
@@ -36,8 +32,7 @@
         </nav>
       </div>
 
-      <Login v-if="showLogin" @close="showLogin = false"></Login>
-      <Cart v-if="showCart" @close="showCart = false"></Cart>
+      <modals-container></modals-container>
 
       <div class="cont-custom text-center bg-light"
            :style="{ backgroundImage: 'url(' + require(`@/assets/img/header-pizza.jpg`) + ')',
@@ -58,7 +53,10 @@
 
     <div class="container-fluid" id="content"
          style="padding-left: 70px !important; padding-right: 70px !important; font-family: 'Montserrat', sans-serif;">
-      <div class="col-md-12"><h2>Food<GoBack></GoBack></h2>
+      <div class="col-md-12">
+        <h2>Food
+          <GoBack></GoBack>
+        </h2>
         <p>...is any substance consumed to provide nutritional support for an organism. Food is usually of plant, animal
           or fungal origin, and contains essential nutrients, such as carbohydrates, fats, proteins, vitamins, or
           minerals. The substance is ingested by an organism and assimilated by the organism's cells to provide energy,
@@ -139,11 +137,11 @@
 </template>
 
 <script>
-import Login from '@/components/Login'
 import Cart from '@/components/Cart'
 import Filter from '@/components/FilterPanel'
 import GoBack from '@/components/GoBack'
 import GoTop from '@/components/GoTop'
+import Login from "@/components/Login";
 
 import '../../web/public/css/main-page.css'
 import '../../web/public/css/cart.css'
@@ -154,17 +152,41 @@ import '../../web/public/css/menu-item-page.css'
 export default {
   name: 'App',
   components: {
-    Login,
-    Cart,
     Filter,
     GoBack,
-    GoTop
+    GoTop,
   },
+
   data() {
     return {
-      showLogin: false,
       showCart: false,
+      showLogin: false,
+
     }
+  },
+
+  methods: {
+    openL() {
+      if (!this.showLogin) {
+        this.$vfm.hideAll()
+        this.showCart = false
+        this.$vfm.show({
+          component: Login,
+        });
+        this.showLogin = true
+      }
+    },
+
+    openC() {
+      if (!this.showCart) {
+        this.$vfm.hideAll()
+        this.showLogin = false
+        this.$vfm.show({
+          component: Cart,
+        });
+        this.showCart = true
+      }
+    },
   },
 }
 </script>

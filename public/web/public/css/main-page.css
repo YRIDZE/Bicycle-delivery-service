@@ -301,6 +301,10 @@ button {
     justify-content: center;
     align-items: center;
     font-family: 'Montserrat', sans-serif;
-    padding: 1rem 1rem 0 !important;
+    padding: 0 !important;
 }
 
+.modal-content{
+    width: auto !important;
+    border-radius: 10px !important;
+}
