@@ -29,10 +29,11 @@ func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/getProductById", h.GetByID)
 	r.HandleFunc("/getProducts", h.GetAll)
 	r.HandleFunc("/getProductBySupplier", h.GetBySupplier)
-	r.HandleFunc("/updateProduct", h.Update)
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w)
+
 	product := new(requests.ProductRequest)
 	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
 		h.logger.Error(err.Error())
@@ -47,15 +48,15 @@ func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
 	h.logger.Infof("product %d successfully created", p.ID)
 }
 
 func (h *ProductHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	productID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	setupResponse(&w)
 
+	productID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 	p, err := h.services.GetByID(productID)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -63,13 +64,14 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
 	h.logger.Infof("user successfully fetched product %d", p.ID)
 }
 
 func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w)
+
 	p, err := h.services.GetAll()
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -85,35 +87,15 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 		)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user fetched all products")
 }
 
-func (h *ProductHandler) Update(w http.ResponseWriter, req *http.Request) {
-	product := new(requests.ProductRequest)
-	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusBadRequest)
-		return
-	}
-
-	p, err := h.services.Update(product)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "invalid data", http.StatusUnauthorized)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&models.ProductResponse{ID: p.ID, SupplierID: p.SupplierID, Name: p.Name, Image: p.Image, Price: p.Price, Type: p.Type, Ingredients: p.Ingredients})
-	h.logger.Infof("product %d successfully updated", p.ID)
-}
-
 func (h *ProductHandler) GetBySupplier(w http.ResponseWriter, req *http.Request) {
-	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	setupResponse(&w)
 
+	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 	pr, err := h.services.GetBySupplier(int32(supplierID))
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -129,7 +111,6 @@ func (h *ProductHandler) GetBySupplier(w http.ResponseWriter, req *http.Request)
 		)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user successfully fetched supplier %d products ", supplierID)

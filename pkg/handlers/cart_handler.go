@@ -38,6 +38,8 @@ func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w)
+
 	cart := new(requests.CartRequest)
 	cart.UserID = req.Context().Value("user").(*models.User).ID
 	c, err := h.service.Create(cart)
@@ -47,13 +49,13 @@ func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.CartResponse{ID: c.ID, UserID: c.UserID})
 	h.logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
 }
 
 func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w)
 	userID := req.Context().Value("user").(*models.User).ID
 
 	cartRequest := new(requests.CartProductRequest)
@@ -109,15 +111,15 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.CartProductResponse{ID: c.ID, UserID: c.UserID, Products: c.Products})
 	h.logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
 }
 
 func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	user := req.Context().Value("user").(*models.User)
+	setupResponse(&w)
 
+	user := req.Context().Value("user").(*models.User)
 	c, err := h.service.GetAllProductsFromCart(user.ID)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -136,8 +138,9 @@ func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
-	cartProduct := new(requests.CartProductRequest)
+	setupResponse(&w)
 
+	cartProduct := new(requests.CartProductRequest)
 	defer req.Body.Close()
 	if err := json.NewDecoder(req.Body).Decode(&cartProduct); err != nil {
 		h.logger.Error(err.Error())
@@ -164,8 +167,9 @@ func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	userID := req.Context().Value("user").(*models.User).ID
+	setupResponse(&w)
 
+	userID := req.Context().Value("user").(*models.User).ID
 	cart, err := h.service.GetCartByUserID(userID)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -186,6 +190,8 @@ func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w)
+
 	userID := req.Context().Value("user").(*models.User).ID
 	productID, err := strconv.Atoi(req.URL.Query().Get("productId"))
 	if err != nil || productID < 1 {

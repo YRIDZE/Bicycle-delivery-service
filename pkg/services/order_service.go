@@ -33,19 +33,3 @@ func (o OrderService) GetByID(id int) (*models.Order, error) {
 func (o OrderService) GetAll(userID int32) (*[]models.Order, error) {
 	return o.repo.GetAll(userID)
 }
-
-func (o OrderService) Update(order *requests.OrderRequest) (*models.Order, error) {
-	return o.repo.Update(
-		&models.Order{
-			ID:       order.ID,
-			UserID:   order.UserID,
-			Address:  order.Address,
-			Status:   order.Status,
-			Products: order.Products,
-		},
-	)
-}
-
-func (o OrderService) Delete(id int) error {
-	return o.repo.Delete(id)
-}

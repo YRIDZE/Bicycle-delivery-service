@@ -35,13 +35,3 @@ func (s SupplierService) GetByName(name string) (int32, error) {
 func (s SupplierService) GetAll() (*[]models.Supplier, error) {
 	return s.repo.GetAll()
 }
-
-func (s SupplierService) Update(supplier *requests.SupplierRequest) (*models.Supplier, error) {
-	return s.repo.Update(
-		&models.Supplier{
-			ID:    supplier.ID,
-			Name:  supplier.Name,
-			Image: supplier.Image,
-		},
-	)
-}

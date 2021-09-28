@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 )
@@ -15,8 +14,6 @@ type OrderRepositoryI interface {
 	GetByID(id int) (*models.Order, error)
 	GetAll(userID int32) (*[]models.Order, error)
 	GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error)
-	Update(order *models.Order) (*models.Order, error)
-	Delete(id int) error
 }
 
 type OrderRepository struct {
@@ -169,66 +166,4 @@ func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.
 		return nil, err
 	}
 	return
-}
-
-func (o OrderRepository) Update(order *models.Order) (*models.Order, error) {
-	ctx := context.Background()
-	tx, err := o.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	query := fmt.Sprintf(
-		"update %s set address = ?, phone_number = ?, customer_name = ?, customer_lastname = ?, status = ? where id = ?", OrdersTable,
-	)
-	_, err = tx.ExecContext(ctx, query, order.Address, order.PhoneNumber, order.CustomerName, order.CustomerLastname, order.Status, order.ID)
-	if err != nil {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	for _, x := range order.Products {
-		query := fmt.Sprintf("update %s set quantity = ? where order_id = ? and product_id = ?", OPTable)
-		_, err = tx.ExecContext(ctx, query, x.Quantity, x.OrderID, x.ProductID)
-		if err != nil {
-			_ = tx.Rollback()
-			return nil, err
-		}
-	}
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	return order, nil
-}
-
-func (o OrderRepository) Delete(id int) error {
-
-	ctx := context.Background()
-	tx, err := o.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	query := fmt.Sprintf("update %s set deleted = ? where order_id = ?", OPTable)
-	_, err = tx.ExecContext(ctx, query, time.Now(), id)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	query2 := fmt.Sprintf("update %s set deleted = ? where id = ?", OrdersTable)
-	_, err = tx.ExecContext(ctx, query2, time.Now(), id)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
