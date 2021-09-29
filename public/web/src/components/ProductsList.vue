@@ -1,10 +1,10 @@
 <template>
   <Product
-      v-for="item in this.$store.state.items.filter(x => x.restaurantId == id)"
+      v-for="item in this.$store.state.items.filter(x => x.supplier_id == id)"
       :key="item.id"
       :id="item.id"
-      :title="item.title"
-      :logo="item.logo"
+      :name="item.name"
+      :image="item.image"
   ></Product>
 </template>
 
@@ -17,7 +17,7 @@ export default {
   name: "ProductList",
   components: {
     Product
-  }
+  },
 }
 </script>
 

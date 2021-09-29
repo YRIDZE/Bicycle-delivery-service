@@ -30,9 +30,6 @@
             </form>
           </div>
           <div class="overlay-container">
-            <div id="close" class="close" :class="{ 'left': signUpMode }">
-              <a href="#" data-bs-dismiss="modal"><i style="color: #ffffff;" class="fas fa-times"></i></a>
-            </div>
             <div class="overlay">
               <div class="overlay-panel overlay-left">
                 <h1><b>Welcome Back!</b></h1>

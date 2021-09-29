@@ -8,11 +8,11 @@
         <div class="modal-body">
           <div class="d-flex flex-column item-container product-from">
             <div class="img-part">
-              <img :src="item.logo" class="img-f" alt="item">
+              <img :src="item.image" class="img-f" alt="item">
             </div>
             <div class="product-data">
               <div class="data">
-                <h1>{{ item.title }}</h1>
+                <h1>{{ item.name }}</h1>
                 <b>Ingredients: </b>
                 <text v-for="ingredient in item.ingredients" :key="ingredient">
                   <text>{{ ingredient }}{{ ", " }}</text>

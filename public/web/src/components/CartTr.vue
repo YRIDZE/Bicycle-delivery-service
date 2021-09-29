@@ -1,8 +1,8 @@
 <template>
   <tr>
     <td>{{ index + 1 }}</td>
-    <td>{{ i.title }}</td>
-    <td>{{ f.title }}</td>
+    <td>{{ i.name }}</td>
+    <td>{{ f.name }}</td>
     <td>{{ i.price }}$</td>
     <td>
       <a style="color: #3b3b3b" @click="reduce()" :disable="item.quantity === 1">
@@ -58,7 +58,7 @@ export default {
       return this.$store.state.items.find(x => x.id == this.item.id)
     },
     f: function () {
-      return this.$store.state.restaurants.find(x => x.id == this.i.restaurantId)
+      return this.$store.state.restaurants.find(x => x.id == this.i.supplier_id)
     }
   },
   name: "CartTr"

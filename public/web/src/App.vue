@@ -4,7 +4,6 @@
       <div class="header-bar fixed-top">
         <nav class="navbar navbar-expand-sm  navbar-dark bg-dark"
              style="background-color:#545454FF !important; padding: 1em !important;">
-
           <a class="navbar-brand" href="/" style="padding:0 30px">
             <font-awesome-icon :icon="['fas', 'bicycle']"/>
             <b> Bicycle</b></a>
@@ -66,7 +65,8 @@
         <Filter></Filter>
         <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px">
           <div class="row">
-            <router-view></router-view>
+            <div v-show="this.$store.state.loading"> Loading...</div>
+            <router-view v-show="!this.$store.state.loading"></router-view>
           </div>
         </section>
       </div>
@@ -161,7 +161,6 @@ export default {
     return {
       showCart: false,
       showLogin: false,
-
     }
   },
 
