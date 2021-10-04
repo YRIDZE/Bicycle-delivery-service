@@ -5,7 +5,7 @@
       content-class="modal-content"
       name="item"
       :esc-to-close="true"
-      @before-open="hide"
+      @before-open="hide; quantity = 1"
   >
     <div class="modal-body">
       <div class="d-flex flex-column item-container product-from">
@@ -70,10 +70,10 @@ export default {
   },
 
   methods: {
-    ...mapActions(['addProduct']),
+    ...mapActions('cart', ['addItem']),
 
     addToCart: function (id, quantity) {
-      this.addProduct({
+      this.addItem({
             id: id,
             quantity: quantity
           }

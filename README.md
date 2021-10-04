@@ -40,6 +40,14 @@ $ go build -o cli cmd/migrate/main.go
 $ ./cli migrate up
 ```
 
+5. Build
+
+```
+$ cd public/bicycle
+$ npm install
+$ npm run build
+```
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.

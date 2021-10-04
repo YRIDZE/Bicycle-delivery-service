@@ -25,7 +25,7 @@
         </section>
       </div>
     </div>
-    <product-popup v-if="this.$store.state.currentProduct" :item="this.$store.state.currentProduct"></product-popup>
+    <product-popup v-if="this.$store.getters['cart/getCurrentItem']" :item="this.$store.getters['cart/getCurrentItem']"></product-popup>
 
     <go-top></go-top>
     <bottom-footer></bottom-footer>
@@ -40,10 +40,6 @@ import '../../bicycle/public/css/menu-item-page.css'
 
 export default {
   name: "App",
-
-  data: () => ({
-    showCart: false,
-  }),
 };
 
 </script>

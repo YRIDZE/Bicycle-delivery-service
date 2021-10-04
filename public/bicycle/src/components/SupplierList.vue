@@ -13,7 +13,6 @@
 <script>
 import Supplier from './Supplier'
 
-
 export default {
   components: {
     Supplier
@@ -41,6 +40,7 @@ export default {
 
 }
 </script>
+
 
 <style scoped>
 

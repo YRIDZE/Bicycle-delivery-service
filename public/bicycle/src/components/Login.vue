@@ -75,11 +75,12 @@ export default {
     registration() {
       axios.post("http://localhost:8081/createUser", this.registrationForm)
           .then(response => console.log(response.data.id));
+      this.hide()
     },
     login() {
       axios.post("http://localhost:8081/login", this.loginForm)
-          .then(response => this.accessToken = response.data.access_token);
-      console.log(this.accessToken)
+          .then(response => console.log(response.data));
+      this.hide()
     }
 
   },

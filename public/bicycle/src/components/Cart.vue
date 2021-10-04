@@ -1,7 +1,7 @@
 <template>
   <div>
     <vue-final-modal
-        v-model="$store.state.showCart"
+        v-model="$store.state.cart.showCart"
         classes="modal-container"
         content-class="modal-content"
         name="cart"
@@ -23,7 +23,7 @@
             </thead>
             <tbody>
             <CartTr
-                v-for="(item, index) in this.$store.getters.getCartList"
+                v-for="(item, index) in this.$store.getters['cart/getCartList']"
                 :item="item" :key="index" :index="index">
             </CartTr>
             </tbody>
@@ -92,8 +92,8 @@
 
 <script>
 import CartTr from './CartTr'
-import Inputmask from "inputmask";
 import HideModals from '../mixins/hideModals'
+import Inputmask from "inputmask";
 
 export default {
   mixins: [HideModals],
@@ -114,7 +114,7 @@ export default {
   computed: {
     total: function () {
       let total = 0;
-      this.$store.getters.getCartList.forEach(cartItem => total += this.$store.state.items.find(x => x.id === cartItem.id).price * cartItem.quantity)
+      this.$store.state.cart.cartList.forEach(cartItem => total += this.$store.state.items.find(x => x.id === cartItem.id).price * cartItem.quantity)
       return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
     },
   },

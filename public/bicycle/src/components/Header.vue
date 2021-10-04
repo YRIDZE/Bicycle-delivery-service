@@ -26,7 +26,7 @@
                                     type="button">
               <font-awesome-icon :icon="['fas', 'user']"/>
               Login</a></li>
-            <li class="nav-item"><a class="nav-link" id="cart" @click="$store.state.showCart = true" href="#"
+            <li class="nav-item"><a class="nav-link" id="cart" @click="$store.state.cart.showCart = true" href="#"
                                     type="button">
               <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
               Cart</a></li>
@@ -57,8 +57,10 @@
 </template>
 
 <script>
+
 export default {
-  name: "Header"
+  name: "Header",
+
 }
 </script>
 

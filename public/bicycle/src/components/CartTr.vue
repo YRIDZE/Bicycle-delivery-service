@@ -5,18 +5,18 @@
     <td>{{ f.name }}</td>
     <td>{{ i.price }}$</td>
     <td>
-      <a style="color: #3b3b3b" @click="addProduct({id: i.id, quantity: -1})"
+      <a style="color: #3b3b3b" @click="addItem({id: i.id, quantity: -1})"
          :disable="item.quantity === 1">
         <font-awesome-icon :icon="['fas', 'minus-circle']"/>
       </a>
       {{ item.quantity }}
-      <a style="color: #3b3b3b" @click="addProduct({id: i.id, quantity: 1})">
+      <a style="color: #3b3b3b" @click="addItem({id: i.id, quantity: 1})">
         <font-awesome-icon :icon="['fas', 'plus-circle']"/>
       </a>
     </td>
     <td></td>
     <td>
-      <a @click="removeProduct(index)">
+      <a @click="removeItem(index)">
         <font-awesome-icon :icon="['fas', 'trash']"/>
       </a>
     </td>
@@ -30,8 +30,7 @@ import {mapActions} from "vuex"
 export default {
   props: ['item', 'index'],
   methods: {
-    ...mapActions(['removeProduct', 'addProduct']),
-
+    ...mapActions('cart',['removeItem', 'addItem']),
   },
 
   computed: {

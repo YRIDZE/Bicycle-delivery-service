@@ -11,11 +11,12 @@
 
 export default {
   props: ['item'],
+
   methods: {
-   showProduct(){
-     this.$store.state.currentProduct = this.item;
-     this.$store.state.showProduct = true;
-   },
+    showProduct() {
+      this.$store.state.cart.currentItem = this.item
+      this.$store.state.showProduct = true;
+    },
   },
 }
 </script>
