@@ -38,7 +38,7 @@ func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	cart := new(requests.CartRequest)
 	cart.UserID = req.Context().Value("user").(*models.User).ID
@@ -55,7 +55,7 @@ func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 	userID := req.Context().Value("user").(*models.User).ID
 
 	cartRequest := new(requests.CartProductRequest)
@@ -117,7 +117,7 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	user := req.Context().Value("user").(*models.User)
 	c, err := h.service.GetAllProductsFromCart(user.ID)
@@ -138,7 +138,7 @@ func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	cartProduct := new(requests.CartProductRequest)
 	defer req.Body.Close()
@@ -167,7 +167,7 @@ func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	userID := req.Context().Value("user").(*models.User).ID
 	cart, err := h.service.GetCartByUserID(userID)
@@ -190,7 +190,7 @@ func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	userID := req.Context().Value("user").(*models.User).ID
 	productID, err := strconv.Atoi(req.URL.Query().Get("productId"))

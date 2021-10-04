@@ -35,7 +35,7 @@ func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
@@ -63,7 +63,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
 	if err != nil || orderID < 1 {
@@ -85,7 +85,7 @@ func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	userID := req.Context().Value("user").(*models.User).ID
 	o, err := h.services.GetAll(userID)

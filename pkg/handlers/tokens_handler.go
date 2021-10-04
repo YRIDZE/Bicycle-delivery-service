@@ -10,6 +10,8 @@ import (
 )
 
 func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
 	userID := req.Context().Value("user").(*models.User).ID
 	err := h.tokenService.DeleteUid(userID)
 	if err != nil {
@@ -33,6 +35,8 @@ func (h *UserHandler) Logout(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
 	c, err := req.Cookie("refresh-token")
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -88,6 +92,8 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
 	r := new(requests.LoginRequest)
 	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
 		h.logger.Error(err.Error())

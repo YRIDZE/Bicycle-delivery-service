@@ -32,7 +32,7 @@ func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	product := new(requests.ProductRequest)
 	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
@@ -54,7 +54,7 @@ func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *ProductHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	productID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 	p, err := h.services.GetByID(productID)
@@ -70,7 +70,7 @@ func (h *ProductHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	p, err := h.services.GetAll()
 	if err != nil {
@@ -93,7 +93,7 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *ProductHandler) GetBySupplier(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
 	pr, err := h.services.GetBySupplier(int32(supplierID))

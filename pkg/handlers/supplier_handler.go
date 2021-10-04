@@ -32,7 +32,7 @@ func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	supplier := new(requests.SupplierRequest)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
@@ -71,7 +71,7 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	supplierID, err := strconv.Atoi(req.URL.Query().Get("id"))
 	if err != nil || supplierID < 1 {
@@ -105,7 +105,7 @@ func (h *SupplierHandler) GetByID(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	s, err := h.services.GetAll()
 	if err != nil {

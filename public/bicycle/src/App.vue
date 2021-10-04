@@ -1,0 +1,49 @@
+<template>
+  <div id="main-content">
+    <header-top></header-top>
+
+    <div class="container-fluid" id="content"
+         style="padding-left: 70px !important; padding-right: 70px !important; font-family: 'Montserrat', sans-serif;">
+      <div class="col-md-12">
+        <h2>Food
+          <go-back></go-back>
+        </h2>
+        <p>...is any substance consumed to provide nutritional support for an organism. Food is usually of plant, animal
+          or fungal origin, and contains essential nutrients, such as carbohydrates, fats, proteins, vitamins, or
+          minerals. The substance is ingested by an organism and assimilated by the organism's cells to provide energy,
+          maintain life, or stimulate growth. </p>
+      </div>
+      <div class="d-flex flex-row mb-5 mt-1">
+        <filter-list></filter-list>
+        <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px">
+          <div class="row">
+            <router-view v-show="!this.$store.state.loading"></router-view>
+            <div v-show="this.$store.state.loading">
+              <pulse-loader :color="'#e97d56'"></pulse-loader>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <product-popup v-if="this.$store.state.currentProduct" :item="this.$store.state.currentProduct"></product-popup>
+
+    <go-top></go-top>
+    <bottom-footer></bottom-footer>
+  </div>
+</template>
+
+<script>
+import '../../bicycle/public/css/main-page.css'
+import '../../bicycle/public/css/cart.css'
+import '../../bicycle/public/css/login-registration.css'
+import '../../bicycle/public/css/menu-item-page.css'
+
+export default {
+  name: "App",
+
+  data: () => ({
+    showCart: false,
+  }),
+};
+
+</script>

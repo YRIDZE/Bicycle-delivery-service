@@ -41,7 +41,7 @@ func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 }
 
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 	user := new(requests.UserRequest)
 
 	defer req.Body.Close()
@@ -70,7 +70,7 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	u, err := h.userService.GetAll()
 	if err != nil {
@@ -90,7 +90,7 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 	user := new(requests.UserRequest)
 
 	defer req.Body.Close()
@@ -120,7 +120,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	userID := req.Context().Value("user").(*models.User).ID
 
@@ -137,7 +137,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w)
+	setupResponse(&w, req)
 
 	user := req.Context().Value("user").(*models.User)
 
