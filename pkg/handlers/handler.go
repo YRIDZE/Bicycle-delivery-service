@@ -52,12 +52,13 @@ func InitHandlers(ctx context.Context, cfg *conf.Config, db *sql.DB) *AppHandler
 	supplierHandler := NewSupplierHandler(cfg.Logger, supplierRepository)
 	productHandler := NewProductHandler(cfg.Logger, productRepository)
 	cartHandler := NewCartHandler(cfg.ConfigToken, cfg.Logger, cartRepository)
-	h := NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler, cartHandler)
+	staticHandler := NewStaticHandler()
+	h := NewAppHandlers(userHandler, orderHandler, supplierHandler, productHandler, cartHandler, staticHandler)
 
 	return h
 }
 
-func setupResponse(w *http.ResponseWriter,  req *http.Request) {
+func setupResponse(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")

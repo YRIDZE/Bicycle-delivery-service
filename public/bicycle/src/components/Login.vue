@@ -10,20 +10,20 @@
       <div class="login-container"
            :class="{ 'right-panel-active': signUpMode }" id="login-container">
         <div class="form-container sign-up-container">
-          <form class="l-r-form" v-on:submit.prevent="login">
+          <form class="l-r-form" v-on:submit.prevent="registration">
             <h1><b>Create Account</b></h1>
-            <input class="login-input" v-model="form.first_name" type="text" placeholder="Firstname"/>
-            <input class="login-input" v-model="form.last_name" type="text" placeholder="Lastname"/>
-            <input class="login-input" v-model="form.email" type="email" placeholder="Email"/>
-            <input class="login-input" v-model="form.password" type="password" placeholder="Password"/>
+            <input class="login-input" v-model="registrationForm.first_name" type="text" placeholder="Firstname"/>
+            <input class="login-input" v-model="registrationForm.last_name" type="text" placeholder="Lastname"/>
+            <input class="login-input" v-model="registrationForm.email" type="email" placeholder="Email"/>
+            <input class="login-input" v-model="registrationForm.password" type="password" placeholder="Password"/>
             <button class="sign-up bt" style="margin-top: 7px">SIGN UP</button>
           </form>
         </div>
         <div class="form-container  sign-in-container">
-          <form class="l-r-form" action="#">
+          <form class="l-r-form" v-on:submit.prevent="login">
             <h1><b>Sign in</b></h1>
-            <input class="login-input" type="email" placeholder="Email"/>
-            <input class="login-input" type="password" placeholder="Password"/>
+            <input class="login-input" v-model="loginForm.email" type="email" placeholder="Email"/>
+            <input class="login-input" v-model="loginForm.password" type="password" placeholder="Password"/>
             <a href="#" style="text-decoration: none; font-size: 14px; margin: 15px 0; color:#000000">Forgot your
               password?</a>
             <button class="sign-in bt">SIGN IN</button>
@@ -50,6 +50,7 @@
 
 <script>
 import HideModals from '../mixins/hideModals'
+import axios from "axios";
 
 export default {
   mixins: [HideModals],
@@ -57,56 +58,31 @@ export default {
   data() {
     return {
       signUpMode: false,
-      form: {
+      registrationForm: {
         first_name: '',
         last_name: '',
         email: '',
         password: '',
-      }
+      },
+      loginForm: {
+        email: '',
+        password: '',
+      },
+      accessToken: ""
     };
   },
   methods: {
+    registration() {
+      axios.post("http://localhost:8081/createUser", this.registrationForm)
+          .then(response => console.log(response.data.id));
+    },
     login() {
-      // let entry = {
-      //   first_name: document.getElementsByName("name"),
-      //   last_name: document.getElementsByName("surname"),
-      //   email: document.getElementsByName("email"),
-      //   password: document.getElementsByName("password"),
-      // };
-
-      const entry = {
-        first_name: "jfjfjf",
-        last_name: "A2",
-        email: "29@gmail.com",
-        password: "password"
-      }
-      // const headers = {
-      //   "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-      //   "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-      //   "Access-Control-Allow-Origin": "*",
-      // };
-      // axios.post("http://localhost:8081/createUser", entry, )
-      //     .then(response => this.id = response.data.id)
-      //     .catch(error => {
-      //       this.errorMessage = error.message;
-      //       console.error("There was an error!", error);
-      //     });
-
-
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-
-        },
-        body: JSON.stringify(entry)
-      };
-      fetch("http://localhost:8081/createUser", requestOptions)
-          .then(response => response.json())
-          .then(data => console.log(data.id));
+      axios.post("http://localhost:8081/login", this.loginForm)
+          .then(response => this.accessToken = response.data.access_token);
+      console.log(this.accessToken)
     }
-  }
+
+  },
 };
 </script>
 

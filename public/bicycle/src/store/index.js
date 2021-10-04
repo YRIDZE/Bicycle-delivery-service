@@ -26,11 +26,12 @@ export default new Vuex.Store({
         };
         state.cartList.push(entry);
       } else {
+        if (entry.quantity === 1) return;
         entry.quantity += payload.quantity;
       }
     },
 
-    remove(state, payload) {
+    removeProduct(state, payload) {
       state.cartList.splice(payload.index, 1);
     },
 
@@ -43,8 +44,8 @@ export default new Vuex.Store({
       context.commit("addProduct", quantity)
     },
 
-    remove(context, id) {
-      context.commit("remove", id)
+    removeProduct(context, id) {
+      context.commit("removeProduct", id)
     }
   },
 

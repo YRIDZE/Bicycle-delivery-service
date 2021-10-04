@@ -16,7 +16,7 @@
     </td>
     <td></td>
     <td>
-      <a @click="remove(index)">
+      <a @click="removeProduct(index)">
         <font-awesome-icon :icon="['fas', 'trash']"/>
       </a>
     </td>
@@ -30,7 +30,7 @@ import {mapActions} from "vuex"
 export default {
   props: ['item', 'index'],
   methods: {
-    ...mapActions(['remove', 'addProduct']),
+    ...mapActions(['removeProduct', 'addProduct']),
 
   },
 
