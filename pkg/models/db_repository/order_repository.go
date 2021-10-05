@@ -31,8 +31,13 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 		return nil, err
 	}
 
-	query := fmt.Sprintf("insert into %s (address, user_id, phone_number, customer_name, customer_lastname) values (?, ?)", OrdersTable)
-	res, err := tx.ExecContext(ctx, query, order.Address, order.UserID, order.PhoneNumber, order.CustomerName, order.CustomerLastname)
+	query := fmt.Sprintf(
+		"insert into %s (address, user_id, phone_number, customer_name, customer_lastname, order_cost, payment_method) values (?, ?, ?, ?, ?, ?, ?)",
+		OrdersTable,
+	)
+	res, err := tx.ExecContext(
+		ctx, query, order.Address, order.UserID, order.PhoneNumber, order.CustomerName, order.CustomerLastname, order.OrderCost, order.PaymentMethod,
+	)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err

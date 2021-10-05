@@ -7,7 +7,6 @@
         name="cart"
         :esc-to-close="true"
         @before-open="hide"
-
     >
       <div class="modal-body">
         <div class="table-responsive">
@@ -22,17 +21,16 @@
             </tr>
             </thead>
             <tbody>
-            <CartTr
+            <cart-tr
                 v-for="(item, index) in this.$store.getters['cart/getCartList']"
                 :item="item" :key="index" :index="index">
-            </CartTr>
+            </cart-tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="d-flex flex-row-reverse">
-        <button class="cart-btn" @click="showCartInfo = true">Order
-        </button>
+        <button class="cart-btn" @click="showCartInfo = true">Order</button>
         <p style="margin-top: 15px !important;">Total <strong>{{ total }}</strong>$</p>
       </div>
     </vue-final-modal>
@@ -45,45 +43,43 @@
     >
       <div class="modal-body">
         <div class="row g-3" style="margin: 1px">
-
-          <div class="col-sm-6">
-            <input type="text" class="login-input" placeholder="Name" value="" required="">
-          </div>
-
-          <div class="col-sm-6">
-            <input type="text" class="login-input" autocomplete='off' placeholder="Surname" value="" required="">
-          </div>
-
-          <div class="cart-col-12">
-            <input type="text" id="phone" class="login-input" autocomplete='off' placeholder="Phone number"
-                   required/>
-          </div>
-
-          <div class="cart-col-12">
-            <input type="text" class="login-input" autocomplete='off'
-                   placeholder="Kharkiv, st. Academician Pavlova 154, apt. 12"
-                   required="">
-            <div class="invalid-feedback">
-              Please enter your address.
+          <form>
+            <div class="col-sm-6">
+              <input type="text" class="login-input" v-model="orderForm.customer_name" placeholder="Name" value=""
+                     required="">
             </div>
-          </div>
 
-          <div class="col-md-7">
-            <form>
-              <select class="login-input" autocomplete='off' required="">
+            <div class="col-sm-6">
+              <input type="text" class="login-input" v-model="orderForm.customer_lastname" autocomplete='off'
+                     placeholder="Surname" value="" required="">
+            </div>
+
+            <div class="cart-col-12">
+              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input" autocomplete='off'
+                     placeholder="Phone number"
+                     required/>
+            </div>
+
+            <div class="cart-col-12">
+              <input type="text" class="login-input" autocomplete='off' v-model="orderForm.address"
+                     placeholder="Kharkiv, st. Academician Pavlova 154, apt. 12"
+                     required="">
+              <div class="invalid-feedback"> Please enter your address.</div>
+            </div>
+
+            <div class="col-md-7">
+              <select class="login-input" v-model="orderForm.payment_method" autocomplete='off' required="">
                 <option value="" disabled selected hidden>Payment method</option>
                 <option>Credit Card</option>
                 <option>Cash</option>
               </select>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
       <div class="btn-group">
-        <button class="cart-btn" style="width:50%">Back
-        </button>
-        <button class="cart-btn" style="width:50%">Confirm
-        </button>
+        <button class="cart-btn" style="width:50%">Back</button>
+        <button class="cart-btn" @click="orderSet" style="width:50%">Confirm</button>
       </div>
     </vue-final-modal>
 
@@ -91,19 +87,25 @@
 </template>
 
 <script>
-import CartTr from './CartTr'
 import HideModals from '../mixins/hideModals'
 import Inputmask from "inputmask";
+import axios from "axios";
 
 export default {
   mixins: [HideModals],
-  components: {
-    CartTr,
-  },
 
   data() {
     return {
       showCartInfo: false,
+      orderForm: {
+        address: '',
+        phone_number: '',
+        customer_name: '',
+        customer_lastname: '',
+        payment_method: '',
+        order_cost: 1.0,
+        products: {},
+      },
     };
   },
   mounted() {
@@ -111,10 +113,24 @@ export default {
     im.mask(document.getElementById('phone'));
   },
 
+  methods: {
+    orderSet() {
+      this.orderForm.products = this.$store.getters["cart/getCartList"];
+      this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
+
+      axios.post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm), {
+        headers:
+            {Authorization: `Bearer ${this.$store.state.accessToken}`}
+      })
+          .then(response => console.log(response.data.id));
+      this.hide();
+    },
+  },
+
   computed: {
     total: function () {
       let total = 0;
-      this.$store.state.cart.cartList.forEach(cartItem => total += this.$store.state.items.find(x => x.id === cartItem.id).price * cartItem.quantity)
+      this.$store.state.cart.cartList.forEach(cartItem => total += this.$store.state.items.find(x => x.id === cartItem.product_id).price * cartItem.quantity);
       return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
     },
   },

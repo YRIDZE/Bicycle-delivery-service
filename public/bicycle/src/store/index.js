@@ -16,6 +16,7 @@ export default new Vuex.Store({
       loading: false,
       showLogin: false,
       showProduct: false,
+      accessToken: ""
     };
   },
   modules,

@@ -74,8 +74,8 @@ export default {
 
     addToCart: function (id, quantity) {
       this.addItem({
-            id: id,
-            quantity: quantity
+            product_id: id,
+            quantity: quantity,
           }
       );
       this.$vfm.hide("item");

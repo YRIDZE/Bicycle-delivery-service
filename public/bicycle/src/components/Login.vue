@@ -68,7 +68,6 @@ export default {
         email: '',
         password: '',
       },
-      accessToken: ""
     };
   },
   methods: {
@@ -79,7 +78,7 @@ export default {
     },
     login() {
       axios.post("http://localhost:8081/login", this.loginForm)
-          .then(response => console.log(response.data));
+          .then(response => this.$store.state.accessToken = response.data.access_token);
       this.hide()
     }
 

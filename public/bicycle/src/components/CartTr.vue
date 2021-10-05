@@ -5,12 +5,12 @@
     <td>{{ f.name }}</td>
     <td>{{ i.price }}$</td>
     <td>
-      <a style="color: #3b3b3b" @click="addItem({id: i.id, quantity: -1})"
+      <a style="color: #3b3b3b" @click="addItem({product_id: i.id, quantity: -1})"
          :disable="item.quantity === 1">
         <font-awesome-icon :icon="['fas', 'minus-circle']"/>
       </a>
       {{ item.quantity }}
-      <a style="color: #3b3b3b" @click="addItem({id: i.id, quantity: 1})">
+      <a style="color: #3b3b3b" @click="addItem({product_id: i.id, quantity: 1})">
         <font-awesome-icon :icon="['fas', 'plus-circle']"/>
       </a>
     </td>
@@ -30,12 +30,12 @@ import {mapActions} from "vuex"
 export default {
   props: ['item', 'index'],
   methods: {
-    ...mapActions('cart',['removeItem', 'addItem']),
+    ...mapActions('cart', ['removeItem', 'addItem']),
   },
 
   computed: {
     i: function () {
-      return this.$store.state.items.find(x => x.id == this.item.id)
+      return this.$store.state.items.find(x => x.id == this.item.product_id)
     },
     f: function () {
       return this.$store.state.restaurants.find(x => x.id == this.i.supplier_id)

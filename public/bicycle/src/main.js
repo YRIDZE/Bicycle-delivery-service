@@ -16,6 +16,7 @@ import Login from "./components/Login";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ProductPopUp from "./components/ProductPopUp";
+import CartTr from './components/CartTr'
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -31,7 +32,8 @@ import {
   faPlusCircle,
   faShoppingBasket,
   faTrash,
-  faUser,
+  faSignInAlt,
+  faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -40,10 +42,11 @@ library.add(
   faFacebookF,
   faLinkedinIn,
   faShoppingBasket,
-  faUser,
   faPlusCircle,
   faMinusCircle,
   faTrash,
+  faSignInAlt,
+  faSignOutAlt,
   faBicycle,
   faChevronCircleLeft,
   faChevronUp
@@ -61,6 +64,7 @@ Vue.component("bottom-footer", Footer);
 Vue.component("header-top", Header);
 Vue.component("product-popup", ProductPopUp);
 Vue.component('pulse-loader', PulseLoader);
+Vue.component('cart-tr', CartTr);
 
 
 Vue.use(VueFinalModal)

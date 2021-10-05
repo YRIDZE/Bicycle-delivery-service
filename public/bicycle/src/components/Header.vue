@@ -22,10 +22,13 @@
         <div class="collapse navbar-collapse" id="toggleMenu">
           <ul class="navbar-nav ms-auto text-center" style="padding:0 30px">
             <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-            <li class="nav-item"><a class="nav-link" id="login" @click="$store.state.showLogin = true" href="#"
+            <li class="nav-item"><a class="nav-link" id="login" @click="$store.state.showLogin = true"
                                     type="button">
-              <font-awesome-icon :icon="['fas', 'user']"/>
+              <font-awesome-icon :icon="['fas', 'sign-in-alt']"/>
               Login</a></li>
+            <li class="nav-item"><a class="nav-link" id="logout" @click="logout" type="button">
+              <font-awesome-icon :icon="['fas', 'sign-out-alt']"/>
+              Logout</a></li>
             <li class="nav-item"><a class="nav-link" id="cart" @click="$store.state.cart.showCart = true" href="#"
                                     type="button">
               <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
@@ -58,9 +61,20 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   name: "Header",
+  methods: {
+    logout() {
+      axios.post("http://localhost:8081/logout", "", {
+        headers:
+            {Authorization: `Bearer ${this.$store.state.accessToken}`}
+      })
+          .then(response => console.log(response.data));
+    }
 
+  },
 }
 </script>
 

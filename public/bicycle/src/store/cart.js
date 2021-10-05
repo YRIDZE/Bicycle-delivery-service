@@ -6,10 +6,10 @@ const state = {
 
 const mutations = {
   addItem(state, payload) {
-    let entry = state.cartList.find((x) => x.id == payload.id);
+    let entry = state.cartList.find(x => x.product_id == payload.product_id);
     if (entry == null) {
       entry = {
-        id: payload.id,
+        product_id: payload.product_id,
         quantity: payload.quantity,
       };
       state.cartList.push(entry);
