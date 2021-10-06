@@ -11,7 +11,7 @@ export default {
   computed: {
     checked: {
       get() {
-        return this.title == 'restaurantType' ? this.$store.getters["filter/getSuppTypeFilter"] : this.$store.getters["filter/getSuppTypeFilter"];
+        return this.title == 'restaurantType' ? this.$store.getters["filter/getSuppTypeFilter"] : this.$store.getters["filter/getProdTypeFilter"];
       },
       set(value) {
         return this.title == 'restaurantType' ? this.$store.dispatch('filter/setSuppTypeFilter', value) : this.$store.dispatch('filter/setProdTypeFilter', value);

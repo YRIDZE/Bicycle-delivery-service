@@ -3,6 +3,8 @@ import axios from "axios";
 const state = {
   status: '',
   token: localStorage.getItem('access_token') || '',
+  showLogin: false,
+
 }
 
 const mutations = {

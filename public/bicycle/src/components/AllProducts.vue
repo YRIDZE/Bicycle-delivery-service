@@ -17,7 +17,6 @@ export default {
       return this.$store.getters["item/getItems"].filter(value => this.$store.getters["filter/getProdTypeFilter"].includes(value.type))
     },
   },
-
 }
 </script>
 

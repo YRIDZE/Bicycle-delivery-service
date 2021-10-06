@@ -33,12 +33,8 @@ const actions = {
 }
 
 const getters = {
-  getCartList: (state) => {
-    return state.cartList
-  },
-  getCurrentItem: (state) => {
-    return state.currentItem
-  }
+  getCartList: state => state.cartList,
+  getCurrentItem: state => state.currentItem,
 }
 
 export default {

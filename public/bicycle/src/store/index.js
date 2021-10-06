@@ -21,8 +21,6 @@ export default new Vuex.Store({
   state() {
     return {
       loading: false,
-      showLogin: false,
-      accessToken: "",
     };
   },
 

@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-      v-model="$store.state.showLogin"
+      v-model="$store.state.user.showLogin"
       classes="modal-container"
       content-class="modal-content"
       :esc-to-close="true"

@@ -16,9 +16,8 @@ const actions = {
 }
 
 const getters = {
-  getItems: (state) => {
-    return state.items
-  },
+  getItems: state => state.items,
+
   getItemsTypes: (state) => {
     let result = new Set();
     state.items.forEach(element => result.add(element.type));

@@ -12,13 +12,13 @@ const routes = [
     component: SupplierList,
   },
   {
+    path: "/all",
+    component: AllProducts,
+  },
+  {
     path: "/:id",
     component: ProductsList,
     props: true,
-  },
-  {
-    path: "/all",
-    component: AllProducts,
   },
 ];
 

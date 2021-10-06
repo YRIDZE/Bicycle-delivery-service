@@ -15,9 +15,7 @@ const actions = {
 }
 
 const getters = {
-  getSuppliers: (state) => {
-    return state.suppliers;
-  },
+  getSuppliers: state => state.suppliers,
 
   getSuppliersTypes: (state) => {
     let result = new Set();

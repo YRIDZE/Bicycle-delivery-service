@@ -22,12 +22,8 @@ const actions = {
 }
 
 const getters = {
-  getSuppTypeFilter: (state) => {
-    return state.supplierTypeFilter
-  },
-  getProdTypeFilter: (state) => {
-    return state.productTypeFilter
-  },
+  getSuppTypeFilter: state => state.supplierTypeFilter,
+  getProdTypeFilter: state => state.productTypeFilter,
 }
 
 export default {

@@ -1,7 +1,8 @@
 <template>
   <div class="card">
     <div class="accordion accordion-flush" id="accordionFlushExample">
-      <button type="button" @click="showAllProd" style="background-color: #e97d56;
+      <router-link to="all">
+        <button type="button" style="background-color: #e97d56;
         border: none;
         text-align: left;
         margin: 0;
@@ -9,10 +10,10 @@
         border-radius: unset;
         font-size: 16px !important;
         width: 250px"> ALL PRODUCTS
-      </button>
+        </button>
+      </router-link>
 
-
-      <div class="accordion-item" v-if="this.$router.currentRoute.fullPath === '/'">
+      <div class="accordion-item">
         <h2 class="accordion-header" id="panel1">
           <button class="accordion-button" type="button" data-bs-toggle="collapse"
                   data-bs-target="#panelSupplierTypes" aria-expanded="true"
@@ -32,7 +33,7 @@
           </div>
         </div>
       </div>
-      <div class="accordion-item" v-else>
+      <div class="accordion-item">
         <h2 class="accordion-header" id="panel2">
           <button class="accordion-button" type="button" data-bs-toggle="collapse"
                   data-bs-target="#panelProductTypes" aria-expanded="true"
@@ -58,13 +59,7 @@
 
 <script>
 
-export default {
-  methods: {
-    showAllProd() {
-      this.$router.push('all');
-    },
-  },
-}
+export default {}
 
 </script>
 
