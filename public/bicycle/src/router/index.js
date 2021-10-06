@@ -11,7 +11,6 @@ const routes = [
     path: "/",
     component: SupplierList,
   },
-
   {
     path: "/:id",
     component: ProductsList,

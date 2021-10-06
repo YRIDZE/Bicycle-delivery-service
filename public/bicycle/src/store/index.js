@@ -4,6 +4,7 @@ import cartState from "./cart"
 import supplier from "./supplier"
 import filter from "./filter"
 import item from "./item"
+import user from "./user"
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ const modules = {
   supp: supplier,
   filter: filter,
   item: item,
+  user: user,
 }
 
 export default new Vuex.Store({

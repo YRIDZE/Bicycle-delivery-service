@@ -22,15 +22,13 @@
         <div class="collapse navbar-collapse" id="toggleMenu">
           <ul class="navbar-nav ms-auto text-center" style="padding:0 30px">
             <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-            <li class="nav-item"><a class="nav-link" id="login" @click="$store.state.showLogin = true"
-                                    type="button">
-              <font-awesome-icon :icon="['fas', 'sign-in-alt']"/>
-              Login</a></li>
-            <li class="nav-item"><a class="nav-link" id="logout" @click="logout" type="button">
+            <li class="nav-item" v-if="isLoggedIn"><a class="nav-link" @click="logout" type="button">
               <font-awesome-icon :icon="['fas', 'sign-out-alt']"/>
               Logout</a></li>
-            <li class="nav-item"><a class="nav-link" id="cart" @click="$store.state.cart.showCart = true" href="#"
-                                    type="button">
+            <li class="nav-item" v-else><a class="nav-link" @click="$store.state.showLogin = true" type="button">
+              <font-awesome-icon :icon="['fas', 'sign-in-alt']"/>
+              Login</a></li>
+            <li class="nav-item"><a class="nav-link" @click="showCart" type="button">
               <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
               Cart</a></li>
           </ul>
@@ -61,19 +59,24 @@
 
 <script>
 
-import axios from "axios";
-
 export default {
   name: "Header",
+  computed: {
+    isLoggedIn: function () {
+      return this.$store.getters["user/isLoggedIn"];
+    },
+  },
   methods: {
     logout() {
-      axios.post("http://localhost:8081/logout", "", {
-        headers:
-            {Authorization: `Bearer ${this.$store.state.accessToken}`}
-      })
-          .then(response => console.log(response.data));
+      this.$store.dispatch('user/logout');
+    },
+    showCart() {
+      if (this.$store.getters["user/isLoggedIn"]) {
+        this.$store.state.cart.showCart = true
+      } else {
+        this.$store.state.showLogin = true
+      }
     }
-
   },
 }
 </script>

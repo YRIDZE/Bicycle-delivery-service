@@ -114,11 +114,10 @@ export default {
       this.orderForm.products = this.$store.getters["cart/getCartList"];
       this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
 
-      axios.post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm), {
-        headers:
-            {Authorization: `Bearer ${this.$store.state.accessToken}`}
-      })
+      axios
+          .post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm))
           .then(response => console.log(response.data.id));
+      this.orderForm = '';
       this.hide();
     },
   },

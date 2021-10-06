@@ -10,7 +10,7 @@
       <div class="login-container"
            :class="{ 'right-panel-active': signUpMode }" id="login-container">
         <div class="form-container sign-up-container">
-          <form class="l-r-form" v-on:submit.prevent="registration">
+          <form class="l-r-form" v-on:submit.prevent="registUser">
             <h1><b>Create Account</b></h1>
             <input class="login-input" v-model="registrationForm.first_name" type="text" placeholder="Firstname"/>
             <input class="login-input" v-model="registrationForm.last_name" type="text" placeholder="Lastname"/>
@@ -20,11 +20,10 @@
           </form>
         </div>
         <div class="form-container  sign-in-container">
-          <form class="l-r-form" v-on:submit.prevent="login">
+          <form class="l-r-form" v-on:submit.prevent="loginUser">
             <h1><b>Sign in</b></h1>
             <input class="login-input" v-model="loginForm.email" type="email" placeholder="Email"/>
-            <input class="login-input" v-model="loginForm.password" type="password"
-                   placeholder="Password"/>
+            <input class="login-input" v-model="loginForm.password" type="password" placeholder="Password"/>
             <a href="#" style="text-decoration: none; font-size: 14px; margin: 15px 0; color:#000000">Forgot your
               password?</a>
             <button class="sign-in bt">SIGN IN</button>
@@ -51,7 +50,8 @@
 
 <script>
 import HideModals from '../mixins/hideModals'
-import axios from "axios";
+import {mapActions} from "vuex";
+
 
 export default {
   mixins: [HideModals],
@@ -72,17 +72,20 @@ export default {
     };
   },
   methods: {
-    registration() {
-      axios.post("http://localhost:8081/createUser", this.registrationForm)
-          .then(response => console.log(response.data.id));
+    ...mapActions('user', ['login', 'registration']),
+
+    registUser() {
+      this.registration(this.registrationForm)
+          .catch(err => console.log(err));
+      this.signUpMode = false;
+      this.registrationForm = '';
+    },
+    loginUser: function () {
+      this.login(this.loginForm)
+          .catch(err => console.log(err));
+      this.loginForm = '';
       this.hide()
     },
-    login() {
-      axios.post("http://localhost:8081/login", this.loginForm)
-          .then(response => this.$store.state.accessToken = response.data.access_token);
-      this.hide()
-    }
-
   },
 };
 </script>

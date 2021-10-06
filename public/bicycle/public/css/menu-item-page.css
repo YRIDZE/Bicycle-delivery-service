@@ -88,6 +88,7 @@ button:active,
 }
 
 .number-minus, .number-plus {
+    cursor: pointer;
     position: absolute;
     width: 40px;
     line-height: 32px;

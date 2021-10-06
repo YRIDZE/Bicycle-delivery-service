@@ -102,10 +102,15 @@ button {
     border-color: #e96b56 !important;
 }
 
+.form-check-input:hover {
+    cursor: pointer !important;
+}
+
 .form-check-input:focus,
 .accordion-button:focus,
 .form-control:focus {
     border-color: #e96b56 !important;
+    cursor: pointer !important;
     box-shadow: 0 0 0 0.25rem rgba(233, 107, 86, 0.43) !important;
 }
 
@@ -116,6 +121,7 @@ button {
 /*--------------------------------------------------*/
 
 .services .icon-box {
+    cursor: pointer;
     text-align: center;
     transition: all ease-in-out 0.3s;
     border-radius: 10px;
@@ -298,7 +304,7 @@ button {
     padding: 0 !important;
 }
 
-.modal-content{
+.modal-content {
     width: auto !important;
     border-radius: 10px !important;
 }

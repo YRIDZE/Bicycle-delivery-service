@@ -65,6 +65,7 @@ export default {
   created() {
     this.fetchedSupplierProducts()
   },
+
 };
 
 </script>
