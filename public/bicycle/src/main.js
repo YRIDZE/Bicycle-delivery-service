@@ -20,6 +20,7 @@ import CartTr from './components/CartTr'
 import Check from './components/Check'
 import Product from "@/components/Product";
 import Supplier from '@/components/Supplier'
+import AllProducts from '@/components/AllProducts'
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -71,6 +72,7 @@ Vue.component('cart-tr', CartTr);
 Vue.component('check', Check);
 Vue.component('product', Product);
 Vue.component('supplier', Supplier);
+Vue.component('all-products', AllProducts);
 
 Vue.use(VueFinalModal)
 Vue.use(PortalVue)

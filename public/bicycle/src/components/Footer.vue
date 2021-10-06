@@ -6,18 +6,24 @@
           <div class="col-lg-3 col-md-6 footer-links">
             <h4>Useful Links</h4>
             <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="/">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a><b style="color: red">&nbsp;&nbsp;SOON</b>
+              </li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a><b style="color: red">&nbsp;&nbsp;SOON</b>
+              </li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a><b style="color: red">&nbsp;&nbsp;SOON</b>
+              </li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a><b style="color: red">&nbsp;&nbsp;SOON</b>
+              </li>
             </ul>
           </div>
           <div class="col-lg-3 col-md-6 footer-links">
             <h4>Our Services</h4>
             <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Delivery</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Tasting</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Delivery</a><b
+                  style="color: red ">&nbsp;&nbsp;SOON</b></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Tasting</a><b style="color: red">&nbsp;&nbsp;SOON</b>
+              </li>
             </ul>
           </div>
           <div class="col-lg-3 col-md-6 footer-contact">
@@ -25,7 +31,7 @@
             <p>
               132, Akademika Pavlova Street <br>
               Kharkiv, Ukraine <br><br>
-              <strong>Phone:</strong> +380988888888<br>
+              <strong>Phone:</strong> +380983709510<br>
               <strong>Email:</strong> localyridze@gmail.com<br>
             </p>
           </div>
@@ -34,7 +40,10 @@
             <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
               valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
             <div class="social-links mt-3">
-              <a href="#">
+              <a href="https://www.linkedin.com/in/yridze">
+                <font-awesome-icon :icon="['fab', 'linkedin-in']"/>
+              </a>
+              <a href="https://www.instagram.com/iamirinalaktionova/">
                 <font-awesome-icon :icon="['fab', 'instagram']"/>
               </a>
               <a href="#">
@@ -42,9 +51,6 @@
               </a>
               <a href="#">
                 <font-awesome-icon :icon="['fab', 'facebook-f']"/>
-              </a>
-              <a href="#">
-                <font-awesome-icon :icon="['fab', 'linkedin-in']"/>
               </a>
             </div>
           </div>

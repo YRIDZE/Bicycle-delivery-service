@@ -7,14 +7,14 @@
 
 <script>
 export default {
-  props: ['name'],
+  props: ['name', 'title'],
   computed: {
     checked: {
       get() {
-        return this.$store.getters["filter/getFilter"].type
+        return this.title == 'restaurantType' ? this.$store.getters["filter/getSuppTypeFilter"] : this.$store.getters["filter/getSuppTypeFilter"];
       },
       set(value) {
-        this.$store.dispatch('filter/setFilter', value)
+        return this.title == 'restaurantType' ? this.$store.dispatch('filter/setSuppTypeFilter', value) : this.$store.dispatch('filter/setProdTypeFilter', value);
       }
     }
   }

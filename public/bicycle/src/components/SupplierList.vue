@@ -16,8 +16,8 @@
 export default {
   computed: {
     filteredSuppList: function () {
-      if (this.$store.getters["filter/getFilter"].type.length === 0) return this.$store.getters["supp/getSuppliers"]
-      return this.$store.getters["supp/getSuppliers"].filter(value => this.$store.getters["filter/getFilter"].type.includes(value.type))
+      if (this.$store.getters["filter/getSuppTypeFilter"].length === 0) return this.$store.getters["supp/getSuppliers"]
+      return this.$store.getters["supp/getSuppliers"].filter(value => this.$store.getters["filter/getSuppTypeFilter"].includes(value.type))
     },
   },
 

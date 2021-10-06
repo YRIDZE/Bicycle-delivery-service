@@ -8,20 +8,24 @@
         <h2>Food
           <go-back></go-back>
         </h2>
-        <p>...is any substance consumed to provide nutritional support for an organism. Food is usually of plant, animal
+        <p style="margin-bottom: 0 !important;">...is any substance consumed to provide nutritional support for an
+          organism. Food is usually of plant, animal
           or fungal origin, and contains essential nutrients, such as carbohydrates, fats, proteins, vitamins, or
           minerals. The substance is ingested by an organism and assimilated by the organism's cells to provide energy,
           maintain life, or stimulate growth. </p>
       </div>
+
       <div class="d-flex flex-row mb-5 mt-1">
         <filter-list></filter-list>
         <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px">
+
           <div class="row">
             <router-view v-show="!this.$store.state.loading"></router-view>
             <div v-show="this.$store.state.loading">
               <pulse-loader :color="'#e97d56'"></pulse-loader>
             </div>
           </div>
+
         </section>
       </div>
     </div>

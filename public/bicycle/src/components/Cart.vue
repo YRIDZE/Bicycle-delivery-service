@@ -42,38 +42,34 @@
         :esc-to-close="true"
     >
       <div class="modal-body">
-        <div class="row g-3" style="margin: 1px">
+        <div class="row g-3" style="margin: 1px; width: 800px !important;">
           <form>
-            <div class="col-sm-6">
-              <input type="text" class="login-input" v-model="orderForm.customer_name" placeholder="Name" value=""
+            <div class="col-sm-12 fields">
+              <input type="text" class="login-input" style="width: 49% !important;" v-model="orderForm.customer_name"
+                     placeholder="Name" value=""
                      required="">
-            </div>
-
-            <div class="col-sm-6">
-              <input type="text" class="login-input" v-model="orderForm.customer_lastname" autocomplete='off'
+              <input type="text" class="login-input" style="width: 49% !important;"
+                     v-model="orderForm.customer_lastname" autocomplete='off'
                      placeholder="Surname" value="" required="">
             </div>
 
             <div class="cart-col-12">
-              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input" autocomplete='off'
-                     placeholder="Phone number"
-                     required/>
-            </div>
-
-            <div class="cart-col-12">
               <input type="text" class="login-input" autocomplete='off' v-model="orderForm.address"
-                     placeholder="Kharkiv, st. Academician Pavlova 154, apt. 12"
-                     required="">
+                     placeholder="Kharkiv, st. Academica Pavlova 154, apt. 12" required="">
               <div class="invalid-feedback"> Please enter your address.</div>
             </div>
 
-            <div class="col-md-7">
-              <select class="login-input" v-model="orderForm.payment_method" autocomplete='off' required="">
+            <div class="cart-col-12 fields">
+              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input" autocomplete='off'
+                     style="width: 49%" placeholder="Phone number" required/>
+              <select class="login-input" v-model="orderForm.payment_method" autocomplete='off' style="width: 49%"
+                      required="">
                 <option value="" disabled selected hidden>Payment method</option>
                 <option>Credit Card</option>
                 <option>Cash</option>
               </select>
             </div>
+
           </form>
         </div>
       </div>
@@ -138,5 +134,10 @@ export default {
 </script>
 
 <style scoped>
+
+.fields {
+  display: flex;
+  justify-content: space-between;
+}
 
 </style>

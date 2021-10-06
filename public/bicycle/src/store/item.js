@@ -19,6 +19,11 @@ const getters = {
   getItems: (state) => {
     return state.items
   },
+  getItemsTypes: (state) => {
+    let result = new Set();
+    state.items.forEach(element => result.add(element.type));
+    return result;
+  },
 }
 
 export default {

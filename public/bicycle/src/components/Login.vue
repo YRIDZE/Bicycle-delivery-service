@@ -23,7 +23,8 @@
           <form class="l-r-form" v-on:submit.prevent="login">
             <h1><b>Sign in</b></h1>
             <input class="login-input" v-model="loginForm.email" type="email" placeholder="Email"/>
-            <input class="login-input" v-model="loginForm.password" type="password" placeholder="Password"/>
+            <input class="login-input" v-model="loginForm.password" type="password"
+                   placeholder="Password"/>
             <a href="#" style="text-decoration: none; font-size: 14px; margin: 15px 0; color:#000000">Forgot your
               password?</a>
             <button class="sign-in bt">SIGN IN</button>
