@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-      v-model="$store.state.showProduct"
+      v-model="$store.state.item.showProduct"
       classes="modal-container"
       content-class="modal-content"
       name="item"

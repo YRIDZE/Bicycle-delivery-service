@@ -25,7 +25,8 @@
         </section>
       </div>
     </div>
-    <product-popup v-if="this.$store.getters['cart/getCurrentItem']" :item="this.$store.getters['cart/getCurrentItem']"></product-popup>
+    <product-popup v-if="this.$store.getters['cart/getCurrentItem']"
+                   :item="this.$store.getters['cart/getCurrentItem']"></product-popup>
 
     <go-top></go-top>
     <bottom-footer></bottom-footer>
@@ -40,6 +41,26 @@ import '../../bicycle/public/css/menu-item-page.css'
 
 export default {
   name: "App",
+
+  methods: {
+    async fetchedSupplierProducts() {
+      this.$store.state.loading = true
+      await fetch("http://localhost:8081/getSuppliers",)
+          .then(response => response.json())
+          .then(async data => {
+            await this.$store.dispatch('supp/setSuppliers', data)
+
+            await fetch("http://localhost:8081/getProducts",)
+                .then(response => response.json())
+                .then(data => this.$store.dispatch('item/setItem', data));
+          })
+      this.$store.state.loading = false
+    },
+  },
+
+  created() {
+    this.fetchedSupplierProducts()
+  },
 };
 
 </script>
