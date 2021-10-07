@@ -122,7 +122,6 @@ button {
 
 .services .icon-box {
     cursor: pointer;
-    text-align: center;
     transition: all ease-in-out 0.3s;
     border-radius: 10px;
     border-style: solid;
@@ -135,16 +134,11 @@ button {
     border-radius: 10px;
 }
 
-.services .icon-box h4 {
-    padding-top: 5px;
+.short {
     font-weight: 700;
-    font-size: 20px;
-}
+    font-size: 17px;
+    margin: 0 5px 0 5px;
 
-.services .icon-box p {
-    line-height: 24px;
-    font-size: 16px;
-    margin-bottom: 5px;
 }
 
 .services .icon-box:hover,

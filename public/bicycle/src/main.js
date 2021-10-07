@@ -8,11 +8,11 @@ import PortalVue from 'portal-vue'
 import PulseLoader from 'vue-spinner/src/BeatLoader'
 
 
-import Cart from './components/Cart'
+import Cart from './views/Cart'
 import FilterList from './components/FilterPanel'
 import GoBack from './components/GoBack'
 import GoTop from './components/GoTop'
-import Login from "./components/Login";
+import Login from "./views/Login";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ProductPopUp from "./components/ProductPopUp";

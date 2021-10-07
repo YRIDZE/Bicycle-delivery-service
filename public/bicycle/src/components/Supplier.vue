@@ -1,20 +1,17 @@
 <template>
-  <div class="mt-4 mx-1" style="border-radius: 10px; min-height: 225px; min-width: 225px">
+  <div class="mt-4 mx-1" style="border-radius: 10px; min-height: 260px; min-width: 260px">
     <div class="icon-box gallery">
-      <router-link :to="{ path : String(id) }"><img :src="image" class="img-fluid" alt="Pizza picture"></router-link>
-      <h4>{{ name }}</h4>
+      <router-link :to="{ path : String(supp.id) }"><img :src="supp.image" class="img-fluid" alt="Pizza picture">
+      </router-link>
+      <p class="short">{{ supp.name }}</p>
+      <p class="time"> {{ supp.workingHours.opening.substr(0, 5) }}-{{ supp.workingHours.closing.substr(0, 5) }}</p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['id', 'name', 'image'],
-  data() {
-    return {
-      loading: false,
-    };
-  },
+  props: ['supp'],
 }
 
 </script>
@@ -22,9 +19,13 @@ export default {
 <style scoped>
 
 .gallery img {
-  width: 225px;
-  height: 225px;
+  width: 260px;
+  height: 260px;
   object-fit: cover;
+}
+
+.time {
+  margin: 0 5px 0 5px !important;
 }
 
 </style>

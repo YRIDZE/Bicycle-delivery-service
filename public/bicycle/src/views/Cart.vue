@@ -37,46 +37,42 @@
 
     <vue-final-modal
         v-model="showCartInfo"
+        name="cartInfo"
         classes="modal-container"
         content-class="modal-content"
         :esc-to-close="true"
     >
       <div class="modal-body">
-        <div class="row g-3" style="margin: 1px; width: 800px !important;">
-          <form>
+        <form>
+          <div class="row g-3" style="margin: 1px; width: 800px !important;">
+
             <div class="col-sm-12 fields">
               <input type="text" class="login-input" style="width: 49% !important;" v-model="orderForm.customer_name"
-                     placeholder="Name" value=""
-                     required="">
+                     placeholder="Name" value="" required>
               <input type="text" class="login-input" style="width: 49% !important;"
-                     v-model="orderForm.customer_lastname" autocomplete='off'
-                     placeholder="Surname" value="" required="">
+                     v-model="orderForm.customer_lastname" placeholder="Surname" value="" required>
             </div>
 
             <div class="cart-col-12">
-              <input type="text" class="login-input" autocomplete='off' v-model="orderForm.address"
-                     placeholder="Kharkiv, st. Academica Pavlova 154, apt. 12" required="">
+              <input type="text" class="login-input" v-model="orderForm.address"
+                     placeholder="Kharkiv, st. Academica Pavlova 154, apt. 12" required>
               <div class="invalid-feedback"> Please enter your address.</div>
             </div>
 
             <div class="cart-col-12 fields">
-              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input" autocomplete='off'
+              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input"
                      style="width: 49%" placeholder="Phone number" required/>
-              <select class="login-input" v-model="orderForm.payment_method" autocomplete='off' style="width: 49%"
-                      required="">
+              <select class="login-input" v-model="orderForm.payment_method" style="width: 49%" required>
                 <option value="" disabled selected hidden>Payment method</option>
                 <option>Credit Card</option>
                 <option>Cash</option>
               </select>
             </div>
 
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-      <div class="btn-group">
-        <button class="cart-btn" style="width:50%">Back</button>
-        <button class="cart-btn" @click="orderSet" style="width:50%">Confirm</button>
-      </div>
+      <button class="cart-btn" @click="orderSet" style="font-size: 16px">Confirm</button>
     </vue-final-modal>
 
   </div>

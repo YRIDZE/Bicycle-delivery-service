@@ -1,5 +1,6 @@
 const state = {
   suppliers: [],
+  loading: false,
 }
 
 const mutations = {

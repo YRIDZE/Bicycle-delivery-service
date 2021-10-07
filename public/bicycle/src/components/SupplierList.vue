@@ -3,9 +3,7 @@
     <supplier
         v-for="supplier in filteredSuppList"
         :key="supplier.id"
-        :id="supplier.id"
-        :name="supplier.name"
-        :image="supplier.image"
+        :supp = "supplier"
     ></supplier>
   </div>
 </template>

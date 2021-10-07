@@ -72,6 +72,7 @@ func (h *UserHandler) Refresh(w http.ResponseWriter, req *http.Request) {
 	err = h.tokenService.UpdateUid(claims.ID, cachedTokens)
 
 	resp := models.LoginResponse{
+		UserID:       claims.ID,
 		AccessToken:  accessString,
 		RefreshToken: refreshString,
 	}
@@ -145,6 +146,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := models.LoginResponse{
+		UserID:       user.ID,
 		AccessToken:  accessString,
 		RefreshToken: refreshString,
 	}

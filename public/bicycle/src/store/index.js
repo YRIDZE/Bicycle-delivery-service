@@ -18,10 +18,4 @@ const modules = {
 
 export default new Vuex.Store({
   modules,
-  state() {
-    return {
-      loading: false,
-    };
-  },
-
 });

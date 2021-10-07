@@ -20,8 +20,8 @@
         <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px">
 
           <div class="row">
-            <router-view v-show="!this.$store.state.loading"></router-view>
-            <div v-show="this.$store.state.loading">
+            <router-view v-show="!this.$store.state.supp.loading"></router-view>
+            <div v-show="this.$store.state.supp.loading">
               <pulse-loader :color="'#e97d56'"></pulse-loader>
             </div>
           </div>
@@ -48,7 +48,7 @@ export default {
 
   methods: {
     async fetchedSupplierProducts() {
-      this.$store.state.loading = true
+      this.$store.state.supp.loading = true
       await fetch("http://localhost:8081/getSuppliers",)
           .then(response => response.json())
           .then(async data => {
@@ -58,7 +58,7 @@ export default {
                 .then(response => response.json())
                 .then(data => this.$store.dispatch('item/setItem', data));
           })
-      this.$store.state.loading = false
+      this.$store.state.supp.loading = false
     },
   },
 

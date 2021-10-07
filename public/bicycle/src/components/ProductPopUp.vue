@@ -73,6 +73,11 @@ export default {
     ...mapActions('cart', ['addItem']),
 
     addToCart: function (id, quantity) {
+      if (!this.$store.getters["user/isLoggedIn"]) {
+        this.$store.state.user.showLogin = true;
+        return
+      }
+
       this.addItem({
             product_id: id,
             quantity: quantity,
