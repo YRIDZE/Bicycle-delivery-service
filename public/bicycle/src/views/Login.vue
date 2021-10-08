@@ -10,7 +10,7 @@
       <div class="login-container"
            :class="{ 'right-panel-active': signUpMode }" id="login-container">
         <div class="form-container sign-up-container">
-          <form class="l-r-form" v-on:submit.prevent="registUser">
+          <form class="l-r-form" v-on:submit.prevent="registrationUser">
             <h1><b>Create Account</b></h1>
             <input class="login-input" v-model="registrationForm.first_name" type="text" placeholder="Firstname"/>
             <input class="login-input" v-model="registrationForm.last_name" type="text" placeholder="Lastname"/>
@@ -72,19 +72,32 @@ export default {
     };
   },
   methods: {
-    ...mapActions('user', ['login', 'registration']),
+    ...mapActions("user", ["login", "registration"]),
 
-    registUser() {
+    registrationUser() {
       this.registration(this.registrationForm)
+          .then(() => {
+            this.$store.dispatch('cart/createCart').catch(err => console.log(err));
+          })
           .catch(err => console.log(err));
       this.signUpMode = false;
-      this.registrationForm = '';
+
+      this.registrationForm.email = '';
+      this.registrationForm.password = '';
+      this.registrationForm.last_name = '';
+      this.registrationForm.first_name = '';
     },
-    loginUser: function () {
+
+    loginUser() {
       this.login(this.loginForm)
+          .then(() => {
+            this.$store.dispatch('cart/getCart').catch(err => console.log(err));
+          })
           .catch(err => console.log(err));
-      this.loginForm = '';
       this.hide()
+
+      this.loginForm.email = '';
+      this.loginForm.password = '';
     },
   },
 };

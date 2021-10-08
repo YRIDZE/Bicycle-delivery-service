@@ -16,7 +16,7 @@
     </td>
     <td></td>
     <td>
-      <a @click="removeItem(index)">
+      <a @click="removeItem(item)">
         <font-awesome-icon :icon="['fas', 'trash']"/>
       </a>
     </td>

@@ -29,7 +29,7 @@ func NewCartHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_repo
 }
 
 func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/createCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
+	r.HandleFunc("/createCart", h.Create)
 	r.Handle("/createCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
 	r.Handle("/getCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
 	r.Handle("/updateCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
@@ -41,11 +41,16 @@ func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
 	setupResponse(&w, req)
 
 	cart := new(requests.CartRequest)
-	cart.UserID = req.Context().Value("user").(*models.User).ID
+
+	if err := json.NewDecoder(req.Body).Decode(&cart); err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
 	c, err := h.service.Create(cart)
 	if err != nil {
 		h.logger.Error(err.Error())
-		http.Error(w, "invalid data", http.StatusUnauthorized)
+		http.Error(w, "invalid data", http.StatusInternalServerError)
 		return
 	}
 
@@ -147,7 +152,7 @@ func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "something went wrong", http.StatusBadRequest)
 		return
 	}
-
+	cartProduct.UserID = req.Context().Value("user").(*models.User).ID
 	if err := cartProduct.Validate(); err != nil {
 		h.logger.Error(err.Error())
 		requests.ValidationErrorResponse(w, err)

@@ -72,7 +72,7 @@
           </div>
         </form>
       </div>
-      <button class="cart-btn" @click="orderSet" style="font-size: 16px">Confirm</button>
+      <button class="cart-btn" @click="createOrder" style="font-size: 16px">Confirm</button>
     </vue-final-modal>
 
   </div>
@@ -106,17 +106,23 @@ export default {
   },
 
   methods: {
-    orderSet() {
+    createOrder() {
       this.orderForm.products = this.$store.getters["cart/getCartList"];
       this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
 
       axios
           .post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm))
           .then(response => console.log(response.data.id));
-      this.orderForm = '';
       this.hide();
+
+      this.orderForm.phone_number = '';
+      this.orderForm.address = '';
+      this.orderForm.customer_lastname = '';
+      this.orderForm.customer_name = '';
+      this.orderForm.payment_method = '';
     },
-  },
+  }
+  ,
 
   computed: {
     total: function () {

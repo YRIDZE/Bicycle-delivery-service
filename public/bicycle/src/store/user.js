@@ -1,74 +1,119 @@
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 const state = {
-  status: '',
-  token: localStorage.getItem('access_token') || '',
   showLogin: false,
-
+  user_id: 0,
+  token: localStorage.getItem("access_token") || "",
+  refreshTask: null,
+  status: "",
 }
 
 const mutations = {
-  auth_request(state) {
-    state.status = 'loading';
+  reg_success(state) {
+    state.status = "success";
   },
   auth_success(state, token) {
-    state.status = 'success';
+    state.status = "success";
     state.token = token;
   },
   auth_error(state) {
-    state.status = 'error';
+    state.status = "error";
   },
   logout(state) {
-    state.status = '';
-    state.token = '';
+    state.status = "";
+    state.token = "";
+  },
+  refreshTask(state, task) {
+    state.refreshTask = task;
+  },
+  cancelTask(state) {
+    clearTimeout(state.refreshTask);
   },
 }
 
 const actions = {
-  login({commit}, user) {
+  async refreshTokens(context) {
+    try {
+      const response = await axios.post("http://localhost:8081/refresh")
+      const access_token = response.data.access_token;
+      const refresh_token = response.data.refresh_token;
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+      context.commit("auth_success", access_token);
+      await context.dispatch("dropRefresh")
+    } catch {
+      context.commit("auth_error");
+      localStorage.removeItem("access_token");
+    }
+
+    await context.dispatch("autoRefresh");
+  },
+
+  autoRefresh(context) {
+    if (state.token) {
+      let token = jwt_decode(state.token);
+      let now = Math.round(Date.now() / 1000);
+      let timeUntilRefresh = token.exp - now;
+      const refreshTask = setTimeout(() => context.dispatch("refreshTokens"), timeUntilRefresh * 1000);
+      context.commit("refreshTask", refreshTask);
+    }
+  },
+
+  dropRefresh(context) {
+    let refresh = localStorage.getItem("refresh_token");
+    let token = jwt_decode(refresh);
+    setTimeout(() => context.dispatch("logout"), token.exp * 1000);
+  },
+
+  login(context, user) {
     return new Promise((resolve, reject) => {
       axios
         .post("http://localhost:8081/login", user)
         .then(response => {
-          const token = response.data.access_token;
-          localStorage.setItem('access-token', response.data.access_token);
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          commit('auth_success', token);
+          const access_token = response.data.access_token;
+          const refresh_token = response.data.refresh_token;
+
+          localStorage.setItem("access_token", access_token);
+          localStorage.setItem("refresh_token", refresh_token);
+
+          axios.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+
+          context.commit("auth_success", access_token);
+          context.dispatch("autoRefresh");
+          context.dispatch("dropRefresh");
+
           resolve(response);
         })
         .catch(error => {
-          commit('auth_error');
-          localStorage.removeItem('access-token');
+          context.commit('auth_error');
+          localStorage.removeItem("access_token");
           reject(error);
         })
     })
   },
 
-  registration({commit}, user) {
-    return new Promise((resolve, reject) => {
-      commit('auth_request');
+  registration(context, user) {
+    return new Promise((resolve) => {
       axios
         .post("http://localhost:8081/createUser", user)
         .then(response => {
-          const token = response.data.access_token;
-          localStorage.setItem('access-token', token);
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          commit('auth_success', token);
+          state.user_id = response.data.id
+          context.commit("reg_success");
           resolve(response);
-        })
-        .catch(err => {
-          commit('auth_error', err)
-          localStorage.removeItem('access-token')
-          reject(err)
         })
     })
   },
-  logout({commit}) {
+  logout(context) {
     return new Promise((resolve) => {
-      commit('logout');
-      axios.post("http://localhost:8081/logout").then()
-      localStorage.removeItem('access-token');
-      delete axios.defaults.headers.common['Authorization'];
+      context.commit("logout");
+      axios.post("http://localhost:8081/logout");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+
+      delete axios.defaults.headers.common["Authorization"];
+      context.commit("cancelTask");
       resolve();
     })
   },
@@ -76,6 +121,8 @@ const actions = {
 
 const getters = {
   isLoggedIn: state => !!state.token,
+  id: state => state.user_id,
+
 }
 
 export default {

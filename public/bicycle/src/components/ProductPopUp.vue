@@ -70,7 +70,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('cart', ['addItem']),
+    ...mapActions('cart', ['addProduct']),
 
     addToCart: function (id, quantity) {
       if (!this.$store.getters["user/isLoggedIn"]) {
@@ -78,7 +78,8 @@ export default {
         return
       }
 
-      this.addItem({
+      this.addProduct({
+            id: this.$store.getters["user/id"],
             product_id: id,
             quantity: quantity,
           }

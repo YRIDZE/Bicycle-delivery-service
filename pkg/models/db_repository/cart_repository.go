@@ -62,7 +62,6 @@ func (c CartRepository) Create(cart *models.Cart) (*models.Cart, error) {
 	defer cancel()
 
 	query := fmt.Sprintf("insert into %s (user_id) value (?)", CartTable)
-
 	res, err := c.db.ExecContext(ctx, query, cart.UserID)
 	if err != nil {
 		return nil, err
@@ -159,7 +158,7 @@ func (c CartRepository) GetCartProductsByID(cartID int) (cartProducts []models.C
 func (c CartRepository) Update(cart *models.Cart) (*models.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
+	fmt.Println(cart)
 	query := fmt.Sprintf("update %s set quantity = ? where cart_id = ? and product_id = ?", CartProductsTable)
 
 	for _, x := range cart.Products {

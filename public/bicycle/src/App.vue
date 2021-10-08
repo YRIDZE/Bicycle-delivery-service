@@ -65,6 +65,9 @@ export default {
   created() {
     this.fetchedSupplierProducts()
   },
+  mounted() {
+    this.$store.dispatch('dropRefresh');
+  }
 
 };
 
