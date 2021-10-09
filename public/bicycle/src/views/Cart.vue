@@ -112,7 +112,10 @@ export default {
 
       axios
           .post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm))
-          .then(response => console.log(response.data.id));
+          .then(() => {
+            this.$store.dispatch("cart/deleteAllFromCart");
+            this.$store.state.cart.cart.products = []
+          })
       this.hide();
 
       this.orderForm.phone_number = '';
@@ -121,8 +124,7 @@ export default {
       this.orderForm.customer_name = '';
       this.orderForm.payment_method = '';
     },
-  }
-  ,
+  },
 
   computed: {
     total: function () {

@@ -15,7 +15,7 @@ const mutations = {
     let entry = state.cart.products.find(x => x.product_id == payload.product_id);
     if (entry == null) {
       entry = {
-        id: state.cart.id,
+        cart_id: state.cart.id,
         product_id: payload.product_id,
         quantity: payload.quantity,
       };
@@ -47,7 +47,7 @@ const mutations = {
   },
   updateCartProduct(state, payload) {
     let cart = {
-      id: 1,
+      id: state.cart.id,
       products: state.cart.products.filter(prod => prod.product_id == payload.product_id),
     };
     return new Promise((resolve, reject) => {
@@ -61,12 +61,35 @@ const mutations = {
         })
     })
   },
+  deleteCartProduct(state, payload) {
+    return new Promise((resolve, reject) => {
+      axios
+        .put(`http://localhost:8081/deleteCartProduct?productId=${payload.product_id}`)
+        .then(response => {
+          resolve(response);
+        })
+        .catch(error => {
+          reject(error);
+        })
+    })
+  },
+  deleteAllCartProducts() {
+    return new Promise((resolve, reject) => {
+      axios
+        .put("http://localhost:8081/deleteAllCartProducts")
+        .then(response => {
+          resolve(response);
+        })
+        .catch(error => {
+          reject(error);
+        })
+    })
+  },
   createCart() {
     return new Promise((resolve, reject) => {
         axios
           .post("http://localhost:8081/createCart", {user_id: user.state.user_id})
           .then(response => {
-            state.cart.id = response.data.id
             resolve(response);
           })
           .catch(error => {
@@ -80,6 +103,9 @@ const mutations = {
         axios
           .post("http://localhost:8081/getCartProducts")
           .then(response => {
+            state.cart.id = response.data[0].id;
+            if (response.data[0].products != null)
+              state.cart.products = response.data[0].products;
             resolve(response);
           })
           .catch(error => {
@@ -102,16 +128,23 @@ const actions = {
   },
   removeItem(context, payload) {
     context.commit("removeItem", payload.product_id);
-    context.commit("updateCartProduct", payload);
+    context.commit("deleteCartProduct", payload);
   },
   createCart(context) {
     context.commit("createCart");
+  },
+  deleteAllFromCart(context) {
+    context.commit("deleteAllCartProducts");
+  },
+  getCart(context) {
+    context.commit("getCart");
   },
 }
 
 const getters = {
   getCartList: state => state.cart.products,
   getCurrentItem: state => state.currentItem,
+  getCartId: state => state.cart.id
 }
 
 export default {

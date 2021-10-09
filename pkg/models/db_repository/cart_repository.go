@@ -20,6 +20,7 @@ type CartRepositoryI interface {
 	Update(cart *models.Cart) (*models.Cart, error)
 	Delete(id int) error
 	DeleteProductFromCart(userID int32, productID int) error
+	DeleteAllProductFromCart(userID int32) error
 }
 
 type CartRepository struct {
@@ -158,9 +159,8 @@ func (c CartRepository) GetCartProductsByID(cartID int) (cartProducts []models.C
 func (c CartRepository) Update(cart *models.Cart) (*models.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	fmt.Println(cart)
-	query := fmt.Sprintf("update %s set quantity = ? where cart_id = ? and product_id = ?", CartProductsTable)
 
+	query := fmt.Sprintf("update %s set quantity = ? where cart_id = ? and product_id = ?", CartProductsTable)
 	for _, x := range cart.Products {
 		_, err := c.db.ExecContext(ctx, query, x.Quantity, x.CartID, x.ProductID)
 		if err != nil {
@@ -195,6 +195,24 @@ func (c CartRepository) DeleteProductFromCart(userID int32, productID int) error
 
 	query := fmt.Sprintf("delete from %s where cart_id = ? and product_id = ?", CartProductsTable)
 	_, err = c.db.ExecContext(ctx, query, cart.ID, productID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c CartRepository) DeleteAllProductFromCart(userID int32) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	cart, err := c.GetCartByUserID(userID)
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("delete from %s where cart_id = ?", CartProductsTable)
+	_, err = c.db.ExecContext(ctx, query, cart.ID)
 	if err != nil {
 		return err
 	}

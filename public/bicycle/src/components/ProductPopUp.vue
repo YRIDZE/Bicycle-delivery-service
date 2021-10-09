@@ -9,20 +9,14 @@
   >
     <div class="modal-body">
       <div class="d-flex flex-column item-container product-from">
-
-        <div class="img-part gallery">
-          <img :src="item.image" class="img-f" alt="item">
-        </div>
-
+        <div class="img-part gallery"><img :src="item.image" class="img-f" alt="item"></div>
         <div class="product-data">
           <div class="data">
             <h1>{{ item.name }}</h1>
-
             <b>Ingredients: </b>
             <div style="display:inline-block;" v-for="ingredient in item.ingredients" :key="ingredient">
               <a>{{ ingredient }}{{ "&nbsp;" }}</a>
             </div>
-
           </div>
         </div>
         <div class="d-flex bd-highlight item-overlay-panel">
@@ -79,7 +73,7 @@ export default {
       }
 
       this.addProduct({
-            id: this.$store.getters["user/id"],
+            cart_id: this.$store.getters["cart/getCartId"],
             product_id: id,
             quantity: quantity,
           }

@@ -34,6 +34,7 @@ func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.Handle("/getCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
 	r.Handle("/updateCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
 	r.Handle("/deleteCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
+	r.Handle("/deleteAllCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteAll)))
 	r.Handle("/deleteCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
 }
 
@@ -128,10 +129,9 @@ func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	c, err := h.service.GetAllProductsFromCart(user.ID)
 	if err != nil {
 		h.logger.Error(err.Error())
-		http.Error(w, "invalid data", http.StatusUnauthorized)
+		http.Error(w, "invalid data", http.StatusInternalServerError)
 		return
 	}
-
 	var resp []models.CartProductResponse
 	for _, x := range *c {
 		resp = append(resp, models.CartProductResponse{ID: x.ID, UserID: x.UserID, Products: x.Products})
@@ -139,7 +139,7 @@ func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
-	h.logger.Infof("user %d successfully fetched profile", user.ID)
+	h.logger.Infof("user %d successfully fetched cart", user.ID)
 }
 
 func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
@@ -214,5 +214,22 @@ func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("cart successfully deleted"))
-	h.logger.Infof("cart product %d successfully deleted", userID)
+	h.logger.Infof("cart %d successfully deleted", userID)
+}
+
+func (h *CartHandler) DeleteAll(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
+	userID := req.Context().Value("user").(*models.User).ID
+
+	err := h.service.DeleteAllProductFromCart(userID)
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("all cart products successfully deleted"))
+	h.logger.Infof("cart products %d successfully deleted", userID)
 }

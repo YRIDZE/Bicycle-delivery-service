@@ -62,11 +62,19 @@ export default {
     },
   },
 
+  computed: {
+    isLoggedIn: function () {
+      return this.$store.getters["user/isLoggedIn"];
+    },
+  },
   created() {
     this.fetchedSupplierProducts()
   },
   mounted() {
     this.$store.dispatch('dropRefresh');
+    if (this.isLoggedIn) {
+      this.$store.dispatch('cart/getCart').catch(err => console.log(err));
+    }
   }
 
 };
