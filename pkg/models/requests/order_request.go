@@ -13,7 +13,6 @@ type OrderRequest struct {
 	CustomerName     string                 `json:"customer_name"`
 	CustomerLastname string                 `json:"customer_lastname"`
 	PaymentMethod    string                 `json:"payment_method"`
-	OrderCost        float64                `json:"order_cost"`
 	Status           string                 `json:"status"`
 	Products         []models.OrderProducts `json:"products"`
 }
@@ -26,7 +25,6 @@ func (c OrderRequest) Validate() error {
 		validation.Field(&c.PhoneNumber, validation.Required),
 		validation.Field(&c.CustomerName, validation.Required, validation.Length(1, 64)),
 		validation.Field(&c.CustomerLastname, validation.Required, validation.Length(1, 64)),
-		validation.Field(&c.OrderCost, validation.Required),
 		validation.Field(&c.PaymentMethod, validation.Required),
 	)
 }

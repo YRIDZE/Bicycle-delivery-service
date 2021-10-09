@@ -1,6 +1,7 @@
 const state = {
   supplierTypeFilter: [],
   productTypeFilter: [],
+  supplierTimeFilter: null,
 }
 
 const mutations = {
@@ -10,6 +11,10 @@ const mutations = {
   setProdTypeFilter(state, value) {
     state.productTypeFilter = value;
   },
+
+  setSuppTimeFilter(state, value) {
+    state.supplierTimeFilter = value
+  }
 }
 
 const actions = {
@@ -19,11 +24,15 @@ const actions = {
   setProdTypeFilter(context, value) {
     context.commit("setProdTypeFilter", value)
   },
+  setSuppTimeFilter(context, value) {
+    context.commit("setSuppTimeFilter", value)
+  }
 }
 
 const getters = {
   getSuppTypeFilter: state => state.supplierTypeFilter,
   getProdTypeFilter: state => state.productTypeFilter,
+  getSuppTimeFilter: state => state.supplierTimeFilter
 }
 
 export default {

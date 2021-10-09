@@ -95,7 +95,6 @@ export default {
         customer_name: '',
         customer_lastname: '',
         payment_method: '',
-        order_cost: 1.0,
         products: {},
       },
     };

@@ -2,23 +2,29 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import SupplierList from "@/components/SupplierList";
 import ProductsList from "@/components/ProductsList";
-import AllProducts from "@/components/AllProducts";
+import SupplierFilter from "@/components/SupplierFilter";
+import ProductFilter from "@/components/ProductFilter";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    component: SupplierList,
-  },
-  {
-    path: "/all",
-    component: AllProducts,
+    components: {
+      filter: SupplierFilter,
+      content: SupplierList,
+    },
   },
   {
     path: "/:id",
-    component: ProductsList,
-    props: true,
+    components: {
+      filter: ProductFilter,
+      content: ProductsList,
+    },
+    props: {
+      filter: false,
+      content: true
+    },
   },
 ];
 

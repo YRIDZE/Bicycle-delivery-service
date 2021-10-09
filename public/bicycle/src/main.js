@@ -9,7 +9,8 @@ import PulseLoader from 'vue-spinner/src/BeatLoader'
 
 
 import Cart from './views/Cart'
-import FilterList from './components/FilterPanel'
+import SupplierFilter from './components/SupplierFilter'
+import ProductFilter from './components/ProductFilter'
 import GoBack from './components/GoBack'
 import GoTop from './components/GoTop'
 import Login from "./views/Login";
@@ -20,7 +21,6 @@ import CartTr from './components/CartTr'
 import Check from './components/Check'
 import Product from "@/components/Product";
 import Supplier from '@/components/Supplier'
-import AllProducts from '@/components/AllProducts'
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -62,7 +62,7 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 Vue.component("login", Login);
 Vue.component("go-top", GoTop);
 Vue.component("go-back", GoBack);
-Vue.component("filter-list", FilterList);
+Vue.component("filter-list", SupplierFilter);
 Vue.component("cart", Cart);
 Vue.component("bottom-footer", Footer);
 Vue.component("header-top", Header);
@@ -72,7 +72,7 @@ Vue.component('cart-tr', CartTr);
 Vue.component('check', Check);
 Vue.component('product', Product);
 Vue.component('supplier', Supplier);
-Vue.component('all-products', AllProducts);
+Vue.component('product-filer', ProductFilter);
 
 Vue.use(VueFinalModal)
 Vue.use(PortalVue)

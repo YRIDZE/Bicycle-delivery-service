@@ -3,7 +3,7 @@
     <supplier
         v-for="supplier in filteredSuppList"
         :key="supplier.id"
-        :supp = "supplier"
+        :supp="supplier"
     ></supplier>
   </div>
 </template>
@@ -14,8 +14,21 @@
 export default {
   computed: {
     filteredSuppList: function () {
-      if (this.$store.getters["filter/getSuppTypeFilter"].length === 0) return this.$store.getters["supp/getSuppliers"]
-      return this.$store.getters["supp/getSuppliers"].filter(value => this.$store.getters["filter/getSuppTypeFilter"].includes(value.type))
+      let suppliers = this.$store.getters["supp/getSuppliers"]
+
+      if (this.$store.getters["filter/getSuppTypeFilter"].length !== 0) {
+        suppliers = suppliers
+            .filter(value => this.$store.getters["filter/getSuppTypeFilter"]
+                .includes(value.type))
+      }
+
+      if (this.$store.getters["filter/getSuppTimeFilter"] != null) {
+        let timestamp = this.$store.getters["filter/getSuppTimeFilter"]
+        suppliers = suppliers.filter(value => (value.workingHours.opening >= timestamp.opening && value.workingHours.closing <= timestamp.closing))
+      }
+
+      return suppliers
+
     },
   },
 

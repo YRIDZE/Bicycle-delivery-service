@@ -16,16 +16,17 @@
       </div>
 
       <div class="d-flex flex-row mb-5 mt-1">
-        <filter-list></filter-list>
-        <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px">
+        <router-view name="filter"></router-view>
 
+        <div class="d-flex align-items-center justify-content-center flex-grow-1" v-if="this.$store.state.supp.loading">
+          <pulse-loader class="flex-grow-1" :color="'#e97d56'" style="position: absolute"></pulse-loader>
+        </div>
+
+        <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px"
+                 v-if="!this.$store.state.supp.loading">
           <div class="row">
-            <router-view v-show="!this.$store.state.supp.loading"></router-view>
-            <div v-show="this.$store.state.supp.loading">
-              <pulse-loader :color="'#e97d56'"></pulse-loader>
-            </div>
+            <router-view name="content"></router-view>
           </div>
-
         </section>
       </div>
     </div>
@@ -53,7 +54,6 @@ export default {
           .then(response => response.json())
           .then(async data => {
             await this.$store.dispatch('supp/setSuppliers', data)
-
             await fetch("http://localhost:8081/getProducts",)
                 .then(response => response.json())
                 .then(data => this.$store.dispatch('item/setItem', data));
