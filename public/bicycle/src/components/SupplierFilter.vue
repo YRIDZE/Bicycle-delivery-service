@@ -2,14 +2,7 @@
   <div class="card">
     <div class="accordion accordion-flush" id="accordionFlushExample">
       <router-link to="all">
-        <button type="button" style="background-color: #e97d56;
-        border: none;
-        text-align: left;
-        margin: 0;
-        padding: 2px 20px 0;
-        border-radius: unset;
-        font-size: 16px !important;
-        width: 250px"> ALL PRODUCTS
+        <button class="all-items text-base" type="button"> ALL PRODUCTS
         </button>
       </router-link>
       <div class="accordion-item">
@@ -24,8 +17,8 @@
              aria-labelledby="panel2">
           <div class="accordion-body">
             <div class="filter-content">
-              <p>from <input id="from" type="time" value="00:00" @change="time" style="width: 150px"></p>
-              <p>to <input id="to" type="time" value="23:59" @change="time" style="width: 150px"></p>
+              <p>from <input class="w-40" id="from" type="time" value="00:00" @change="time"></p>
+              <p>to <input class="w-40" id="to" type="time" value="23:59" @change="time"></p>
             </div>
           </div>
         </div>
@@ -42,8 +35,8 @@
              aria-labelledby="panel1">
           <div class="accordion-body">
             <div class="filter-content">
-              <div class="card-body" v-for="(value) in this.$store.getters['supp/getSuppliersTypes']" :key="value"
-                   style="padding: 5px !important;">
+              <div class="card-body p-1.5" v-for="(value) in this.$store.getters['supp/getSuppliersTypes']"
+                   :key="value">
                 <check :title="'restaurantType'" :name="value"></check>
               </div>
             </div>
@@ -63,8 +56,8 @@ export default {
         opening: document.getElementById("from").value,
         closing: document.getElementById("to").value,
       })
-    }
-  }
+    },
+  },
 }
 
 </script>

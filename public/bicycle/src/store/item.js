@@ -21,6 +21,7 @@ const getters = {
   getItemsTypes: (state) => {
     let result = new Set();
     state.items.forEach(element => result.add(element.type));
+
     return result;
   },
 }

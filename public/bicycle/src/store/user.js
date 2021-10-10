@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 const state = {
   showLogin: false,
   user_id: 0,
+
   token: localStorage.getItem("access_token") || "",
   refreshTask: null,
   status: "",
@@ -36,11 +37,15 @@ const actions = {
   async refreshTokens(context) {
     try {
       const response = await axios.post("http://localhost:8081/refresh")
+
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
+
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
+
       axios.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+
       context.commit("auth_success", access_token);
       await context.dispatch("dropRefresh")
     } catch {
@@ -105,10 +110,12 @@ const actions = {
         })
     })
   },
+
   logout(context) {
     return new Promise((resolve) => {
       context.commit("logout");
       axios.post("http://localhost:8081/logout");
+
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
 
@@ -122,7 +129,6 @@ const actions = {
 const getters = {
   isLoggedIn: state => !!state.token,
   id: state => state.user_id,
-
 }
 
 export default {

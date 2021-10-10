@@ -14,14 +14,14 @@
           <div class="data">
             <h1>{{ item.name }}</h1>
             <b>Ingredients: </b>
-            <div style="display:inline-block;" v-for="ingredient in item.ingredients" :key="ingredient">
+            <div class="inline-block" v-for="ingredient in item.ingredients" :key="ingredient">
               <a>{{ ingredient }}{{ "&nbsp;" }}</a>
             </div>
           </div>
         </div>
         <div class="d-flex bd-highlight item-overlay-panel">
           <div class="me-auto p-2 bd-highlight">
-            <div style="padding: 0 10px ">
+            <div class="py-0 px-2.5">
               <div class="number" data-step="1" data-min="1" data-max="100">
                 <input v-model="quantity" class="number-text" type="text" name="quantity" readonly>
                 <a @click="reduce()" class="number-minus">−</a>
@@ -30,10 +30,10 @@
             </div>
           </div>
           <div class="p-2 bd-highlight">
-            <p style="margin-top: 15px !important;">Total: <strong>{{ total }}$</strong></p>
+            <p class="mt-4">Total: <strong>{{ total }}$</strong></p>
           </div>
           <div class="p-2 bd-highlight">
-            <div style="padding: 0 10px ">
+            <div class="py-0 px-2.5">
               <button class="add-to-cart-btn" @click="addToCart(item.id, quantity)">ADD TO CART</button>
             </div>
           </div>

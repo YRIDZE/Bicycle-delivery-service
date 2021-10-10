@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4 mx-1" style="border-radius: 10px; min-height: 260px; min-width: 260px">
+  <div class="mt-4 mx-1 supplier">
     <div class="icon-box gallery">
       <router-link :to="{ path : String(supp.id) }"><img :src="supp.image" class="img-fluid" alt="Pizza picture">
       </router-link>
@@ -22,6 +22,12 @@ export default {
   width: 260px;
   height: 260px;
   object-fit: cover;
+}
+
+.supplier {
+  border-radius: 10px;
+  min-height: 260px;
+  min-width: 260px;
 }
 
 .time {

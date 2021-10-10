@@ -2,13 +2,13 @@
   <div id="main-content">
     <header-top></header-top>
 
-    <div class="container-fluid" id="content"
-         style="padding-left: 70px !important; padding-right: 70px !important; font-family: 'Montserrat', sans-serif;">
+    <div class="container-fluid px-16" id="content"
+         style="font-family: 'Montserrat', sans-serif;">
       <div class="col-md-12">
         <h2>Food
           <go-back></go-back>
         </h2>
-        <p style="margin-bottom: 0 !important;">...is any substance consumed to provide nutritional support for an
+        <p class="-mb-0">...is any substance consumed to provide nutritional support for an
           organism. Food is usually of plant, animal
           or fungal origin, and contains essential nutrients, such as carbohydrates, fats, proteins, vitamins, or
           minerals. The substance is ingested by an organism and assimilated by the organism's cells to provide energy,
@@ -18,11 +18,12 @@
       <div class="d-flex flex-row mb-5 mt-1">
         <router-view name="filter"></router-view>
 
-        <div class="d-flex align-items-center justify-content-center flex-grow-1" v-if="this.$store.state.supp.loading">
+        <div class="d-flex align-items-center justify-content-center flex-grow-1 "
+             v-if="this.$store.state.supp.loading">
           <pulse-loader class="flex-grow-1" :color="'#e97d56'" style="position: absolute"></pulse-loader>
         </div>
 
-        <section id="services" class="services flex-shrink-1" style="padding-bottom: 10px"
+        <section id="services" class="services flex-shrink-1 pb-2.5"
                  v-if="!this.$store.state.supp.loading">
           <div class="row">
             <router-view name="content"></router-view>
@@ -39,10 +40,10 @@
 </template>
 
 <script>
-import '../../bicycle/public/css/main-page.css'
-import '../../bicycle/public/css/cart.css'
-import '../../bicycle/public/css/login-registration.css'
-import '../../bicycle/public/css/menu-item-page.css'
+import './assets/css/main-page.css'
+import './assets/css/cart.css'
+import './assets/css/login-registration.css'
+import './assets/css/menu-item-page.css'
 
 export default {
   name: "App",

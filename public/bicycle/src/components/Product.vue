@@ -1,10 +1,10 @@
 <template>
-  <div class="mt-4 mx-1" style="border-radius: 10px; min-height: 215px; min-width: 330px; max-width: 330px">
+  <div class="mt-4 mx-1 product">
     <div class="icon-box gallery">
       <img :src="item.image" class="img-fluid" @click="showProduct" alt="menu-item"/>
       <div>
-        <p class="short" style="float: left; width: 80%">{{ item.name }}</p>
-        <p style="float: right; text-align: right !important;"> {{ item.price }}$</p>
+        <p class="short w-4/5 float-left">{{ item.name }}</p>
+        <p class="float-right text-right"> {{ item.price }}$</p>
       </div>
     </div>
   </div>
@@ -32,4 +32,10 @@ export default {
   object-fit: cover;
 }
 
+.product {
+  border-radius: 10px;
+  min-height: 215px;
+  min-width: 330px;
+  max-width: 330px
+}
 </style>

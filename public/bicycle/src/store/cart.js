@@ -11,6 +11,7 @@ const state = {
 }
 
 const mutations = {
+
   addItem(state, payload) {
     let entry = state.cart.products.find(x => x.product_id == payload.product_id);
     if (entry == null) {
@@ -21,10 +22,13 @@ const mutations = {
       };
       state.cart.products.push(entry);
     } else {
-      if (entry.quantity === 1 && payload.quantity < 0) return;
+      if (entry.quantity === 1 && payload.quantity < 0)
+        return;
+
       entry.quantity += payload.quantity;
     }
   },
+
   removeItem(state, payload) {
     state.cart.products.splice(payload.index, 1);
   },
@@ -45,6 +49,7 @@ const mutations = {
         })
     })
   },
+
   updateCartProduct(state, payload) {
     let cart = {
       id: state.cart.id,
@@ -61,6 +66,7 @@ const mutations = {
         })
     })
   },
+
   deleteCartProduct(state, payload) {
     return new Promise((resolve, reject) => {
       axios
@@ -85,6 +91,7 @@ const mutations = {
         })
     })
   },
+
   createCart() {
     return new Promise((resolve, reject) => {
         axios
@@ -98,12 +105,14 @@ const mutations = {
       }
     )
   },
+
   getCart() {
     return new Promise((resolve, reject) => {
         axios
           .post("http://localhost:8081/getCartProducts")
           .then(response => {
             state.cart.id = response.data[0].id;
+
             if (response.data[0].products != null)
               state.cart.products = response.data[0].products;
             resolve(response);
@@ -144,7 +153,7 @@ const actions = {
 const getters = {
   getCartList: state => state.cart.products,
   getCurrentItem: state => state.currentItem,
-  getCartId: state => state.cart.id
+  getCartId: state => state.cart.id,
 }
 
 export default {

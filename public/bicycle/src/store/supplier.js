@@ -21,6 +21,7 @@ const getters = {
   getSuppliersTypes: (state) => {
     let result = new Set();
     state.suppliers.forEach(element => result.add(element.type));
+
     return result;
   },
 }

@@ -1,7 +1,7 @@
 <template id="backToTop">
   <div class="vue-back-to-top" v-show="visible"
        @click="scrollTop">
-    <font-awesome-icon style="color: #545454; width: 30px; height: 30px" :icon="['fa', 'chevron-up']"/>
+    <font-awesome-icon class="w-7 h-7" style="color: #545454" :icon="['fa', 'chevron-up']"/>
 
   </div>
 </template>

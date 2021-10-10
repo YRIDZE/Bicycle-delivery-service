@@ -2,6 +2,8 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import "./assets/css/tailwind.css"
+
 
 import VueFinalModal from "vue-final-modal";
 import PortalVue from 'portal-vue'

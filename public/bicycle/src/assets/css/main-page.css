@@ -302,3 +302,14 @@ button {
     width: auto !important;
     border-radius: 10px !important;
 }
+
+.all-items {
+    border: none;
+    text-align: left;
+    margin: 0;
+    padding: 2px 20px 0;
+    border-radius: unset;
+    width: 250px;
+    color: black;
+    background-color: #e97d56;
+}
