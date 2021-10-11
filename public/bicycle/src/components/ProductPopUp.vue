@@ -30,7 +30,7 @@
             </div>
           </div>
           <div class="p-2 bd-highlight">
-            <p class="mt-4">Total: <strong>{{ total }}$</strong></p>
+            <p>Total: <strong>{{ total }}$</strong></p>
           </div>
           <div class="p-2 bd-highlight">
             <div class="py-0 px-2.5">

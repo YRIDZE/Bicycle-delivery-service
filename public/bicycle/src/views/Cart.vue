@@ -27,11 +27,12 @@
             </cart-tr>
             </tbody>
           </table>
+          <div class="text-center mb-3 italic" v-if="this.$store.getters['cart/getCartList'].length === 0">empty cart</div>
         </div>
       </div>
-      <div class="d-flex flex-row-reverse">
-        <button class="cart-btn" @click="showCartInfo = true">Order</button>
-        <p style="margin-top: 15px !important;">Total <strong>{{ total }}</strong>$</p>
+      <div class="d-flex flex-row-reverse mb-3" v-if="this.$store.getters['cart/getCartList'].length !== 0">
+        <button class="cart-btn mr-3" @click="showCartInfo = true">Order</button>
+        <p class="mx-2">Total <strong>{{ total }}</strong>$</p>
       </div>
     </vue-final-modal>
 
@@ -43,14 +44,14 @@
         :esc-to-close="true"
     >
       <div class="modal-body">
-        <form>
-          <div class="row g-3" style="margin: 1px; width: 800px !important;">
+        <form v-on:submit.prevent="createOrder">
+          <div class="row g-3 m-px" style="width: 800px !important;">
 
             <div class="col-sm-12 fields">
-              <input type="text" class="login-input" style="width: 49% !important;" v-model="orderForm.customer_name"
-                     placeholder="Name" value="" required>
-              <input type="text" class="login-input" style="width: 49% !important;"
-                     v-model="orderForm.customer_lastname" placeholder="Surname" value="" required>
+              <input type="text" class="login-input" style="width: 49%" v-model="orderForm.customer_name"
+                     placeholder="Name" required>
+              <input type="text" class="login-input" style="width: 49%"
+                     v-model="orderForm.customer_lastname" placeholder="Surname" required>
             </div>
 
             <div class="cart-col-12">
@@ -68,11 +69,11 @@
                 <option>Cash</option>
               </select>
             </div>
+            <button class="cart-btn mb-3 mt-1" style="font-size: 16px">Confirm</button>
 
           </div>
         </form>
       </div>
-      <button class="cart-btn" @click="createOrder" style="font-size: 16px">Confirm</button>
     </vue-final-modal>
 
   </div>
@@ -106,6 +107,7 @@ export default {
 
   methods: {
     createOrder() {
+      console.log(this.orderForm)
       this.orderForm.products = this.$store.getters["cart/getCartList"];
       this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
 

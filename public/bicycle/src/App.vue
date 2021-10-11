@@ -44,6 +44,8 @@ import './assets/css/main-page.css'
 import './assets/css/cart.css'
 import './assets/css/login-registration.css'
 import './assets/css/menu-item-page.css'
+import axios from "axios";
+import {getTokenTimeUntilRefresh} from "@/store/user";
 
 export default {
   name: "App",
@@ -62,22 +64,22 @@ export default {
       this.$store.state.supp.loading = false
     },
   },
+  async mounted() {
+    if (this.$store.getters["user/isLoggedIn"]) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${this.$store.getters["user/accessToken"]}`;
+      if (getTokenTimeUntilRefresh(this.$store.getters["user/refreshToken"]) > 0) {
+        await this.$store.dispatch('user/dropRefresh');
+        await this.$store.dispatch('user/autoRefresh');
+        await this.$store.dispatch('cart/getCart');
+      } else {
+        await this.$store.dispatch('user/logout')
+      }
+    }
 
-  computed: {
-    isLoggedIn: function () {
-      return this.$store.getters["user/isLoggedIn"];
-    },
   },
   created() {
     this.fetchedSupplierProducts()
   },
-  mounted() {
-    this.$store.dispatch('dropRefresh');
-    if (this.isLoggedIn) {
-      this.$store.dispatch('cart/getCart').catch(err => console.log(err));
-    }
-  }
-
 };
 
 </script>

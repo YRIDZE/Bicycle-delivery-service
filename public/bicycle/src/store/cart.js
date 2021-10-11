@@ -108,20 +108,19 @@ const mutations = {
 
   getCart() {
     return new Promise((resolve, reject) => {
-        axios
-          .post("http://localhost:8081/getCartProducts")
-          .then(response => {
-            state.cart.id = response.data[0].id;
+      axios
+        .post("http://localhost:8081/getCartProducts")
+        .then(response => {
+          state.cart.id = response.data[0].id;
 
-            if (response.data[0].products != null)
-              state.cart.products = response.data[0].products;
-            resolve(response);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      }
-    )
+          if (response.data[0].products != null)
+            state.cart.products = response.data[0].products;
+          resolve(response);
+        })
+        .catch(error => {
+          reject(error);
+        })
+    })
   },
 }
 

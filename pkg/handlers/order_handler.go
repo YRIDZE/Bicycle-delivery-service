@@ -98,7 +98,16 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	var resp []models.OrderResponse
 	for _, x := range *o {
 		resp = append(
-			resp, models.OrderResponse{ID: x.ID, UserID: x.UserID, Address: x.Address, Status: x.Address, Products: x.Products},
+			resp, models.OrderResponse{
+				ID:               x.ID,
+				UserID:           x.UserID,
+				Address:          x.Address,
+				PhoneNumber:      x.PhoneNumber,
+				CustomerName:     x.CustomerName,
+				CustomerLastname: x.CustomerLastname,
+				Status:           x.Status,
+				Products:         x.Products,
+			},
 		)
 	}
 

@@ -8,6 +8,11 @@ button {
     letter-spacing: 1px;
 }
 
+h1 {
+    font-size: xx-large !important;
+    margin-bottom: 0.5rem !important;
+}
+
 #header {
     padding-top: 60px;
 }

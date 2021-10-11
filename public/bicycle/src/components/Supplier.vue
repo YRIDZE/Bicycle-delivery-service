@@ -1,7 +1,7 @@
 <template>
   <div class="mt-4 mx-1 supplier">
     <div class="icon-box gallery">
-      <router-link :to="{ path : String(supp.id) }"><img :src="supp.image" class="img-fluid" alt="Pizza picture">
+      <router-link :to="{ path : String(supp.id) }"><img :src="supp.image" class="img-fluid" alt="Supplier picture">
       </router-link>
       <p class="short">{{ supp.name }}</p>
       <p class="time"> {{ supp.workingHours.opening.substr(0, 5) }}-{{ supp.workingHours.closing.substr(0, 5) }}</p>

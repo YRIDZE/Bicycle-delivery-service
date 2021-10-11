@@ -23,6 +23,7 @@ import CartTr from './components/CartTr'
 import Check from './components/Check'
 import Product from "@/components/Product";
 import Supplier from '@/components/Supplier'
+import OrderList from '@/components/OrderList'
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -75,6 +76,7 @@ Vue.component('check', Check);
 Vue.component('product', Product);
 Vue.component('supplier', Supplier);
 Vue.component('product-filer', ProductFilter);
+Vue.component('order-list', OrderList);
 
 Vue.use(VueFinalModal)
 Vue.use(PortalVue)

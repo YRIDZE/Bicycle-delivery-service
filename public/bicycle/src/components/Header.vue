@@ -29,6 +29,9 @@
             <li class="nav-item"><a class="nav-link" @click="showCart" type="button">
               <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
               Cart</a></li>
+            <li class="nav-item"><a class="nav-link" @click="showOrders" v-if="isLoggedIn" type="button">
+              <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
+              Orders</a></li>
           </ul>
         </div>
       </nav>
@@ -36,11 +39,12 @@
 
     <login></login>
     <cart></cart>
+    <order-list></order-list>
 
     <div class="cont-custom text-center bg-light h-96 pt-24 px-12 pb-0 mb-4 bg-cover"
          :style="{ backgroundImage: 'url(' + require(`@/assets/header-pizza.jpg`) + ')'}">
       <h1 class="mb-3"><b>Bicycle</b></h1>
-      <h4 class="mb-3">Subheading</h4>
+      <h4 class="mb-3">This is the way</h4>
       <div class="search-container">
         <input type="text" class="input" placeholder="what are you looking for...">
         <input type="button" class="close-btn" value="Search">
@@ -64,11 +68,14 @@ export default {
     },
     showCart() {
       if (this.$store.getters["user/isLoggedIn"]) {
-        this.$store.state.cart.showCart = true
+        this.$store.state.cart.showCart = true;
       } else {
-        this.$store.state.user.showLogin = true
+        this.$store.state.user.showLogin = true;
       }
-    }
+    },
+    showOrders() {
+      this.$store.state.orders.showOrders = true;
+    },
   },
 }
 </script>
