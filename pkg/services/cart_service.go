@@ -48,10 +48,6 @@ func (c CartService) Update(cart *requests.CartProductRequest) (*models.Cart, er
 	)
 }
 
-func (c CartService) Delete(id int) error {
-	return c.repo.Delete(id)
-}
-
 func (c CartService) DeleteProductFromCart(userID int32, productID int) error {
 	return c.repo.DeleteProductFromCart(userID, productID)
 }

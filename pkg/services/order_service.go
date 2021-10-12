@@ -30,10 +30,6 @@ func (o OrderService) Create(order *requests.OrderRequest) (*models.Order, error
 	)
 }
 
-func (o OrderService) GetByID(id int) (*models.Order, error) {
-	return o.repo.GetByID(id)
-}
-
 func (o OrderService) GetAll(userID int32) (*[]models.Order, error) {
 	return o.repo.GetAll(userID)
 }

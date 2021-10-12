@@ -18,7 +18,6 @@ type CartRepositoryI interface {
 	GetAllProductsFromCart(userID int32) (*[]models.Cart, error)
 	GetCartProductsByID(id int) (cartProducts []models.CartProducts, err error)
 	Update(cart *models.Cart) (*models.Cart, error)
-	Delete(id int) error
 	DeleteProductFromCart(userID int32, productID int) error
 	DeleteAllProductFromCart(userID int32) error
 }
@@ -169,19 +168,6 @@ func (c CartRepository) Update(cart *models.Cart) (*models.Cart, error) {
 	}
 
 	return cart, nil
-}
-
-func (c CartRepository) Delete(cartID int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := fmt.Sprintf("delete from %s where cart_id = ?", CartProductsTable)
-	_, err := c.db.ExecContext(ctx, query, cartID)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c CartRepository) DeleteProductFromCart(userID int32, productID int) error {

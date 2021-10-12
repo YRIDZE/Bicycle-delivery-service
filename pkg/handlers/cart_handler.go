@@ -33,7 +33,6 @@ func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.Handle("/createCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
 	r.Handle("/getCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
 	r.Handle("/updateCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/deleteCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Delete)))
 	r.Handle("/deleteAllCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteAll)))
 	r.Handle("/deleteCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
 }
@@ -169,29 +168,6 @@ func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&models.CartProductResponse{ID: p.ID, UserID: p.UserID, Products: p.Products})
 	h.logger.Infof("cart %d product successfully updated", p.ID)
-}
-
-func (h *CartHandler) Delete(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
-	userID := req.Context().Value("user").(*models.User).ID
-	cart, err := h.service.GetCartByUserID(userID)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	err = h.service.Delete(cart.ID)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("cart successfully deleted"))
-	h.logger.Infof("cart %d successfully deleted", userID)
 }
 
 func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {

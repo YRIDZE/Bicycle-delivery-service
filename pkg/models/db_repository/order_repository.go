@@ -11,7 +11,6 @@ import (
 
 type OrderRepositoryI interface {
 	Create(order *models.Order) (*models.Order, error)
-	GetByID(id int) (*models.Order, error)
 	GetAll(userID int32) (*[]models.Order, error)
 	GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error)
 }
@@ -60,43 +59,6 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 	}
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
-	}
-
-	return order, nil
-}
-
-func (o OrderRepository) GetByID(id int) (*models.Order, error) {
-	order := new(models.Order)
-	query := fmt.Sprintf("select id, user_id, address, phone_number, customer_name, customer_lastname, status from %s where id = ?", OrdersTable)
-	err := o.db.QueryRow(query, id).Scan(
-		&order.ID, &order.UserID, &order.Address, &order.PhoneNumber, &order.CustomerName, &order.CustomerLastname, &order.Status,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	query2 := fmt.Sprintf("select order_id, product_id, quantity from %s where order_id = ?", OPTable)
-	pr, err := o.db.Prepare(query2)
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := pr.Query(order.ID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		orderProduct := new(models.OrderProducts)
-		err := rows.Scan(&orderProduct.OrderID, &orderProduct.ProductID, &orderProduct.Quantity)
-		if err != nil {
-			return nil, err
-		}
-		order.Products = append(order.Products, *orderProduct)
-	}
-	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 

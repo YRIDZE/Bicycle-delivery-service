@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/conf"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
@@ -30,7 +28,6 @@ func NewOrderHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_rep
 
 func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.Handle("/createOrder", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
-	r.Handle("/getOrderById", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetByID)))
 	r.Handle("/getOrders", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
 }
 
@@ -60,28 +57,6 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
 	h.logger.Infof("order %d successfully created by User %d", o.ID, o.UserID)
-}
-
-func (h *OrderHandler) GetByID(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
-	orderID, err := strconv.Atoi(req.URL.Query().Get("id"))
-	if err != nil || orderID < 1 {
-		h.logger.Error(errors.New("invalid id parameter"))
-		http.Error(w, "invalid id parameter", http.StatusNotFound)
-		return
-	}
-
-	o, err := h.services.GetByID(orderID)
-	if err != nil {
-		h.logger.Error(err.Error())
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&models.OrderResponse{ID: o.ID, UserID: o.UserID, Address: o.Address, Status: o.Address, Products: o.Products})
-	h.logger.Infof("user %d fetched order %d", o.UserID, o.ID)
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
