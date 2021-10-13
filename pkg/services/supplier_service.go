@@ -24,10 +24,6 @@ func (s SupplierService) Create(supplier *requests.SupplierRequest) (*models.Sup
 	)
 }
 
-func (s SupplierService) GetByID(id int) (*models.Supplier, error) {
-	return s.repo.GetByID(id)
-}
-
 func (s SupplierService) GetByName(name string) (int32, error) {
 	return s.repo.GetByName(name)
 }

@@ -17,17 +17,17 @@ func NewOrderService(repo db_repository.OrderRepositoryI) *OrderService {
 func (o OrderService) Create(order *requests.OrderRequest) (*models.Order, error) {
 	return o.repo.Create(
 		&models.Order{
-			ID:       order.ID,
-			UserID:   order.UserID,
-			Address:  order.Address,
-			Status:   order.Status,
-			Products: order.Products,
+			ID:               order.ID,
+			UserID:           order.UserID,
+			Address:          order.Address,
+			PhoneNumber:      order.PhoneNumber,
+			CustomerName:     order.CustomerName,
+			CustomerLastname: order.CustomerLastname,
+			PaymentMethod:    order.PaymentMethod,
+			Status:           order.Status,
+			Products:         order.Products,
 		},
 	)
-}
-
-func (o OrderService) GetByID(id int) (*models.Order, error) {
-	return o.repo.GetByID(id)
 }
 
 func (o OrderService) GetAll(userID int32) (*[]models.Order, error) {

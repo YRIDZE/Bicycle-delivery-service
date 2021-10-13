@@ -42,25 +42,6 @@ func (u UserService) GetByID(id int32) (*models.User, error) {
 	return u.userRepo.GetByID(id)
 }
 
-func (u UserService) GetAll() (*[]models.User, error) {
-	return u.userRepo.GetAll()
-}
-
-func (u UserService) Update(user *requests.UserRequest) (*models.User, error) {
-	return u.userRepo.Create(
-		&models.User{
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-			Password:  generatePasswordHash(user.Password),
-		},
-	)
-}
-
-func (u UserService) Delete(id int32) error {
-	return u.userRepo.Delete(id)
-}
-
 func generatePasswordHash(password string) string {
 	p, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(p)

@@ -1,6 +1,7 @@
 package models
 
 type LoginResponse struct {
+	UserID       int32  `json:"user_id"`
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
@@ -30,6 +31,7 @@ type OrderResponse struct {
 	CustomerLastname string          `json:"customer_lastname"`
 	Status           string          `json:"status"`
 	Products         []OrderProducts `json:"products"`
+	CreatedAt        string          `json:"created_at"`
 }
 
 type SuppliersResponse struct {

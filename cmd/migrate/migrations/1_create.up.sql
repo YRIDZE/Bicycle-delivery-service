@@ -48,6 +48,7 @@ CREATE TABLE orders
     phone_number      VARCHAR(16)                  NOT NULL,
     customer_name     VARCHAR(64)                  NOT NULL,
     customer_lastname VARCHAR(64)                  NOT NULL,
+    payment_method    ENUM ('Credit Card', 'Cash') NOT NULL,
     status            ENUM ('in progress', 'done') NOT NULL,
     deleted           TIMESTAMP DEFAULT NULL,
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

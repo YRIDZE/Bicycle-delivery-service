@@ -10,7 +10,6 @@ import (
 
 type SupplierRepositoryI interface {
 	Create(supplier *models.Supplier) (*models.Supplier, error)
-	GetByID(id int) (*models.Supplier, error)
 	GetAll() (*[]models.Supplier, error)
 	GetByName(name string) (int32, error)
 	Update(supplier *models.Supplier) (*models.Supplier, error)
@@ -40,27 +39,6 @@ func (s SupplierRepository) Create(supplier *models.Supplier) (*models.Supplier,
 		return nil, err
 	}
 	supplier.ID = int32(lastID)
-
-	return supplier, nil
-}
-
-func (s SupplierRepository) GetByID(id int) (*models.Supplier, error) {
-	var deletedV sql.NullString
-	supplier := new(models.Supplier)
-
-	query := fmt.Sprintf("select id, name, type, image, opening, closing, deleted from %s where id = ?", SuppliersTable)
-	err := s.db.QueryRow(query, id).Scan(
-		&supplier.ID, &supplier.Name, &supplier.Type, &supplier.Image, &supplier.WorkHours.Opening, &supplier.WorkHours.Closing,
-		&deletedV,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	supplier.Deleted = ""
-	if deletedV.Valid {
-		supplier.Deleted = deletedV.String
-	}
 
 	return supplier, nil
 }

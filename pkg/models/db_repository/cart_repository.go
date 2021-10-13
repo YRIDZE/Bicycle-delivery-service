@@ -18,8 +18,8 @@ type CartRepositoryI interface {
 	GetAllProductsFromCart(userID int32) (*[]models.Cart, error)
 	GetCartProductsByID(id int) (cartProducts []models.CartProducts, err error)
 	Update(cart *models.Cart) (*models.Cart, error)
-	Delete(id int) error
 	DeleteProductFromCart(userID int32, productID int) error
+	DeleteAllProductFromCart(userID int32) error
 }
 
 type CartRepository struct {
@@ -62,7 +62,6 @@ func (c CartRepository) Create(cart *models.Cart) (*models.Cart, error) {
 	defer cancel()
 
 	query := fmt.Sprintf("insert into %s (user_id) value (?)", CartTable)
-
 	res, err := c.db.ExecContext(ctx, query, cart.UserID)
 	if err != nil {
 		return nil, err
@@ -161,7 +160,6 @@ func (c CartRepository) Update(cart *models.Cart) (*models.Cart, error) {
 	defer cancel()
 
 	query := fmt.Sprintf("update %s set quantity = ? where cart_id = ? and product_id = ?", CartProductsTable)
-
 	for _, x := range cart.Products {
 		_, err := c.db.ExecContext(ctx, query, x.Quantity, x.CartID, x.ProductID)
 		if err != nil {
@@ -170,19 +168,6 @@ func (c CartRepository) Update(cart *models.Cart) (*models.Cart, error) {
 	}
 
 	return cart, nil
-}
-
-func (c CartRepository) Delete(cartID int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := fmt.Sprintf("delete from %s where cart_id = ?", CartProductsTable)
-	_, err := c.db.ExecContext(ctx, query, cartID)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c CartRepository) DeleteProductFromCart(userID int32, productID int) error {
@@ -196,6 +181,24 @@ func (c CartRepository) DeleteProductFromCart(userID int32, productID int) error
 
 	query := fmt.Sprintf("delete from %s where cart_id = ? and product_id = ?", CartProductsTable)
 	_, err = c.db.ExecContext(ctx, query, cart.ID, productID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c CartRepository) DeleteAllProductFromCart(userID int32) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	cart, err := c.GetCartByUserID(userID)
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("delete from %s where cart_id = ?", CartProductsTable)
+	_, err = c.db.ExecContext(ctx, query, cart.ID)
 	if err != nil {
 		return err
 	}
