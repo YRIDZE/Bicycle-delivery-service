@@ -10,11 +10,12 @@ import (
 )
 
 type ConfigDB struct {
-	Host       string
-	Port       string
-	Username   string
-	DBName     string
-	DbPassword string
+	Host           string
+	Port           string
+	Username       string
+	DBName         string
+	DbPassword     string
+	DbRootPassword string
 }
 
 type ConfigServer struct {
@@ -72,11 +73,12 @@ func NewConfig() *Config {
 			RefreshLifetimeMinutes: refreshLifetimeMinutes,
 		},
 		ConfigDB: &ConfigDB{
-			Host:       viper.GetString("db.host"),
-			Port:       viper.GetString("db.port"),
-			Username:   viper.GetString("db.username"),
-			DBName:     viper.GetString("db.dbname"),
-			DbPassword: os.Getenv("DB_PASSWORD"),
+			Host:           viper.GetString("db.host"),
+			Port:           viper.GetString("db.port"),
+			Username:       viper.GetString("db.username"),
+			DBName:         viper.GetString("db.dbname"),
+			DbPassword:     os.Getenv("DB_PASSWORD"),
+			DbRootPassword: os.Getenv("DB_ROOT_PASSWORD"),
 		},
 		Logger: logger,
 	}

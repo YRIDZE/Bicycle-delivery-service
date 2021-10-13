@@ -23,6 +23,7 @@ $ git clone https://github.com/YRIDZE/Bicycle-delivery-service.git
 2. Create `logs` directory
 
 ```
+$ cd Bicycle-delivery-service
 $ mkdir logs
 ```
 
@@ -35,8 +36,8 @@ $ mkdir logs
 4. Migrate db
 
 ```
-$ cd Bicycle-delivery-service
 $ go build -o cli cmd/migrate/main.go
+$ ./cli migrate create
 $ ./cli migrate up
 ```
 

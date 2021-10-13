@@ -1,6 +1,7 @@
 package command
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
@@ -23,7 +24,44 @@ var rootCmd = &cobra.Command{
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "migrate cmd is used for database migration",
-	Long:  `migrate cmd is used for database migration: migrate < up | down >`,
+	Long:  `migrate cmd is used for database migration: migrate < create | up | down >`,
+}
+
+var migrateCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "create db",
+	Long:  `Command to create db for further migrations`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Running migrate create command")
+
+		db, err := sql.Open(
+			"mysql",
+			fmt.Sprintf(
+				"root:%s@tcp(%s:%s)/?multiStatements=true",
+				cfg.ConfigDB.DbRootPassword,
+				cfg.ConfigDB.Host,
+				cfg.ConfigDB.Port,
+			),
+		)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+
+		_, err = db.Exec("CREATE DATABASE IF NOT EXISTS " + cfg.ConfigDB.DBName)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = db.Exec(fmt.Sprintf("GRANT ALL PRIVILEGES ON %s.* TO %s@%s;", cfg.ConfigDB.DBName, cfg.ConfigDB.Username, cfg.ConfigDB.Host))
+		if err != nil {
+			panic(err)
+		}
+
+		db.Close()
+
+		fmt.Println("Creation done with success")
+	},
 }
 
 var migrateUpCmd = &cobra.Command{
@@ -44,7 +82,7 @@ var migrateUpCmd = &cobra.Command{
 			fmt.Printf("opening file error: %v \n", err)
 		}
 
-		m, err := migrate.NewWithInstance("file", fileSource, "delivery_db", dbDriver)
+		m, err := migrate.NewWithInstance("file", fileSource, cfg.ConfigDB.DBName, dbDriver)
 		if err != nil {
 			fmt.Printf("migrate error: %v \n", err)
 		}
@@ -76,7 +114,7 @@ var migrateDownCmd = &cobra.Command{
 			fmt.Printf("opening file error: %v \n", err)
 		}
 
-		m, err := migrate.NewWithInstance("file", fileSource, "delivery_db", dbDriver)
+		m, err := migrate.NewWithInstance("file", fileSource, cfg.ConfigDB.DBName, dbDriver)
 		if err != nil {
 			fmt.Printf("migrate error: %v \n", err)
 		}
@@ -93,6 +131,7 @@ func init() {
 	rootCmd.AddCommand(migrateCmd)
 	migrateCmd.AddCommand(migrateUpCmd)
 	migrateCmd.AddCommand(migrateDownCmd)
+	migrateCmd.AddCommand(migrateCreateCmd)
 }
 
 func Execute() {
