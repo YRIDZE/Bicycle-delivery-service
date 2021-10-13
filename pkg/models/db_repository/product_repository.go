@@ -56,6 +56,26 @@ func (p ProductRepository) GetByName(name string) (int32, error) {
 	return id, nil
 }
 
+func (p ProductRepository) GetByID(id int) (*models.Product, error) {
+	product := new(models.Product)
+
+	query := fmt.Sprintf(
+		"select id, name, price, type, ingredients, image, supplier_id from %s where id = ?",
+		ProductsTable,
+	)
+	var ingredientsJson string
+	err := p.db.QueryRow(query, id).Scan(
+		&product.ID, &product.Name, &product.Price, &product.Type, &ingredientsJson, &product.Image, &product.SupplierID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = json.Unmarshal([]byte(ingredientsJson), &product.Ingredients)
+
+	return product, nil
+}
+
 func (p ProductRepository) GetAll() (*[]models.Product, error) {
 	var products []models.Product
 	var product models.Product

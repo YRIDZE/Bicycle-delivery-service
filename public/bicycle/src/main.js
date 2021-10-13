@@ -23,7 +23,9 @@ import CartTr from './components/CartTr'
 import Check from './components/Check'
 import Product from "@/components/Product";
 import Supplier from '@/components/Supplier'
+import Orders from '@/components/Orders'
 import OrderList from '@/components/OrderList'
+import OrderListProducts from '@/components/OrderListProducts'
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
@@ -40,7 +42,8 @@ import {
   faShoppingBasket,
   faSignInAlt,
   faSignOutAlt,
-  faTrash
+  faTrash,
+  faStream,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -56,7 +59,8 @@ library.add(
   faSignOutAlt,
   faBicycle,
   faChevronCircleLeft,
-  faChevronUp
+  faChevronUp,
+  faStream,
 );
 
 Vue.config.productionTip = false;
@@ -76,7 +80,9 @@ Vue.component('check', Check);
 Vue.component('product', Product);
 Vue.component('supplier', Supplier);
 Vue.component('product-filer', ProductFilter);
+Vue.component('orders', Orders);
 Vue.component('order-list', OrderList);
+Vue.component('order-list-products', OrderListProducts);
 
 Vue.use(VueFinalModal)
 Vue.use(PortalVue)

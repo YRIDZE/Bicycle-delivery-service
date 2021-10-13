@@ -68,7 +68,7 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 	var orders []models.Order
 	query := fmt.Sprintf(
-		"select id, user_id, address, phone_number, customer_name, customer_lastname, status from %s where user_id=? and deleted is null",
+		"select id, user_id, address, phone_number, customer_name, customer_lastname, status, created_at from %s where user_id=? and deleted is null",
 		OrdersTable,
 	)
 	pr, err := o.db.Prepare(query)
@@ -84,7 +84,7 @@ func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 
 	for rows.Next() {
 		var order models.Order
-		err := rows.Scan(&order.ID, &order.UserID, &order.Address, &order.PhoneNumber, &order.CustomerName, &order.CustomerLastname, &order.Status)
+		err := rows.Scan(&order.ID, &order.UserID, &order.Address, &order.PhoneNumber, &order.CustomerName, &order.CustomerLastname, &order.Status, &order.CreatedAt)
 		if err != nil {
 			return nil, err
 		}

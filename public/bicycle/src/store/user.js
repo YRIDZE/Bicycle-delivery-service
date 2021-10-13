@@ -6,7 +6,10 @@ const state = {
   user_id: 0,
   refresh_token: localStorage.getItem("refresh_token") || "",
   access_token: localStorage.getItem("access_token") || "",
+
   refreshTask: null,
+  logoutTask: null,
+
   status: "",
 }
 
@@ -38,7 +41,11 @@ const mutations = {
   refreshTask(state, task) {
     state.refreshTask = task;
   },
+  logoutTask(state, task) {
+    state.logoutTask = task;
+  },
   cancelTask(state) {
+    clearTimeout(state.logoutTask)
     clearTimeout(state.refreshTask);
   },
 }
@@ -60,10 +67,11 @@ const actions = {
         access_token: access_token,
         refresh_token: refresh_token
       });
-      await context.dispatch("dropRefresh")
+      context.commit("cancelTask");
     } catch {
       context.commit("auth_error");
     }
+    await context.dispatch("dropRefresh")
     await context.dispatch("autoRefresh");
   },
 
@@ -71,9 +79,9 @@ const actions = {
     if (state.access_token) {
       let timeUntilRefresh = getTokenTimeUntilRefresh(state.access_token)
 
-      if (timeUntilRefresh < 1) {
+      if (timeUntilRefresh < 1)
         await context.dispatch("refreshTokens")
-      }
+
 
       const refreshTask = setTimeout(() => context.dispatch("refreshTokens"), timeUntilRefresh * 1000);
       context.commit("refreshTask", refreshTask);
@@ -83,10 +91,8 @@ const actions = {
   async dropRefresh(context) {
     if (state.refresh_token) {
       let timeUntilRefresh = getTokenTimeUntilRefresh(state.refresh_token)
-      if (timeUntilRefresh < 1) {
-        await context.dispatch("logout")
-      }
-      setTimeout(() => context.dispatch("logout"), timeUntilRefresh * 1000);
+      const logoutTask = setTimeout(() => context.dispatch("logout"), timeUntilRefresh * 1000);
+      context.commit("logoutTask", logoutTask)
     }
   },
 
@@ -130,12 +136,14 @@ const actions = {
   },
 
   logout(context) {
-    return new Promise((resolve) => {
-      axios.post("http://localhost:8081/logout");
-      context.commit("logout");
-      context.commit("cancelTask");
-      resolve();
-    })
+    if (state.refresh_token) {
+      return new Promise((resolve) => {
+        axios.post("http://localhost:8081/logout");
+        context.commit("logout");
+        context.commit("cancelTask");
+        resolve();
+      })
+    }
   },
 }
 

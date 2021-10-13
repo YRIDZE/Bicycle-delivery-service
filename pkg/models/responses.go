@@ -31,6 +31,7 @@ type OrderResponse struct {
 	CustomerLastname string          `json:"customer_lastname"`
 	Status           string          `json:"status"`
 	Products         []OrderProducts `json:"products"`
+	CreatedAt        string          `json:"created_at"`
 }
 
 type SuppliersResponse struct {

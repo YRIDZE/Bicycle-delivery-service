@@ -29,7 +29,7 @@ const actions = {
 }
 
 const getters = {
-  getOrders: state => state.orders,
+  getOrders: state => state.orders.reverse(),
 
 }
 

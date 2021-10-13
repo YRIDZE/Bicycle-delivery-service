@@ -82,6 +82,7 @@ func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 				CustomerLastname: x.CustomerLastname,
 				Status:           x.Status,
 				Products:         x.Products,
+				CreatedAt:        x.CreatedAt,
 			},
 		)
 	}

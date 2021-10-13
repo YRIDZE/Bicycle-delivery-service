@@ -72,7 +72,7 @@ export default {
         await this.$store.dispatch('user/autoRefresh');
         await this.$store.dispatch('cart/getCart');
       } else {
-        await this.$store.dispatch('user/logout')
+        this.$store.commit("user/logout");
       }
     }
 

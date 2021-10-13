@@ -30,7 +30,7 @@
               <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
               Cart</a></li>
             <li class="nav-item"><a class="nav-link" @click="showOrders" v-if="isLoggedIn" type="button">
-              <font-awesome-icon :icon="['fas', 'shopping-basket']"/>
+              <font-awesome-icon :icon="['fas', 'stream']"/>
               Orders</a></li>
           </ul>
         </div>
@@ -39,7 +39,7 @@
 
     <login></login>
     <cart></cart>
-    <order-list></order-list>
+    <orders></orders>
 
     <div class="cont-custom text-center bg-light h-96 pt-24 px-12 pb-0 mb-4 bg-cover"
          :style="{ backgroundImage: 'url(' + require(`@/assets/header-pizza.jpg`) + ')'}">
@@ -74,6 +74,7 @@ export default {
       }
     },
     showOrders() {
+      this.$store.dispatch('orders/getOrders')
       this.$store.state.orders.showOrders = true;
     },
   },
