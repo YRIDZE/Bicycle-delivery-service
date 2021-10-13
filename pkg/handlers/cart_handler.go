@@ -29,17 +29,18 @@ func NewCartHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_repo
 }
 
 func (h *CartHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.HandleFunc("/createCart", h.Create)
-	r.Handle("/createCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.CreateProduct)))
-	r.Handle("/getCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
-	r.Handle("/updateCart", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Update)))
-	r.Handle("/deleteAllCartProducts", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteAll)))
-	r.Handle("/deleteCartProduct", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.DeleteProduct)))
+	auth := appH.UserHandler.AuthMiddleware
+	meth := appH.MethodDispatcher
+
+	r.Handle("/createCart", meth(Methods{post: http.HandlerFunc(h.Create)}))
+	r.Handle("/createCartProduct", auth(meth(Methods{post: http.HandlerFunc(h.CreateProduct)})))
+	r.Handle("/getCartProducts", auth(meth(Methods{get: http.HandlerFunc(h.GetAll)})))
+	r.Handle("/updateCart", auth(meth(Methods{put: http.HandlerFunc(h.Update)})))
+	r.Handle("/deleteAllCartProducts", auth(meth(Methods{delete: http.HandlerFunc(h.DeleteAll)})))
+	r.Handle("/deleteCartProduct", auth(meth(Methods{delete: http.HandlerFunc(h.DeleteProduct)})))
 }
 
 func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	cart := new(requests.CartRequest)
 
 	if err := json.NewDecoder(req.Body).Decode(&cart); err != nil {
@@ -60,7 +61,6 @@ func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
 	userID := req.Context().Value("user").(*models.User).ID
 
 	cartRequest := new(requests.CartProductRequest)
@@ -122,8 +122,6 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	user := req.Context().Value("user").(*models.User)
 	c, err := h.service.GetAllProductsFromCart(user.ID)
 	if err != nil {
@@ -142,8 +140,6 @@ func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	cartProduct := new(requests.CartProductRequest)
 	defer req.Body.Close()
 	if err := json.NewDecoder(req.Body).Decode(&cartProduct); err != nil {
@@ -171,8 +167,6 @@ func (h *CartHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	userID := req.Context().Value("user").(*models.User).ID
 	productID, err := strconv.Atoi(req.URL.Query().Get("productId"))
 	if err != nil || productID < 1 {
@@ -194,8 +188,6 @@ func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *CartHandler) DeleteAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	userID := req.Context().Value("user").(*models.User).ID
 
 	err := h.service.DeleteAllProductFromCart(userID)

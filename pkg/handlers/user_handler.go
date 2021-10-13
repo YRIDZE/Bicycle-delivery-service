@@ -29,16 +29,18 @@ func NewUserHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, userRepo db_
 }
 
 func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.HandleFunc("/login", h.Login)
-	r.HandleFunc("/refresh", h.Refresh)
-	r.Handle("/logout", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Logout)))
+	auth := appH.UserHandler.AuthMiddleware
+	meth := appH.MethodDispatcher
 
-	r.HandleFunc("/createUser", appH.UserHandler.Create)
-	r.Handle("/getUser", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetProfile)))
+	r.Handle("/login", meth(Methods{post: http.HandlerFunc(h.Login)}))
+	r.Handle("/refresh", meth(Methods{get: http.HandlerFunc(h.Refresh)}))
+	r.Handle("/logout", auth(meth(Methods{get: http.HandlerFunc(h.Logout)})))
+
+	r.Handle("/createUser", meth(Methods{get: http.HandlerFunc(h.Create)}))
+	r.Handle("/getUser", auth(meth(Methods{get: http.HandlerFunc(h.GetProfile)})))
 }
 
 func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
 	user := new(requests.UserRequest)
 
 	defer req.Body.Close()
@@ -67,7 +69,6 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
 
 	user := req.Context().Value("user").(*models.User)
 

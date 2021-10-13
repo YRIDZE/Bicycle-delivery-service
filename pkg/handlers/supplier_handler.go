@@ -24,14 +24,15 @@ func NewSupplierHandler(logger *yolo_log.Logger, repo db_repository.SupplierRepo
 }
 
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.HandleFunc("/createSupplier", h.Create)
-	r.HandleFunc("/getSuppliers", h.GetAll)
-	r.HandleFunc("/getSupplierTypes", h.GetTypes)
+	meth := appH.MethodDispatcher
+
+	r.Handle("/createSupplier", meth(Methods{post: http.HandlerFunc(h.Create)}))
+	r.Handle("/getSuppliers", meth(Methods{get: http.HandlerFunc(h.GetAll)}))
+	r.Handle("/getSupplierTypes", meth(Methods{get: http.HandlerFunc(h.GetTypes)}))
+
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	supplier := new(requests.SupplierRequest)
 	if err := json.NewDecoder(req.Body).Decode(&supplier); err != nil {
 		h.logger.Error(err.Error())
@@ -69,8 +70,6 @@ func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	s, err := h.services.GetAll()
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -102,8 +101,6 @@ func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *SupplierHandler) GetTypes(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	supplierTypes, err := h.services.GetTypes()
 	if err != nil {
 		h.logger.Error(err.Error())

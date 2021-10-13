@@ -27,13 +27,14 @@ func NewOrderHandler(cfg *conf.ConfigToken, logger *yolo_log.Logger, repo db_rep
 }
 
 func (h *OrderHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/createOrder", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.Create)))
-	r.Handle("/getOrders", appH.UserHandler.AuthMiddleware(http.HandlerFunc(h.GetAll)))
+	auth := appH.UserHandler.AuthMiddleware
+	meth := appH.MethodDispatcher
+
+	r.Handle("/createOrder", auth(meth(Methods{post: http.HandlerFunc(h.Create)})))
+	r.Handle("/getOrders", auth(meth(Methods{get: http.HandlerFunc(h.GetAll)})))
 }
 
 func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	order := new(requests.OrderRequest)
 	if err := json.NewDecoder(req.Body).Decode(&order); err != nil {
 		h.logger.Error(err.Error())
@@ -60,8 +61,6 @@ func (h *OrderHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *OrderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	userID := req.Context().Value("user").(*models.User).ID
 	o, err := h.services.GetAll(userID)
 	if err != nil {

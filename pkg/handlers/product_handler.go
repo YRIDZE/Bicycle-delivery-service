@@ -24,14 +24,14 @@ func NewProductHandler(logger *yolo_log.Logger, repo db_repository.ProductReposi
 }
 
 func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.HandleFunc("/createProduct", h.Create)
-	r.HandleFunc("/getProducts", h.GetAll)
-	r.HandleFunc("/getProductTypes", h.GetTypes)
+	meth := appH.MethodDispatcher
+
+	r.Handle("/createProduct", meth(Methods{post: http.HandlerFunc(h.Create)}))
+	r.Handle("/getProducts", meth(Methods{get: http.HandlerFunc(h.GetAll)}))
+	r.Handle("/getProductTypes", meth(Methods{get: http.HandlerFunc(h.GetTypes)}))
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	product := new(requests.ProductRequest)
 	if err := json.NewDecoder(req.Body).Decode(&product); err != nil {
 		h.logger.Error(err.Error())
@@ -52,8 +52,6 @@ func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	p, err := h.services.GetAll()
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -75,8 +73,6 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *ProductHandler) GetTypes(w http.ResponseWriter, req *http.Request) {
-	setupResponse(&w, req)
-
 	productTypes, err := h.services.GetTypes()
 	if err != nil {
 		h.logger.Error(err.Error())
