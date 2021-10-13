@@ -28,10 +28,8 @@ export default {
       }
 
       return suppliers
-
     },
   },
-
 }
 </script>
 

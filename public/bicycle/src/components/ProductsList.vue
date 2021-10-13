@@ -8,10 +8,10 @@
       ></product>
     </div>
     <div class="clearfix btn-group offset-md-5 py-4 text-center" v-if="pageCount !== 1">
-      <button class="btn btn-sm btn-outline-secondary" @click="prevPage"
+      <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(-1)"
               :disabled="this.$store.getters['prod/getPage'] === 0"> Previous
       </button>
-      <button class="btn btn-sm btn-outline-secondary" @click="nextPage"
+      <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(1)"
               :disabled="this.$store.getters['prod/getPage'] >= pageCount-1"> Next
       </button>
     </div>
@@ -27,13 +27,6 @@ export default {
   props: ["id"],
   methods: {
     ...mapActions('prod', ['changePageNumber']),
-
-    nextPage() {
-      this.changePageNumber(1);
-    },
-    prevPage() {
-      this.changePageNumber(-1);
-    }
   },
   computed: {
     filteredProdList: function () {
@@ -58,7 +51,7 @@ export default {
       const start = this.$store.getters["prod/getPage"] * 12;
       const end = start + 12;
       return this.filteredProdList.slice(start, end);
-    }
+    },
   },
 };
 </script>
