@@ -9,7 +9,7 @@ export default {
   props: ['item'],
   computed: {
     product: function () {
-      return this.$store.getters["item/getItems"].find(x => x.id == this.item.product_id)
+      return this.$store.getters["prod/getProducts"].find(x => x.id == this.item.product_id)
     },
   },
 }

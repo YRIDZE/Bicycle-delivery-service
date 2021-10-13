@@ -57,9 +57,14 @@ export default {
           .then(response => response.json())
           .then(async data => {
             await this.$store.dispatch('supp/setSuppliers', data)
+            await this.$store.dispatch('supp/getSupplierTypes');
+
             await fetch("http://localhost:8081/getProducts",)
                 .then(response => response.json())
-                .then(data => this.$store.dispatch('item/setItem', data));
+                .then(data => {
+                  this.$store.dispatch('prod/setProduct', data)
+                  this.$store.dispatch('prod/getProductTypes');
+                });
           })
       this.$store.state.supp.loading = false
     },

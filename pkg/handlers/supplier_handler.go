@@ -26,6 +26,7 @@ func NewSupplierHandler(logger *yolo_log.Logger, repo db_repository.SupplierRepo
 func (h *SupplierHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/createSupplier", h.Create)
 	r.HandleFunc("/getSuppliers", h.GetAll)
+	r.HandleFunc("/getSupplierTypes", h.GetTypes)
 }
 
 func (h *SupplierHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -97,5 +98,20 @@ func (h *SupplierHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
-	h.logger.Infof("user fetched suppliers")
+	h.logger.Infof("fetched suppliers")
+}
+
+func (h *SupplierHandler) GetTypes(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
+	supplierTypes, err := h.services.GetTypes()
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(supplierTypes)
+	h.logger.Infof("fetched supplier types")
 }

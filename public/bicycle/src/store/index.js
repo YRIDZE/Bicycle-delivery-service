@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import cartState from "./cart"
 import supplier from "./supplier"
 import filter from "./filter"
-import item from "./item"
+import product from "./product"
 import user from "./user"
 import orders from "./orders"
 
@@ -13,7 +13,7 @@ const modules = {
   cart: cartState,
   supp: supplier,
   filter: filter,
-  item: item,
+  prod: product,
   user: user,
   orders: orders
 }

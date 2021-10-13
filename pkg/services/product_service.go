@@ -32,6 +32,14 @@ func (p ProductService) GetAll() (*[]models.Product, error) {
 	return p.repo.GetAll()
 }
 
+func (p ProductService) GetByName(name string) (int32, error) {
+	return p.repo.GetByName(name)
+}
+
+func (p ProductService) GetTypes() (*[]models.ProductTypes, error) {
+	return p.repo.GetTypes()
+}
+
 func (p ProductService) Update(product *requests.ProductRequest) (*models.Product, error) {
 	return p.repo.Update(
 		&models.Product{
@@ -44,8 +52,4 @@ func (p ProductService) Update(product *requests.ProductRequest) (*models.Produc
 			Ingredients: product.Ingredients,
 		},
 	)
-}
-
-func (p ProductService) GetByName(name string) (int32, error) {
-	return p.repo.GetByName(name)
 }

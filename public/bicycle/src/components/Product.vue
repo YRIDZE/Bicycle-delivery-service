@@ -18,7 +18,7 @@ export default {
   methods: {
     showProduct() {
       this.$store.state.cart.currentItem = this.item
-      this.$store.state.item.showProduct = true;
+      this.$store.state.prod.showProduct = true;
     },
   },
 }

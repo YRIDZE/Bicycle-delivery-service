@@ -17,7 +17,7 @@
              aria-labelledby="panel2">
           <div class="accordion-body">
             <div class="filter-content">
-              <div class="card-body p-1.5" v-for="(value) in this.$store.getters['item/getItemsTypes']" :key="value">
+              <div class="card-body p-1.5" v-for="(value) in this.$store.getters['prod/getProductsTypes']" :key="value">
                 <check :title="'productType'" :name="value"></check>
               </div>
             </div>

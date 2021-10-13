@@ -26,6 +26,7 @@ func NewProductHandler(logger *yolo_log.Logger, repo db_repository.ProductReposi
 func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.HandleFunc("/createProduct", h.Create)
 	r.HandleFunc("/getProducts", h.GetAll)
+	r.HandleFunc("/getProductTypes", h.GetTypes)
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -70,5 +71,20 @@ func (h *ProductHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
-	h.logger.Infof("user fetched all products")
+	h.logger.Infof("fetched all products")
+}
+
+func (h *ProductHandler) GetTypes(w http.ResponseWriter, req *http.Request) {
+	setupResponse(&w, req)
+
+	productTypes, err := h.services.GetTypes()
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(productTypes)
+	h.logger.Infof("fetched product types")
 }

@@ -130,7 +130,7 @@ export default {
   computed: {
     total: function () {
       let total = 0;
-      this.$store.getters["cart/getCartList"].forEach(cartItem => total += this.$store.getters["item/getItems"].find(x => x.id === cartItem.product_id).price * cartItem.quantity);
+      this.$store.getters["cart/getCartList"].forEach(cartItem => total += this.$store.getters["prod/getProducts"].find(x => x.id === cartItem.product_id).price * cartItem.quantity);
       return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
     },
   },

@@ -35,7 +35,7 @@ export default {
 
   computed: {
     i: function () {
-      return this.$store.getters["item/getItems"].find(x => x.id == this.item.product_id)
+      return this.$store.getters["prod/getProducts"].find(x => x.id == this.item.product_id)
     },
     f: function () {
       return this.$store.getters["supp/getSuppliers"].find(x => x.id == this.i.supplier_id)

@@ -12,6 +12,7 @@ type SupplierRepositoryI interface {
 	Create(supplier *models.Supplier) (*models.Supplier, error)
 	GetAll() (*[]models.Supplier, error)
 	GetByName(name string) (int32, error)
+	GetTypes() (*[]models.SupplierTypes, error)
 	Update(supplier *models.Supplier) (*models.Supplier, error)
 	DeleteUnnecessary(period int) error
 }
@@ -105,4 +106,32 @@ func (s SupplierRepository) DeleteUnnecessary(period int) error {
 		return err
 	}
 	return nil
+}
+
+func (s SupplierRepository) GetTypes() (*[]models.SupplierTypes, error) {
+	var supplierTypes []models.SupplierTypes
+	var supplierType models.SupplierTypes
+
+	query := fmt.Sprintf("select distinct type from %s where deleted is null", SuppliersTable)
+
+	pr, err := s.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := pr.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&supplierType)
+		if err != nil {
+			return nil, err
+		}
+		supplierTypes = append(supplierTypes, supplierType)
+	}
+
+	return &supplierTypes, nil
 }

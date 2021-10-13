@@ -24,6 +24,10 @@ func (s SupplierService) Create(supplier *requests.SupplierRequest) (*models.Sup
 	)
 }
 
+func (s SupplierService) GetTypes() (*[]models.SupplierTypes, error) {
+	return s.repo.GetTypes()
+}
+
 func (s SupplierService) GetByName(name string) (int32, error) {
 	return s.repo.GetByName(name)
 }

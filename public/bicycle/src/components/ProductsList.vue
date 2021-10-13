@@ -15,7 +15,7 @@ export default {
   props: ["id"],
   computed: {
     filteredProdList: function () {
-      let products = this.$store.getters["item/getItems"]
+      let products = this.$store.getters["prod/getProducts"]
 
       if (this.$store.getters["filter/getProdTypeFilter"].length !== 0) {
         products = products
