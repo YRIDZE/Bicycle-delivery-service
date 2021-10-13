@@ -34,7 +34,7 @@
           </div>
           <div class="p-2 bd-highlight">
             <div class="py-0 px-2.5">
-              <button class="add-to-cart-btn" v-if="this.$store.getters['user/isLoggedIn']"
+              <button class="add-to-cart-btn"
                       @click="addToCart(item.id, quantity)">ADD TO CART
               </button>
             </div>
@@ -69,6 +69,10 @@ export default {
     ...mapActions('cart', ['addProduct']),
 
     addToCart: function (id, quantity) {
+      if (!this.$store.getters["user/isLoggedIn"]) {
+        this.$store.state.user.showLogin = true;
+        return
+      }
       this.addProduct({
             cart_id: this.$store.getters["cart/getCartId"],
             product_id: id,
