@@ -3,7 +3,6 @@ package db_repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -35,7 +34,6 @@ func (c CartRepository) GetCart(userID int32) (int, error) {
 	}
 
 	return exist, nil
-
 }
 
 func NewCartRepository(db *sql.DB) *CartRepository {
@@ -115,13 +113,6 @@ func (c CartRepository) GetAllProductsFromCart(userID int32) (*[]models.Cart, er
 		cart.Products = orderProducts
 
 		carts = append(carts, cart)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(carts) == 0 {
-		return nil, errors.New("sql: no rows in result set")
 	}
 
 	return &carts, nil

@@ -3,7 +3,6 @@ package db_repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
@@ -96,13 +95,6 @@ func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 		order.Products = orderProducts
 
 		orders = append(orders, order)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(orders) == 0 {
-		return nil, errors.New("sql: no rows in result set")
 	}
 
 	return &orders, nil

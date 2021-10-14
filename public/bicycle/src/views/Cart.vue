@@ -69,13 +69,11 @@
                 <option>Cash</option>
               </select>
             </div>
-            <button class="cart-btn mb-3 mt-1" style="font-size: 16px">Confirm</button>
-
+            <button class="cart-btn mb-3 mt-1" type="submit" style="font-size: 16px">Confirm</button>
           </div>
         </form>
       </div>
     </vue-final-modal>
-
   </div>
 </template>
 
@@ -107,7 +105,6 @@ export default {
 
   methods: {
     createOrder() {
-      console.log(this.orderForm)
       this.orderForm.products = this.$store.getters["cart/getCartList"];
       this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
 

@@ -9,7 +9,7 @@ const mutations = {
   getOrders() {
     return new Promise((resolve, reject) => {
         axios
-          .post("http://localhost:8081/getOrders")
+          .get("/getOrders")
           .then(response => {
             state.orders = response.data;
             resolve(response);
@@ -29,7 +29,7 @@ const actions = {
 }
 
 const getters = {
-  getOrders: state => state.orders.reverse(),
+  getOrders: state => state.orders,
 
 }
 

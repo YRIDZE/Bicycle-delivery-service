@@ -11,6 +11,9 @@
           v-for="(item, index) in $store.getters['orders/getOrders']"
           :item="item" :key="index" :index="index">
       </order-list>
+      <div class="text-center italic" v-if="this.$store.getters['orders/getOrders'].length === 0">not a single
+        order has been made
+      </div>
     </ol>
   </vue-final-modal>
 </template>
@@ -43,6 +46,7 @@ export default {
 .list-block {
   overflow: auto;
   width: 37.5rem;
-  height: 37.5rem;
+  height: auto;
+  max-height: 37.5rem;
 }
 </style>

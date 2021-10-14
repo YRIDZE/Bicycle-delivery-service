@@ -59,7 +59,7 @@ export function getTokenTimeUntilRefresh(t) {
 const actions = {
   async refreshTokens(context) {
     try {
-      const response = await axios.post("http://localhost:8081/refresh")
+      const response = await axios.get("/refresh")
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
 
@@ -71,6 +71,7 @@ const actions = {
     } catch {
       context.commit("auth_error");
     }
+
     await context.dispatch("dropRefresh")
     await context.dispatch("autoRefresh");
   },
@@ -81,7 +82,6 @@ const actions = {
 
       if (timeUntilRefresh < 1)
         await context.dispatch("refreshTokens")
-
 
       const refreshTask = setTimeout(() => context.dispatch("refreshTokens"), timeUntilRefresh * 1000);
       context.commit("refreshTask", refreshTask);
@@ -99,7 +99,7 @@ const actions = {
   login(context, user) {
     return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/login", user)
+        .post("/login", user)
         .then(response => {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
@@ -123,22 +123,22 @@ const actions = {
   },
 
   registration(context, user) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/createUser", user)
+        .post("/createUser", user)
         .then(response => {
           state.user_id = response.data.id
-
           context.commit("reg_success");
           resolve(response);
         })
+        .catch(error => reject(error))
     })
   },
 
   logout(context) {
     if (state.refresh_token) {
       return new Promise((resolve) => {
-        axios.post("http://localhost:8081/logout");
+        axios.post("/logout");
         context.commit("logout");
         context.commit("cancelTask");
         resolve();

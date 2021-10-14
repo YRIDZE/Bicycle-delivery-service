@@ -17,7 +17,7 @@ const mutations = {
   getProductTypes(state) {
     return new Promise((resolve, reject) => {
       axios
-        .get("http://localhost:8081/getProductTypes")
+        .get("/getProductTypes")
         .then(response => {
           state.productTypes = response.data;
           resolve(response);

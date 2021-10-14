@@ -7,7 +7,7 @@
           :item="item"
       ></product>
     </div>
-    <div class="clearfix btn-group offset-md-5 py-4 text-center" v-if="pageCount !== 1">
+    <div class="clearfix btn-group offset-md-5 py-4 text-center" v-if="pageCount > 1">
       <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(-1)"
               :disabled="this.$store.getters['prod/getPage'] === 0"> Previous
       </button>
@@ -19,8 +19,6 @@
 </template>
 
 <script>
-
-
 import {mapActions} from "vuex";
 
 export default {
