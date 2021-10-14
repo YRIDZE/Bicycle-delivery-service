@@ -59,9 +59,10 @@ CREATE TABLE orders
 
 CREATE TABLE order_products
 (
-    order_id   INT NOT NULL,
+    order_id   INT           NOT NULL,
     product_id INT,
-    quantity   INT NOT NULL,
+    quantity   INT           NOT NULL,
+    price      DECIMAL(9, 2) NOT NULL,
     deleted    TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

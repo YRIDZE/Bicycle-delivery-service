@@ -5,7 +5,7 @@ const state = {
   productTypes: [],
   pageNumber: 0,
   showProduct: false,
-}
+};
 
 const mutations = {
   setProduct(state, items) {
@@ -18,16 +18,14 @@ const mutations = {
     return new Promise((resolve, reject) => {
       axios
         .get("/getProductTypes")
-        .then(response => {
+        .then((response) => {
           state.productTypes = response.data;
           resolve(response);
         })
-        .catch(error => {
-          reject(error);
-        })
-    })
+        .catch((error) => reject(error));
+    });
   },
-}
+};
 
 const actions = {
   setProduct(context, items) {
@@ -38,20 +36,19 @@ const actions = {
   },
   changePageNumber(context, value) {
     context.commit("changePageNumber", value);
-
-  }
-}
+  },
+};
 
 const getters = {
-  getProducts: state => state.products,
-  getProductsTypes: state => state.productTypes,
-  getPage: state => state.pageNumber,
-}
+  getProducts: (state) => state.products,
+  getProductsTypes: (state) => state.productTypes,
+  getPage: (state) => state.pageNumber,
+};
 
 export default {
   namespaced: true,
   state,
   mutations,
   actions,
-  getters
-}
+  getters,
+};

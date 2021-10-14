@@ -16,10 +16,11 @@ type Order struct {
 }
 
 type OrderProducts struct {
-	OrderID   int32  `json:"order_id"`
-	ProductID int    `json:"product_id"`
-	Quantity  int    `json:"quantity"`
-	Deleted   string `json:"deleted"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	OrderID   int32   `json:"order_id"`
+	ProductID int     `json:"product_id"`
+	Quantity  int     `json:"quantity"`
+	Price     float64 `json:"price"`
+	Deleted   string  `json:"deleted"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
 }

@@ -7,12 +7,21 @@
     <ol class="list-group list-group-numbered">
       <order-list-products v-for="(i) in item.products" :key="i" :item="i"></order-list-products>
     </ol>
+    <p class="text-right font-black">{{ total(item.products) }}$</p>
+
   </div>
 </template>
 
 <script>
 export default {
   props: ['item', 'index'],
+  methods: {
+    total(products) {
+      let total = 0;
+      products.forEach(product => total += product.price * product.quantity);
+      return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
+    },
+  }
 }
 </script>
 

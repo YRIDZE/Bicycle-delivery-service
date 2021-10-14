@@ -19,6 +19,7 @@ const mutations = {
         cart_id: state.cart.id,
         product_id: payload.product_id,
         quantity: payload.quantity,
+        price: payload.price,
       };
       state.cart.products.push(entry);
     } else {
@@ -41,12 +42,8 @@ const mutations = {
     return new Promise((resolve, reject) => {
       axios
         .post("/createCartProduct", cart)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
@@ -58,12 +55,8 @@ const mutations = {
     return new Promise((resolve, reject) => {
       axios
         .put("/updateCart", cart)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
@@ -71,24 +64,16 @@ const mutations = {
     return new Promise((resolve, reject) => {
       axios
         .delete(`/deleteCartProduct?productId=${payload.product_id}`)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
   deleteAllCartProducts() {
     return new Promise((resolve, reject) => {
       axios
         .delete("/deleteAllCartProducts")
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
@@ -96,12 +81,8 @@ const mutations = {
     return new Promise((resolve, reject) => {
         axios
           .post("/createCart", {user_id: user.state.user_id})
-          .then(response => {
-            resolve(response);
-          })
-          .catch(error => {
-            reject(error);
-          })
+          .then((response) => resolve(response))
+          .catch((error) => reject(error))
       }
     )
   },
@@ -110,16 +91,15 @@ const mutations = {
     return new Promise((resolve, reject) => {
       axios
         .get("/getCartProducts")
-        .then(response => {
+        .then((response) => {
           state.cart.id = response.data[0].id;
 
           if (response.data[0].products != null)
             state.cart.products = response.data[0].products;
+
           resolve(response);
         })
-        .catch(error => {
-          reject(error);
-        })
+        .catch((error) => reject(error))
     })
   },
 }
@@ -150,9 +130,9 @@ const actions = {
 }
 
 const getters = {
-  getCartList: state => state.cart.products,
-  getCurrentItem: state => state.currentItem,
-  getCartId: state => state.cart.id,
+  getCartList: (state) => state.cart.products,
+  getCurrentItem: (state) => state.currentItem,
+  getCartId: (state) => state.cart.id,
 }
 
 export default {

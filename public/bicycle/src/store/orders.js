@@ -2,8 +2,8 @@ import axios from "axios";
 
 const state = {
   showOrders: false,
-  orders: []
-}
+  orders: [],
+};
 
 const mutations = {
   getOrders() {
@@ -14,29 +14,27 @@ const mutations = {
             state.orders = response.data;
             resolve(response);
           })
-          .catch(error => {
-            reject(error);
-          })
+          .catch(error => reject(error));
       }
     )
   },
-}
+};
 
 const actions = {
   getOrders(context) {
     context.commit("getOrders");
   },
-}
+};
 
 const getters = {
-  getOrders: state => state.orders,
-
-}
+  getOrders: (state) => state.orders,
+  getReverseOrders: (state) => state.orders.reverse(),
+};
 
 export default {
   namespaced: true,
   state,
   mutations,
   actions,
-  getters
-}
+  getters,
+};

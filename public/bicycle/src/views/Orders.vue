@@ -8,7 +8,7 @@
   >
     <ol class="list-group list-block">
       <order-list
-          v-for="(item, index) in $store.getters['orders/getOrders']"
+          v-for="(item, index) in $store.getters['orders/getReverseOrders']"
           :item="item" :key="index" :index="index">
       </order-list>
       <div class="text-center italic" v-if="this.$store.getters['orders/getOrders'].length === 0">not a single

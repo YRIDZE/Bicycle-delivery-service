@@ -112,7 +112,7 @@ export default {
           .post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm))
           .then(() => {
             this.$store.dispatch("cart/deleteAllFromCart");
-            this.$store.state.cart.cart.products = []
+            this.$store.state.cart.cart.products = [];
           })
       this.hide();
 
@@ -131,7 +131,7 @@ export default {
       return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
     },
   },
-}
+};
 </script>
 
 <style scoped>
