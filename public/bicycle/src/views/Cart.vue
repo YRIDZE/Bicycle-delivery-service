@@ -10,7 +10,7 @@
     >
       <div class="modal-body">
         <div class="table-responsive">
-          <table class="table table-striped custom-table">
+          <table class="table table-striped custom-table m-0">
             <thead>
             <tr>
               <th>#</th>
@@ -27,11 +27,12 @@
             </cart-tr>
             </tbody>
           </table>
-          <div class="text-center mb-3 italic" v-if="this.$store.getters['cart/getCartList'].length === 0">empty cart</div>
+          <div class="text-center mb-3 italic" v-if="this.$store.getters['cart/getCartList'].length === 0">empty cart
+          </div>
         </div>
       </div>
-      <div class="d-flex flex-row-reverse mb-3" v-if="this.$store.getters['cart/getCartList'].length !== 0">
-        <button class="cart-btn mr-3" @click="showCartInfo = true">Order</button>
+      <div class="d-flex flex-row-reverse my-2" v-if="this.$store.getters['cart/getCartList'].length !== 0">
+        <button class="cart-btn font-black mr-3" @click="showCartInfo = true">Order</button>
         <p class="mx-2">Total <strong>{{ total }}</strong>$</p>
       </div>
     </vue-final-modal>
@@ -44,36 +45,60 @@
         :esc-to-close="true"
     >
       <div class="modal-body">
-        <form v-on:submit.prevent="createOrder">
+        <form v-on:submit.prevent="showCartOrder = true">
           <div class="row g-3 m-px" style="width: 800px !important;">
-
             <div class="col-sm-12 fields">
-              <input type="text" class="login-input" style="width: 49%" v-model="orderForm.customer_name"
+              <input type="text" class="login-input m-0" style="width: 49%" v-model="orderForm.customer_name"
                      placeholder="Name" required>
-              <input type="text" class="login-input" style="width: 49%"
+              <input type="text" class="login-input m-0" style="width: 49%"
                      v-model="orderForm.customer_lastname" placeholder="Surname" required>
             </div>
 
             <div class="cart-col-12">
-              <input type="text" class="login-input" v-model="orderForm.address"
+              <input type="text" class="login-input m-0" v-model="orderForm.address"
                      placeholder="Kharkiv, st. Academica Pavlova 154, apt. 12" required>
               <div class="invalid-feedback"> Please enter your address.</div>
             </div>
 
             <div class="cart-col-12 fields">
-              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input"
+              <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input m-0"
                      style="width: 49%" placeholder="Phone number" required/>
-              <select class="login-input" v-model="orderForm.payment_method" style="width: 49%" required>
+              <select class="login-input m-0" v-model="orderForm.payment_method" style="width: 49%" required>
                 <option value="" disabled selected hidden>Payment method</option>
                 <option>Credit Card</option>
                 <option>Cash</option>
               </select>
             </div>
-            <button class="cart-btn mb-3 mt-1" type="submit" style="font-size: 16px">Confirm</button>
+            <button class="cart-btn font-black my-2" type="submit" style="font-size: 16px">Confirm</button>
           </div>
         </form>
       </div>
     </vue-final-modal>
+    <vue-final-modal
+        v-model="showCartOrder"
+        name="cartInfo"
+        classes="modal-container"
+        content-class="modal-content"
+        :esc-to-close="true"
+    >
+      <div class="modal-body">
+
+        <div class="row g-3 m-px" style="width: 800px !important;">
+          <p>{{ orderForm.customer_lastname }} {{ orderForm.customer_name }} : {{ orderForm.address }}</p>
+          <small class="m-0">{{ orderForm.phone_number }}</small>
+          <ol class="list-group list-group-numbered px-2">
+            <order-list-products v-for="(i) in this.$store.getters['cart/getCartList']" :key="i"
+                                 :item="i"></order-list-products>
+          </ol>
+          <p class="text-right font-black mt-2">by {{ orderForm.payment_method }} <strong>{{ total }}</strong>$</p>
+          <button class="cart-btn font-black my-2" @click="createOrder" type="submit" style="font-size: 16px">
+            ORDER
+          </button>
+        </div>
+
+      </div>
+    </vue-final-modal>
+
   </div>
 </template>
 
@@ -88,6 +113,7 @@ export default {
   data() {
     return {
       showCartInfo: false,
+      showCartOrder: false,
       orderForm: {
         address: '',
         phone_number: '',

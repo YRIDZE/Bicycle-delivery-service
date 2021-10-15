@@ -95,7 +95,7 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 		}
 
 		for _, x := range cartRequest.Products {
-			p := models.CartProducts{CartID: cart.ID, ProductID: x.ProductID, Quantity: x.Quantity}
+			p := models.CartProducts{CartID: cart.ID, ProductID: x.ProductID, Quantity: x.Quantity, Price: x.Price}
 			cart.Products = append(cart.Products, p)
 		}
 	case 0:

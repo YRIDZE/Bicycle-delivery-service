@@ -91,9 +91,10 @@ CREATE TABLE cart
 
 CREATE TABLE cart_products
 (
-    cart_id    INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity   INT NOT NULL,
+    cart_id    INT           NOT NULL,
+    product_id INT           NOT NULL,
+    quantity   INT           NOT NULL,
+    price      DECIMAL(9, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (cart_id) REFERENCES cart (id),
