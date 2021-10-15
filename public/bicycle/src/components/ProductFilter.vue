@@ -2,7 +2,7 @@
   <div class="card">
     <div class="accordion accordion-flush" id="accordionFlushExample">
       <router-link to="/">
-        <button class="all-items text-base" type="button"> ALL SUPPLIERS
+        <button class="all-items text-base" @click="clearSuppFilter" type="button"> ALL SUPPLIERS
         </button>
       </router-link>
       <div class="accordion-item">
@@ -30,7 +30,15 @@
 
 <script>
 export default {
-  name: "ProductFilter"
+  methods: {
+    clearSuppFilter() {
+      this.$store.dispatch("filter/setSuppTimeFilter", null);
+      this.$store.dispatch("filter/setSuppTypeFilter", []);
+    },
+  },
+  mounted() {
+    this.$store.dispatch('filter/setProdTypeFilter', []);
+  }
 }
 </script>
 

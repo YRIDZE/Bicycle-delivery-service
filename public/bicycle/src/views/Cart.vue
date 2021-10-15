@@ -49,20 +49,20 @@
           <div class="row g-3 m-px" style="width: 800px !important;">
             <div class="col-sm-12 fields">
               <input type="text" class="login-input m-0" style="width: 49%" v-model="orderForm.customer_name"
-                     placeholder="Name" required>
-              <input type="text" class="login-input m-0" style="width: 49%"
+                     placeholder="Name" autocomplete="off" required>
+              <input type="text" class="login-input m-0" style="width: 49%" autocomplete="off"
                      v-model="orderForm.customer_lastname" placeholder="Surname" required>
             </div>
 
             <div class="cart-col-12">
-              <input type="text" class="login-input m-0" v-model="orderForm.address"
+              <input type="text" class="login-input m-0" v-model="orderForm.address" autocomplete="off"
                      placeholder="Kharkiv, st. Academica Pavlova 154, apt. 12" required>
               <div class="invalid-feedback"> Please enter your address.</div>
             </div>
 
             <div class="cart-col-12 fields">
               <input type="text" id="phone" v-model="orderForm.phone_number" class="login-input m-0"
-                     style="width: 49%" placeholder="Phone number" required/>
+                     style="width: 49%" placeholder="Phone number" autocomplete="off" required/>
               <select class="login-input m-0" v-model="orderForm.payment_method" style="width: 49%" required>
                 <option value="" disabled selected hidden>Payment method</option>
                 <option>Credit Card</option>
@@ -153,7 +153,10 @@ export default {
   computed: {
     total: function () {
       let total = 0;
-      this.$store.getters["cart/getCartList"].forEach(cartItem => total += this.$store.getters["prod/getProducts"].find(x => x.id === cartItem.product_id).price * cartItem.quantity);
+      this.$store.getters["cart/getCartList"]
+          .forEach(cartItem => total += this.$store.getters["prod/getProducts"]
+              .find(x => x.id === cartItem.product_id).price * cartItem.quantity);
+
       return total.toFixed(2).toString().replace(/\B(?=(\d{3})+$)/g, ',');
     },
   },

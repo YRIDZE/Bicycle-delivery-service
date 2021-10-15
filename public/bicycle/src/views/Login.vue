@@ -106,7 +106,16 @@ export default {
                   text: error.response.data.validationError + '<br> Please try to register again'
                 });
                 break;
+              case 401:
+                this.$notify({
+                  group: 'log-reg',
+                  type: `error`,
+                  title: 'User With Such Email Already Exists',
+                  text: 'Please try to register again with another email'
+                });
+                break;
             }
+
           });
     },
 
@@ -134,7 +143,7 @@ export default {
                   group: 'log-reg',
                   type: `error`,
                   title: 'User Not Found',
-                  text: 'Please try login again'
+                  text: 'Please try to login again'
                 });
                 break;
             }

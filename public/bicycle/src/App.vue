@@ -6,7 +6,8 @@
          style="font-family: 'Montserrat', sans-serif;">
       <div class="col-md-12">
         <h2>Food
-          <go-back></go-back>
+          <go-back
+              v-if="this.$router.currentRoute.fullPath !== '/' && this.$router.currentRoute.fullPath !== '/all'"></go-back>
         </h2>
         <p class="-mb-0">...is any substance consumed to provide nutritional support for an
           organism. Food is usually of plant, animal

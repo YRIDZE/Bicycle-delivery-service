@@ -3,7 +3,7 @@ CREATE TABLE users
     id         INT          NOT NULL AUTO_INCREMENT,
     firstname  VARCHAR(64)  NOT NULL,
     lastname   VARCHAR(64)  NOT NULL,
-    email      VARCHAR(64)  NOT NULL,
+    email      VARCHAR(64)  NOT NULL Unique,
     password   VARCHAR(128) NOT NULL,
     deleted    TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

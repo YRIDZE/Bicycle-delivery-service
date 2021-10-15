@@ -56,10 +56,17 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	exist, err := h.userService.EmailExist(user.Email)
+	if err != nil || exist == 1 {
+		h.logger.Error(err.Error())
+		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
 	u, err := h.userService.Create(user)
 	if err != nil {
 		h.logger.Error(err.Error())
-		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		http.Error(w, "invalid credentials", http.StatusBadRequest)
 		return
 	}
 

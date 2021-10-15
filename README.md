@@ -10,7 +10,7 @@ delivery will be managed by the seller.
 
 ## Requirements for development
 
-Application works with Go 1.16.6 and MySQL 8.0.26
+Application works with Go 1.16.6, MySQL 8.0.26 and npm 6.14.15
 
 ## Installation
 
@@ -30,7 +30,7 @@ $ mkdir logs
 3. Add project configs:
 
 - Create the `.evn` file; add and fill fields as suggested in the `.env.dist` file.
-- Open `conf/config.yml` and replace **_port_** and **_db_** with you own data.
+- Open `conf/config.yml` and replace `port` and `db` with you own data.
 
 
 4. Migrate db
@@ -41,13 +41,22 @@ $ ./cli migrate create
 $ ./cli migrate up
 ```
 
-5. Build
+5. Build and run an app 
 
 ```
 $ cd public/bicycle
 $ npm install
 $ npm run build
+
+$ cd ../../ && go run main.go
 ```
+
+6. Open this app in your browser using following address
+
+```
+http://localhost:port 
+```
+The `port` value can be specified in `config.yml` file. By default, the value is `8081`.  
 
 ## License
 

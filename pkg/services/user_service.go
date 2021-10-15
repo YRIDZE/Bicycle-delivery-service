@@ -42,6 +42,10 @@ func (u UserService) GetByID(id int32) (*models.User, error) {
 	return u.userRepo.GetByID(id)
 }
 
+func (u UserService) EmailExist(email string) (int, error) {
+	return u.userRepo.EmailExist(email)
+}
+
 func generatePasswordHash(password string) string {
 	p, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(p)
