@@ -17,7 +17,7 @@ const mutations = {
   getProductTypes(state) {
     return new Promise((resolve, reject) => {
       axios
-        .get("/getProductTypes")
+        .get("getProductTypes")
         .then((response) => {
           state.productTypes = response.data;
           resolve(response);

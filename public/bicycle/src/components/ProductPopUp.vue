@@ -50,9 +50,13 @@ import HideModals from "@/mixins/hideModals";
 import {mapActions} from "vuex";
 
 export default {
-  props: ["item"],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+  },
   mixins: [HideModals],
-
   data() {
     return {
       quantity: 1,

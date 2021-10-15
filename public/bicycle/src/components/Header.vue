@@ -18,7 +18,6 @@
         </button>
         <div class="collapse navbar-collapse" id="toggleMenu">
           <ul class="navbar-nav ms-auto text-center px-7 py-0">
-            <li class="nav-item"><a class="nav-link" href="#">About</a></li>
             <li class="nav-item" v-if="isLoggedIn"><a class="nav-link" id="logout" @click="logout" type="button">
               <font-awesome-icon :icon="['fas', 'sign-out-alt']"/>
               Logout</a></li>
@@ -41,14 +40,10 @@
     <cart></cart>
     <orders></orders>
 
-    <div class="cont-custom text-center bg-light h-96 pt-24 px-12 pb-0 mb-4 bg-cover"
+    <div class="text-center bg-light h-96 pt-28 px-12 pb-0 mb-4 bg-cover"
          :style="{ backgroundImage: 'url(' + require(`@/assets/header-pizza.jpg`) + ')'}">
-      <h1 class="mb-3"><b>Bicycle</b></h1>
-      <h4 class="mb-3">This is the way</h4>
-      <div class="search-container">
-        <input type="text" class="input" placeholder="what are you looking for...">
-        <input type="button" class="close-btn" value="Search">
-      </div>
+      <p class="font-bold italic text-8xl	mb-3 mt-8">Bicycle</p>
+      <p class="italic text-3xl	">This is the way</p>
     </div>
   </header>
 </template>
@@ -82,5 +77,13 @@ export default {
 </script>
 
 <style scoped>
-
+span {
+  position: absolute;
+  right: 0.1rem;
+  top: 0.7rem;
+  color: white;
+  border-radius: 50%;
+  font-size: 90%;
+  padding: 0.4rem;
+}
 </style>

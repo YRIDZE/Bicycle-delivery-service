@@ -84,7 +84,7 @@
       <div class="modal-body">
 
         <div class="row g-3 m-px" style="width: 800px !important;">
-          <p>{{ orderForm.customer_lastname }} {{ orderForm.customer_name }} : {{ orderForm.address }}</p>
+          <p>{{ orderForm.customer_lastname }} {{ orderForm.customer_name }}: {{ orderForm.address }}</p>
           <small class="m-0">{{ orderForm.phone_number }}</small>
           <ol class="list-group list-group-numbered px-2">
             <order-list-products v-for="(i) in this.$store.getters['cart/getCartList']" :key="i"

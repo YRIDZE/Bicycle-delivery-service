@@ -13,7 +13,12 @@
 <script>
 
 export default {
-  props: ['item'],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+  },
 
   methods: {
     showProduct() {

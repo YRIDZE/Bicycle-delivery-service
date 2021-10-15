@@ -1,5 +1,5 @@
 <template>
-  <div class="list-group-item list-group-item">
+  <div class="list-group-item list-group-item p-3">
     <div class="d-flex w-100 justify-content-between">
       <b class="mb-1 w-3/4">{{ item.address }}</b>
       <small>{{ item.created_at }}</small>
@@ -14,7 +14,16 @@
 
 <script>
 export default {
-  props: ['item', 'index'],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    }
+  },
   methods: {
     total(products) {
       let total = 0;

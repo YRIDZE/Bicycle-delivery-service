@@ -22,7 +22,12 @@
 import {mapActions} from "vuex";
 
 export default {
-  props: ["id"],
+  props: {
+    id: {
+      type: Number,
+      required: true,
+    },
+  },
   methods: {
     ...mapActions('prod', ['changePageNumber']),
   },

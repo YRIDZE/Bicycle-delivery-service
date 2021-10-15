@@ -41,7 +41,7 @@ const mutations = {
 
     return new Promise((resolve, reject) => {
       axios
-        .post("/createCartProduct", cart)
+        .post("createCartProduct", cart)
         .then((response) => resolve(response))
         .catch((error) => reject(error))
     })
@@ -54,7 +54,7 @@ const mutations = {
     };
     return new Promise((resolve, reject) => {
       axios
-        .put("/updateCart", cart)
+        .put("updateCart", cart)
         .then((response) => resolve(response))
         .catch((error) => reject(error))
     })
@@ -63,7 +63,7 @@ const mutations = {
   deleteCartProduct(state, payload) {
     return new Promise((resolve, reject) => {
       axios
-        .delete(`/deleteCartProduct?productId=${payload.product_id}`)
+        .delete(`deleteCartProduct?productId=${payload.product_id}`)
         .then((response) => resolve(response))
         .catch((error) => reject(error))
     })
@@ -71,7 +71,7 @@ const mutations = {
   deleteAllCartProducts() {
     return new Promise((resolve, reject) => {
       axios
-        .delete("/deleteAllCartProducts")
+        .delete("deleteAllCartProducts")
         .then((response) => resolve(response))
         .catch((error) => reject(error))
     })
@@ -80,7 +80,7 @@ const mutations = {
   createCart() {
     return new Promise((resolve, reject) => {
         axios
-          .post("/createCart", {user_id: user.state.user_id})
+          .post("createCart", {user_id: user.state.user_id})
           .then((response) => resolve(response))
           .catch((error) => reject(error))
       }
@@ -90,7 +90,7 @@ const mutations = {
   getCart() {
     return new Promise((resolve, reject) => {
       axios
-        .get("/getCartProducts")
+        .get("getCartProducts")
         .then((response) => {
           state.cart.id = response.data[0].id;
 

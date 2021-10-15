@@ -13,7 +13,7 @@ const mutations = {
   getSupplierTypes(state) {
     return new Promise((resolve, reject) => {
         axios
-          .get("/getSupplierTypes")
+          .get("getSupplierTypes")
           .then(response => {
             state.supplierTypes = response.data;
             resolve(response);

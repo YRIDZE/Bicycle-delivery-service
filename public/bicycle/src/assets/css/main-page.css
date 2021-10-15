@@ -26,45 +26,6 @@ h1 {
     position: relative;
 }
 
-.search-container {
-    padding: 20px 50px;
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.input {
-    width: 450px;
-    height: 65px;
-    border: 3px solid #e96b56;
-    background-color: transparent;
-    padding: 15px 30px;
-    border-radius: 30px;
-    color: #000000;
-    font-size: 18px;
-    outline: none;
-}
-
-.close-btn:active {
-    transform: scale(0.95);
-}
-
-.close-btn {
-    position: absolute;
-    top: 20px;
-    right: 46px;
-    width: 120px;
-    height: 65px;
-    background-color: rgb(84, 84, 84);
-    color: #FFFFFF;
-    border: 0;
-    border-radius: 30px;
-    cursor: pointer;
-    outline: none;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
 
 .navbar-dark .navbar-nav .nav-link,
 .navbar-dark .navbar-brand {

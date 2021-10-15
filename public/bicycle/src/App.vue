@@ -54,13 +54,13 @@ export default {
   methods: {
     async fetchedSupplierProducts() {
       this.$store.state.supp.loading = true
-      await fetch("/getSuppliers",)
+      await fetch("getSuppliers",)
           .then(response => response.json())
           .then(async data => {
             await this.$store.dispatch('supp/setSuppliers', data)
             await this.$store.dispatch('supp/getSupplierTypes');
 
-            await fetch("/getProducts",)
+            await fetch("getProducts",)
                 .then(response => response.json())
                 .then(data => {
                   this.$store.dispatch('prod/setProduct', data)

@@ -7,7 +7,16 @@
 
 <script>
 export default {
-  props: ['name', 'title'],
+  props: {
+    name: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true
+    }
+  },
   computed: {
     checked: {
       get() {

@@ -28,7 +28,16 @@
 import {mapActions} from "vuex"
 
 export default {
-  props: ['item', 'index'],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    }
+  },
   methods: {
     ...mapActions('cart', ['removeItem', 'addItem']),
   },

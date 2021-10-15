@@ -11,7 +11,7 @@
           v-for="(item, index) in $store.getters['orders/getReverseOrders']"
           :item="item" :key="index" :index="index">
       </order-list>
-      <div class="text-center italic" v-if="this.$store.getters['orders/getOrders'].length === 0">not a single
+      <div class="text-center italic" v-if="$store.getters['orders/getOrders'] === null">not a single
         order has been made
       </div>
     </ol>

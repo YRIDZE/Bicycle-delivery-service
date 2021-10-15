@@ -60,7 +60,7 @@ export function getTokenTimeUntilRefresh(t) {
 const actions = {
   async refreshTokens(context) {
     try {
-      const response = await axios.get("/refresh");
+      const response = await axios.get("refresh");
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
 
@@ -100,7 +100,7 @@ const actions = {
   login(context, user) {
     return new Promise((resolve, reject) => {
       axios
-        .post("/login", user)
+        .post("login", user)
         .then(response => {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
@@ -126,7 +126,7 @@ const actions = {
   registration(context, user) {
     return new Promise((resolve, reject) => {
       axios
-        .post("/createUser", user)
+        .post("createUser", user)
         .then(response => {
           state.user_id = response.data.id;
           context.commit("reg_success");
@@ -139,7 +139,7 @@ const actions = {
   logout(context) {
     if (state.refresh_token) {
       return new Promise((resolve) => {
-        axios.post("/logout");
+        axios.post("logout");
         context.commit("logout");
         context.commit("cancelTask");
         resolve();

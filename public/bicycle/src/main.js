@@ -4,7 +4,7 @@ import store from "./store";
 import router from "./router";
 import axios from "axios";
 import "./assets/css/tailwind.css";
-// import Config from "../../../conf/config.yml";
+import Config from "../../../conf/config.yml";
 
 import VueFinalModal from "vue-final-modal";
 import PortalVue from 'portal-vue';
@@ -89,8 +89,8 @@ Vue.use(VueFinalModal);
 Vue.use(Notifications);
 Vue.use(PortalVue);
 
-// let port = Config.port;
-axios.defaults.baseURL = `http://localhost:8081`;
+let port = Config.port;
+axios.defaults.baseURL = 'http://localhost:'+ port + '/';
 
 new Vue({
   router,
