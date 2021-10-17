@@ -14,30 +14,27 @@
           <div class="data">
             <h1>{{ item.name }}</h1>
             <b>Ingredients: </b>
-            <div class="inline-block" v-for="ingredient in item.ingredients" :key="ingredient">
-              <a>{{ ingredient }}{{ "&nbsp;" }}</a>
-            </div>
+            <a>{{ item.ingredients.join(', ') }}</a>
           </div>
         </div>
-        <div class="d-flex bd-highlight item-overlay-panel">
-          <div class="me-auto p-2 bd-highlight">
-            <div class="py-0 px-2.5">
-              <div class="number" data-step="1" data-min="1" data-max="100">
+        <div class="d-flex bd-highlight justify-content-between item-overlay-panel p-2">
+          <div class="p-2 px-5">
+            <p>Price: <strong>{{ item.price }}$</strong></p>
+          </div>
+          <div>
+            <div class="px-2.5">
+              <div class="number ml-36" data-step="1" data-min="1" data-max="100">
                 <input v-model="quantity" class="number-text" type="text" name="quantity" readonly>
                 <a @click="reduce()" class="number-minus">−</a>
                 <a @click="add()" class="number-plus">+</a>
               </div>
             </div>
           </div>
-          <div class="p-2 bd-highlight">
-            <p>Total: <strong>{{ total }}$</strong></p>
-          </div>
-          <div class="p-2 bd-highlight">
-            <div class="py-0 px-2.5">
+          <div class="px-5 d-flex justify-content-end">
+            <p class="px-2 pt-1">Total: <strong>{{ total }}$</strong></p>
               <button class="add-to-cart-btn"
                       @click="addToCart(item.id, quantity, item.price)">ADD TO CART
               </button>
-            </div>
           </div>
         </div>
       </div>

@@ -180,7 +180,6 @@ func (h *UserHandler) IsValid(w http.ResponseWriter, req *http.Request) {
 
 	if cachedTokens, ok := h.tokenService.GetUidByID(claims); ok != nil || cachedTokens.AccessUID != claims.UID {
 		http.Error(w, "invalid token", http.StatusUnauthorized)
-		fmt.Println("tyt2")
 		return
 	}
 	w.WriteHeader(http.StatusOK)

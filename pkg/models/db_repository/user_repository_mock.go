@@ -57,6 +57,10 @@ func (u *UserRepositoryMock) Update(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
+func (u *UserRepositoryMock) EmailExist(email string) (int, error) {
+	return 1, nil
+}
+
 func (u *UserRepositoryMock) Delete(id int32) error {
 	return nil
 }

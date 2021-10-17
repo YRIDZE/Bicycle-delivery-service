@@ -69,6 +69,5 @@ func (u *UserRepository) EmailExist(email string) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(exist)
 	return exist, nil
 }

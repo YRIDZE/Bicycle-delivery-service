@@ -1,10 +1,11 @@
 <template>
-  <div class="mt-4 mx-1 product">
-    <div class="icon-box gallery">
-      <img :src="item.image" class="img-fluid" @click="showProduct" alt="Product picture"/>
-      <div>
-        <p class="short w-4/5 float-left">{{ item.name }}</p>
-        <p class="float-right text-right"> {{ item.price }}$</p>
+  <div class="card mt-4 mx-1 product icon-box">
+    <div class="gallery">
+      <img :src="item.image" class="img-fluid" style="background-color: #FFFFFF" @click="showProduct"
+           alt="Product picture"/>
+      <div class="card-body  d-flex flex-row align-items-center">
+        <div class="short text-xl">{{ item.name }}</div>
+        <div class="ml-auto text-2xl">{{ item.price }}$</div>
       </div>
     </div>
   </div>
@@ -26,7 +27,7 @@ export default {
       this.$store.state.prod.showProduct = true;
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -41,6 +42,6 @@ export default {
   border-radius: 10px;
   min-height: 235px;
   min-width: 365px;
-  max-width: 365px
+  max-width: 365px;
 }
 </style>
