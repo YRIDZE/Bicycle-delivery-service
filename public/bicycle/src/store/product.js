@@ -3,6 +3,7 @@ import axios from "axios";
 const state = {
   products: [],
   productTypes: [],
+  productTypesBySupp: [],
   pageNumber: 0,
   showProduct: false,
 };
@@ -25,6 +26,17 @@ const mutations = {
         .catch((error) => reject(error));
     });
   },
+  getProductTypesBySupp(state, payload) {
+    return new Promise((resolve, reject) => {
+      axios
+        .get(`getProductTypesBySupp?id=${payload}`)
+        .then((response) => {
+          state.productTypesBySupp = response.data;
+          resolve(response);
+        })
+        .catch((error) => reject(error));
+    });
+  },
 };
 
 const actions = {
@@ -34,6 +46,9 @@ const actions = {
   getProductTypes(context) {
     context.commit("getProductTypes");
   },
+  getProductTypesBySupp(context, payload) {
+    context.commit("getProductTypesBySupp", payload);
+  },
   changePageNumber(context, value) {
     context.commit("changePageNumber", value);
   },
@@ -42,6 +57,7 @@ const actions = {
 const getters = {
   getProducts: (state) => state.products,
   getProductsTypes: (state) => state.productTypes,
+  getProductsTypesBySupp: (state) => state.productTypesBySupp,
   getPage: (state) => state.pageNumber,
 };
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models/db_repository"
@@ -29,6 +30,7 @@ func (h *ProductHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 	r.Handle("/createProduct", meth(Methods{post: http.HandlerFunc(h.Create)}))
 	r.Handle("/getProducts", meth(Methods{get: http.HandlerFunc(h.GetAll)}))
 	r.Handle("/getProductTypes", meth(Methods{get: http.HandlerFunc(h.GetTypes)}))
+	r.Handle("/getProductTypesBySupp", meth(Methods{get: http.HandlerFunc(h.GetTypesBySupplier)}))
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -83,4 +85,18 @@ func (h *ProductHandler) GetTypes(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(productTypes)
 	h.logger.Infof("fetched product types")
+}
+
+func (h *ProductHandler) GetTypesBySupplier(w http.ResponseWriter, req *http.Request) {
+	supplierID, _ := strconv.Atoi(req.URL.Query().Get("id"))
+	productTypes, err := h.services.GetTypesBySupplier(int32(supplierID))
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(productTypes)
+	h.logger.Infof("user successfully fetched supplier %d products ", supplierID)
 }

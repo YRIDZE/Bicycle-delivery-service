@@ -5,10 +5,10 @@
     <div class="container-fluid px-16" id="content"
          style="font-family: 'Montserrat', sans-serif;">
       <div class="col-md-12">
-        <h2>Food
+        <b class="text-3xl">Food
           <go-back
               v-if="this.$router.currentRoute.fullPath !== '/' && this.$router.currentRoute.fullPath !== '/all'"></go-back>
-        </h2>
+        </b>
         <p class="-mb-0">...is any substance consumed to provide nutritional support for an
           organism. Food is usually of plant, animal
           or fungal origin, and contains essential nutrients, such as carbohydrates, fats, proteins, vitamins, or

@@ -60,6 +60,10 @@ export default {
       }
     },
   },
+  mounted() {
+    let path = this.$router.currentRoute.fullPath;
+    this.$store.dispatch('prod/getProductTypesBySupp', path[path.length-1]);
+  }
 };
 </script>
 

@@ -32,15 +32,15 @@ export default {
 <style scoped>
 
 .gallery img {
-  width: 330px !important;
-  height: 215px;
+  width: 365px !important;
+  height: 235px;
   object-fit: cover;
 }
 
 .product {
   border-radius: 10px;
-  min-height: 215px;
-  min-width: 330px;
-  max-width: 330px
+  min-height: 235px;
+  min-width: 365px;
+  max-width: 365px
 }
 </style>

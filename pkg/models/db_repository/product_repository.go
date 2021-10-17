@@ -12,6 +12,7 @@ type ProductRepositoryI interface {
 	Create(product *models.Product) (*models.Product, error)
 	GetAll() (*[]models.Product, error)
 	GetTypes() (*[]models.ProductTypes, error)
+	GetTypesBySupplier(supplierID int32) (*[]models.ProductTypes, error)
 	GetByName(name string) (int32, error)
 	Update(product *models.Product) (*models.Product, error)
 }
@@ -135,6 +136,34 @@ func (p ProductRepository) GetTypes() (*[]models.ProductTypes, error) {
 	}
 
 	rows, err := pr.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&productType)
+		if err != nil {
+			return nil, err
+		}
+		productTypes = append(productTypes, productType)
+	}
+
+	return &productTypes, nil
+}
+
+func (p ProductRepository) GetTypesBySupplier(supplierID int32) (*[]models.ProductTypes, error) {
+	var productTypes []models.ProductTypes
+	var productType models.ProductTypes
+
+	query := fmt.Sprintf("select distinct type from %s where supplier_id = ? and deleted is null", ProductsTable)
+
+	pr, err := p.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := pr.Query(supplierID)
 	if err != nil {
 		return nil, err
 	}

@@ -78,7 +78,6 @@ export default {
 
 <style scoped>
 span {
-  position: absolute;
   right: 0.1rem;
   top: 0.7rem;
   color: white;

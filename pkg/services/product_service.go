@@ -40,6 +40,10 @@ func (p ProductService) GetTypes() (*[]models.ProductTypes, error) {
 	return p.repo.GetTypes()
 }
 
+func (p ProductService) GetTypesBySupplier(supplierID int32) (*[]models.ProductTypes, error) {
+	return p.repo.GetTypesBySupplier(supplierID)
+}
+
 func (p ProductService) Update(product *requests.ProductRequest) (*models.Product, error) {
 	return p.repo.Update(
 		&models.Product{

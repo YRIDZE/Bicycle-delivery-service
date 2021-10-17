@@ -17,7 +17,7 @@
              aria-labelledby="panel2">
           <div class="accordion-body">
             <div class="filter-content">
-              <div class="card-body p-1.5" v-for="(value) in this.$store.getters['prod/getProductsTypes']" :key="value">
+              <div class="card-body p-1.5" v-for="(value) in productTypes" :key="value">
                 <check :title="'productType'" :name="value"></check>
               </div>
             </div>
@@ -39,6 +39,16 @@ export default {
   mounted() {
     this.$store.dispatch('filter/setProdTypeFilter', []);
   },
+  computed: {
+    productTypes() {
+      let path = this.$router.currentRoute.fullPath
+      if (path !== "/all") {
+        return this.$store.getters['prod/getProductsTypesBySupp']
+      } else {
+        return this.$store.getters['prod/getProductsTypes']
+      }
+    }
+  }
 }
 </script>
 
