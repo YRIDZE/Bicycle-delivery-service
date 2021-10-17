@@ -14,20 +14,23 @@
 export default {
   computed: {
     filteredSuppList: function () {
-      let suppliers = this.$store.getters["supp/getSuppliers"]
+      let suppliers = this.$store.getters["supp/getSuppliers"];
 
       if (this.$store.getters["filter/getSuppTypeFilter"].length !== 0) {
         suppliers = suppliers
             .filter(value => this.$store.getters["filter/getSuppTypeFilter"]
-                .includes(value.type))
+                .includes(value.type));
       }
 
-      if (this.$store.getters["filter/getSuppTimeFilter"] != null) {
-        let timestamp = this.$store.getters["filter/getSuppTimeFilter"]
-        suppliers = suppliers.filter(value => (value.workingHours.opening >= timestamp.opening && value.workingHours.closing <= timestamp.closing))
+      if (this.getSuppTypeFilter != null) {
+        let timestamp = this.getSuppTypeFilter;
+        suppliers = suppliers.filter(value => (value.workingHours.opening <= timestamp.opening && value.workingHours.closing <= timestamp.closing));
       }
 
-      return suppliers
+      return suppliers;
+    },
+    getSuppTypeFilter: function () {
+      return this.$store.getters["filter/getSuppTimeFilter"];
     },
   },
 }

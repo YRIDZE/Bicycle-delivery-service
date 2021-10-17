@@ -14,9 +14,7 @@ func (h *AppHandlers) MethodDispatcher(methods Methods) http.Handler {
 		func(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			w.Header().Set(
-				"Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token,  Special-Request-Header, Authorization",
-			)
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token,  Special-Request-Header, Authorization")
 
 			switch req.Method {
 			case "GET":

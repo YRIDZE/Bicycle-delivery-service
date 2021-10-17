@@ -35,7 +35,7 @@
           <div class="p-2 bd-highlight">
             <div class="py-0 px-2.5">
               <button class="add-to-cart-btn"
-                      @click="addToCart(item.id, quantity)">ADD TO CART
+                      @click="addToCart(item.id, quantity, item.price)">ADD TO CART
               </button>
             </div>
           </div>
@@ -50,9 +50,13 @@ import HideModals from "@/mixins/hideModals";
 import {mapActions} from "vuex";
 
 export default {
-  props: ["item"],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+  },
   mixins: [HideModals],
-
   data() {
     return {
       quantity: 1,
@@ -68,7 +72,7 @@ export default {
   methods: {
     ...mapActions('cart', ['addProduct']),
 
-    addToCart: function (id, quantity) {
+    addToCart: function (id, quantity, price) {
       if (!this.$store.getters["user/isLoggedIn"]) {
         this.$store.state.user.showLogin = true;
         return
@@ -77,6 +81,7 @@ export default {
             cart_id: this.$store.getters["cart/getCartId"],
             product_id: id,
             quantity: quantity,
+            price: price,
           }
       );
       this.$vfm.hide("item");

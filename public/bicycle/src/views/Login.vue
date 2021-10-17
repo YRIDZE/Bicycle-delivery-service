@@ -12,21 +12,24 @@
         <div class="form-container sign-up-container">
           <form class="l-r-form" v-on:submit.prevent="registrationUser">
             <h1><b>Create Account</b></h1>
-            <input class="login-input" v-model="registrationForm.first_name" type="text" placeholder="Firstname"/>
-            <input class="login-input" v-model="registrationForm.last_name" type="text" placeholder="Lastname"/>
-            <input class="login-input" v-model="registrationForm.email" type="email" placeholder="Email"/>
-            <input class="login-input" v-model="registrationForm.password" type="password" placeholder="Password"/>
-            <button class="sign-up bt my-3">SIGN UP</button>
+            <input class="login-input" v-model="registrationForm.first_name" type="text" placeholder="Firstname"
+                   required/>
+            <input class="login-input" v-model="registrationForm.last_name" type="text" placeholder="Lastname"
+                   required/>
+            <input class="login-input" v-model="registrationForm.email" type="email" placeholder="Email" required/>
+            <input class="login-input" v-model="registrationForm.password" type="password" placeholder="Password"
+                   required/>
+            <button class="sign-up bt my-3" type="submit">SIGN UP</button>
           </form>
         </div>
         <div class="form-container  sign-in-container">
           <form class="l-r-form" v-on:submit.prevent="loginUser">
             <h1><b>Sign in</b></h1>
-            <input class="login-input" v-model="loginForm.email" type="email" placeholder="Email"/>
-            <input class="login-input" v-model="loginForm.password" type="password" placeholder="Password"/>
+            <input class="login-input" v-model="loginForm.email" type="email" placeholder="Email" required/>
+            <input class="login-input" v-model="loginForm.password" type="password" placeholder="Password" required/>
             <a class="my-4 mt-0 no-underline text-sm" href="#" style="color:#000000">Forgot your
               password?</a>
-            <button class="sign-in bt mb-3">SIGN IN</button>
+            <button class="sign-in bt mb-3" type="submit">SIGN IN</button>
           </form>
         </div>
         <div class="overlay-container">
@@ -74,30 +77,77 @@ export default {
   methods: {
     ...mapActions("user", ["login", "registration"]),
 
-    registrationUser() {
-      this.registration(this.registrationForm)
-          .then(() => {
-            this.$store.dispatch('cart/createCart').catch(err => console.log(err));
-          })
-          .catch(err => console.log(err));
-      this.signUpMode = false;
-
+    cleanFields() {
       this.registrationForm.email = '';
       this.registrationForm.password = '';
       this.registrationForm.last_name = '';
       this.registrationForm.first_name = '';
-    },
-
-    loginUser() {
-      this.login(this.loginForm)
-          .then(() => {
-            this.$store.dispatch('cart/getCart').catch(err => console.log(err));
-          })
-          .catch(err => console.log(err));
-      this.hide()
-
       this.loginForm.email = '';
       this.loginForm.password = '';
+    },
+
+    registrationUser() {
+      this.registration(this.registrationForm)
+          .then(response => {
+            if (response.status === 201) {
+              this.cleanFields()
+              this.signUpMode = false;
+            }
+            this.$store.dispatch('cart/createCart');
+          })
+          .catch(error => {
+            switch (error.response.status) {
+              case 400:
+                this.$notify({
+                  group: 'log-reg',
+                  type: 'error',
+                  duration: 10000,
+                  title: 'Validation Error: ',
+                  text: error.response.data.validationError + '<br> Please try to register again'
+                });
+                break;
+              case 401:
+                this.$notify({
+                  group: 'log-reg',
+                  type: `error`,
+                  title: 'User With Such Email Already Exists',
+                  text: 'Please try to register again with another email'
+                });
+                break;
+            }
+
+          });
+    },
+
+    loginUser: function () {
+      this.login(this.loginForm)
+          .then(response => {
+            if (response.status === 200) {
+              this.hide()
+              this.cleanFields()
+            }
+            this.$store.dispatch('cart/getCart');
+          })
+          .catch(error => {
+            switch (error.response.status) {
+              case 400:
+                this.$notify({
+                  group: 'log-reg',
+                  type: 'error',
+                  title: 'Validation Error',
+                  text: error.response.data.validationError + '<br> Please try to login again'
+                });
+                break;
+              case 401:
+                this.$notify({
+                  group: 'log-reg',
+                  type: `error`,
+                  title: 'User Not Found',
+                  text: 'Please try to login again'
+                });
+                break;
+            }
+          });
     },
   },
 };

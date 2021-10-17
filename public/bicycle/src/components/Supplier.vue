@@ -11,7 +11,12 @@
 
 <script>
 export default {
-  props: ['supp'],
+  props: {
+    supp: {
+      type: Object,
+      required: true,
+    },
+  },
 }
 
 </script>

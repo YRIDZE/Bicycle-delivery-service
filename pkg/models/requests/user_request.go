@@ -31,7 +31,7 @@ func (c UserRequest) Validate() error {
 func (c LoginRequest) Validate() error {
 	return validation.ValidateStruct(
 		&c,
-		validation.Field(&c.Email, validation.Required, is.Email),
-		validation.Field(&c.Password, validation.Required),
+		validation.Field(&c.Email, validation.Required, is.Email, validation.Length(7, 30)),
+		validation.Field(&c.Password, validation.Required, validation.Length(7, 20)),
 	)
 }

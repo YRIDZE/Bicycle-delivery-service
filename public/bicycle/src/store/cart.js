@@ -19,6 +19,7 @@ const mutations = {
         cart_id: state.cart.id,
         product_id: payload.product_id,
         quantity: payload.quantity,
+        price: payload.price,
       };
       state.cart.products.push(entry);
     } else {
@@ -40,13 +41,9 @@ const mutations = {
 
     return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/createCartProduct", cart)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .post("createCartProduct", cart)
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
@@ -57,51 +54,35 @@ const mutations = {
     };
     return new Promise((resolve, reject) => {
       axios
-        .put("http://localhost:8081/updateCart", cart)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .put("updateCart", cart)
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
   deleteCartProduct(state, payload) {
     return new Promise((resolve, reject) => {
       axios
-        .put(`http://localhost:8081/deleteCartProduct?productId=${payload.product_id}`)
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .delete(`deleteCartProduct?productId=${payload.product_id}`)
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
   deleteAllCartProducts() {
     return new Promise((resolve, reject) => {
       axios
-        .put("http://localhost:8081/deleteAllCartProducts")
-        .then(response => {
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        })
+        .delete("deleteAllCartProducts")
+        .then((response) => resolve(response))
+        .catch((error) => reject(error))
     })
   },
 
   createCart() {
     return new Promise((resolve, reject) => {
         axios
-          .post("http://localhost:8081/createCart", {user_id: user.state.user_id})
-          .then(response => {
-            resolve(response);
-          })
-          .catch(error => {
-            reject(error);
-          })
+          .post("createCart", {user_id: user.state.user_id})
+          .then((response) => resolve(response))
+          .catch((error) => reject(error))
       }
     )
   },
@@ -109,17 +90,16 @@ const mutations = {
   getCart() {
     return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/getCartProducts")
-        .then(response => {
+        .get("getCartProducts")
+        .then((response) => {
           state.cart.id = response.data[0].id;
 
           if (response.data[0].products != null)
             state.cart.products = response.data[0].products;
+
           resolve(response);
         })
-        .catch(error => {
-          reject(error);
-        })
+        .catch((error) => reject(error))
     })
   },
 }
@@ -150,9 +130,9 @@ const actions = {
 }
 
 const getters = {
-  getCartList: state => state.cart.products,
-  getCurrentItem: state => state.currentItem,
-  getCartId: state => state.cart.id,
+  getCartList: (state) => state.cart.products,
+  getCurrentItem: (state) => state.currentItem,
+  getCartId: (state) => state.cart.id,
 }
 
 export default {

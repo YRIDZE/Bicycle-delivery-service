@@ -57,7 +57,7 @@ func (h *CartHandler) Create(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.CartResponse{ID: c.ID, UserID: c.UserID})
-	h.logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
+	h.logger.Infof("cart %d successfully created by user %d", c.ID, c.UserID)
 }
 
 func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
@@ -95,7 +95,7 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 		}
 
 		for _, x := range cartRequest.Products {
-			p := models.CartProducts{CartID: cart.ID, ProductID: x.ProductID, Quantity: x.Quantity}
+			p := models.CartProducts{CartID: cart.ID, ProductID: x.ProductID, Quantity: x.Quantity, Price: x.Price}
 			cart.Products = append(cart.Products, p)
 		}
 	case 0:
@@ -118,7 +118,7 @@ func (h *CartHandler) CreateProduct(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&models.CartProductResponse{ID: c.ID, UserID: c.UserID, Products: c.Products})
-	h.logger.Infof("cart %d successfully created by User %d", c.ID, c.UserID)
+	h.logger.Infof("product %d successfully created by user %d", cartRequest.Products[0].ProductID, c.UserID)
 }
 
 func (h *CartHandler) GetAll(w http.ResponseWriter, req *http.Request) {
@@ -183,8 +183,8 @@ func (h *CartHandler) DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("cart successfully deleted"))
-	h.logger.Infof("cart %d successfully deleted", userID)
+	w.Write([]byte("cart product successfully deleted"))
+	h.logger.Infof("cart product %d successfully deleted", productID)
 }
 
 func (h *CartHandler) DeleteAll(w http.ResponseWriter, req *http.Request) {
@@ -199,5 +199,5 @@ func (h *CartHandler) DeleteAll(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("all cart products successfully deleted"))
-	h.logger.Infof("cart products %d successfully deleted", userID)
+	h.logger.Infof("user %d cart products successfully deleted", userID)
 }

@@ -3,7 +3,6 @@ package db_repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -35,7 +34,6 @@ func (c CartRepository) GetCart(userID int32) (int, error) {
 	}
 
 	return exist, nil
-
 }
 
 func NewCartRepository(db *sql.DB) *CartRepository {
@@ -46,10 +44,10 @@ func (c CartRepository) CreateProduct(cart *models.Cart) (*models.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := fmt.Sprintf("insert into %s (cart_id, product_id, quantity) value (?, ?, ?)", CartProductsTable)
+	query := fmt.Sprintf("insert into %s (cart_id, product_id, quantity, price) value (?, ?, ?, ?)", CartProductsTable)
 
 	for _, x := range cart.Products {
-		_, err := c.db.ExecContext(ctx, query, x.CartID, x.ProductID, x.Quantity)
+		_, err := c.db.ExecContext(ctx, query, x.CartID, x.ProductID, x.Quantity, x.Price)
 		if err != nil {
 			return nil, err
 		}
@@ -116,19 +114,12 @@ func (c CartRepository) GetAllProductsFromCart(userID int32) (*[]models.Cart, er
 
 		carts = append(carts, cart)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(carts) == 0 {
-		return nil, errors.New("sql: no rows in result set")
-	}
 
 	return &carts, nil
 }
 
 func (c CartRepository) GetCartProductsByID(cartID int) (cartProducts []models.CartProducts, err error) {
-	query := fmt.Sprintf("select cart_id, product_id, quantity from %s where cart_id = ?", CartProductsTable)
+	query := fmt.Sprintf("select cart_id, product_id, quantity, price from %s where cart_id = ?", CartProductsTable)
 	pr, err := c.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -142,7 +133,7 @@ func (c CartRepository) GetCartProductsByID(cartID int) (cartProducts []models.C
 
 	for rows.Next() {
 		cartProduct := new(models.CartProducts)
-		err := rows.Scan(&cartProduct.CartID, &cartProduct.ProductID, &cartProduct.Quantity)
+		err := rows.Scan(&cartProduct.CartID, &cartProduct.ProductID, &cartProduct.Quantity, &cartProduct.Price)
 		if err != nil {
 			return nil, err
 		}

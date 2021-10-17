@@ -3,7 +3,6 @@ package db_repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
@@ -48,9 +47,9 @@ func (o OrderRepository) Create(order *models.Order) (*models.Order, error) {
 	}
 	order.ID = int32(lastID)
 
-	query2 := fmt.Sprintf("insert into %s (order_id, product_id, quantity) values (?, ?, ?)", OPTable)
+	query2 := fmt.Sprintf("insert into %s (order_id, product_id, quantity, price) values (?, ?, ?, ?)", OPTable)
 	for i, x := range order.Products {
-		_, err := tx.ExecContext(ctx, query2, order.ID, x.ProductID, x.Quantity)
+		_, err := tx.ExecContext(ctx, query2, order.ID, x.ProductID, x.Quantity, x.Price)
 		if err != nil {
 			_ = tx.Rollback()
 			return nil, err
@@ -97,19 +96,12 @@ func (o OrderRepository) GetAll(userID int32) (*[]models.Order, error) {
 
 		orders = append(orders, order)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(orders) == 0 {
-		return nil, errors.New("sql: no rows in result set")
-	}
 
 	return &orders, nil
 }
 
 func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.OrderProducts, err error) {
-	query := fmt.Sprintf("select order_id, product_id, quantity from %s where order_id = ?", OPTable)
+	query := fmt.Sprintf("select order_id, product_id, quantity, price from %s where order_id = ?", OPTable)
 	pr, err := o.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -122,7 +114,7 @@ func (o OrderRepository) GetOrderProductsByID(id int32) (orderProducts []models.
 
 	for rows.Next() {
 		orderProduct := new(models.OrderProducts)
-		err := rows.Scan(&orderProduct.OrderID, &orderProduct.ProductID, &orderProduct.Quantity)
+		err := rows.Scan(&orderProduct.OrderID, &orderProduct.ProductID, &orderProduct.Quantity, &orderProduct.Price)
 		if err != nil {
 			return nil, err
 		}

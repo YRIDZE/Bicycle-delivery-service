@@ -1,38 +1,39 @@
 import Vue from "vue";
 import App from "./App.vue";
-import router from "./router";
 import store from "./store";
-import "./assets/css/tailwind.css"
-
+import router from "./router";
+import axios from "axios";
+import "./assets/css/tailwind.css";
+import Config from "../../../conf/config.yml";
 
 import VueFinalModal from "vue-final-modal";
-import PortalVue from 'portal-vue'
-import PulseLoader from 'vue-spinner/src/BeatLoader'
+import PortalVue from 'portal-vue';
+import PulseLoader from 'vue-spinner/src/BeatLoader';
+import Notifications from 'vue-notification';
 
-
-import Cart from './views/Cart'
-import SupplierFilter from './components/SupplierFilter'
-import ProductFilter from './components/ProductFilter'
-import GoBack from './components/GoBack'
-import GoTop from './components/GoTop'
+import Cart from './views/Cart';
+import SupplierFilter from './components/SupplierFilter';
+import ProductFilter from './components/ProductFilter';
+import GoBack from './components/GoBack';
+import GoTop from './components/GoTop';
 import Login from "./views/Login";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ProductPopUp from "./components/ProductPopUp";
-import CartTr from './components/CartTr'
-import Check from './components/Check'
+import CartTr from './components/CartTr';
+import Check from './components/Check';
 import Product from "@/components/Product";
-import Supplier from '@/components/Supplier'
-import Orders from '@/components/Orders'
-import OrderList from '@/components/OrderList'
-import OrderListProducts from '@/components/OrderListProducts'
+import Supplier from '@/components/Supplier';
+import Orders from './views/Orders';
+import OrderList from '@/components/OrderList';
+import OrderListProducts from '@/components/OrderListProducts';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {library} from "@fortawesome/fontawesome-svg-core";
-import {faFacebookF, faInstagram, faLinkedinIn, faTwitter} from "@fortawesome/free-brands-svg-icons"
+import {faFacebookF, faInstagram, faLinkedinIn, faTwitter} from "@fortawesome/free-brands-svg-icons";
 import {
   faBicycle,
   faChevronCircleLeft,
@@ -42,8 +43,8 @@ import {
   faShoppingBasket,
   faSignInAlt,
   faSignOutAlt,
-  faTrash,
   faStream,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -84,12 +85,15 @@ Vue.component('orders', Orders);
 Vue.component('order-list', OrderList);
 Vue.component('order-list-products', OrderListProducts);
 
-Vue.use(VueFinalModal)
-Vue.use(PortalVue)
+Vue.use(VueFinalModal);
+Vue.use(Notifications);
+Vue.use(PortalVue);
+
+let port = Config.port;
+axios.defaults.baseURL = 'http://localhost:'+ port + '/';
 
 new Vue({
   router,
   store,
   render: (h) => h(App),
 }).$mount("#app");
-

@@ -17,8 +17,10 @@
              aria-labelledby="panel2">
           <div class="accordion-body">
             <div class="filter-content">
-              <p>Open <input class="w-40 text-right" id="from" type="time" value="00:00" @change="time"></p>
-              <p>Close  <input class="w-40 text-right" id="to" type="time" value="23:59" @change="time"></p>
+              <p class="pb-2">Open <input class="w-40 text-right outline-none" id="from" type="time" value="00:00"
+                                          @change="time"></p>
+              <p>Close <input class="w-40 text-right outline-none" id="to" type="time" value="23:59" @change="time">
+              </p>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 const state = {
   showLogin: false,
   user_id: 0,
+
   refresh_token: localStorage.getItem("refresh_token") || "",
   access_token: localStorage.getItem("access_token") || "",
 
@@ -59,19 +60,20 @@ export function getTokenTimeUntilRefresh(t) {
 const actions = {
   async refreshTokens(context) {
     try {
-      const response = await axios.post("http://localhost:8081/refresh")
+      const response = await axios.get("refresh");
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
 
       context.commit("auth_success", {
         access_token: access_token,
-        refresh_token: refresh_token
+        refresh_token: refresh_token,
       });
       context.commit("cancelTask");
     } catch {
       context.commit("auth_error");
     }
-    await context.dispatch("dropRefresh")
+
+    await context.dispatch("dropRefresh");
     await context.dispatch("autoRefresh");
   },
 
@@ -82,7 +84,6 @@ const actions = {
       if (timeUntilRefresh < 1)
         await context.dispatch("refreshTokens")
 
-
       const refreshTask = setTimeout(() => context.dispatch("refreshTokens"), timeUntilRefresh * 1000);
       context.commit("refreshTask", refreshTask);
     }
@@ -90,16 +91,16 @@ const actions = {
 
   async dropRefresh(context) {
     if (state.refresh_token) {
-      let timeUntilRefresh = getTokenTimeUntilRefresh(state.refresh_token)
+      let timeUntilRefresh = getTokenTimeUntilRefresh(state.refresh_token);
       const logoutTask = setTimeout(() => context.dispatch("logout"), timeUntilRefresh * 1000);
-      context.commit("logoutTask", logoutTask)
+      context.commit("logoutTask", logoutTask);
     }
   },
 
   login(context, user) {
     return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/login", user)
+        .post("login", user)
         .then(response => {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
@@ -118,40 +119,40 @@ const actions = {
           context.commit('auth_error');
           localStorage.removeItem("access_token");
           reject(error);
-        })
-    })
+        });
+    });
   },
 
   registration(context, user) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios
-        .post("http://localhost:8081/createUser", user)
+        .post("createUser", user)
         .then(response => {
-          state.user_id = response.data.id
-
+          state.user_id = response.data.id;
           context.commit("reg_success");
           resolve(response);
         })
-    })
+        .catch(error => reject(error));
+    });
   },
 
   logout(context) {
     if (state.refresh_token) {
       return new Promise((resolve) => {
-        axios.post("http://localhost:8081/logout");
+        axios.post("logout");
         context.commit("logout");
         context.commit("cancelTask");
         resolve();
-      })
+      });
     }
   },
 }
 
 const getters = {
-  isLoggedIn: state => !!state.refresh_token,
-  id: state => state.user_id,
-  accessToken: state => state.access_token,
-  refreshToken: state => state.refresh_token,
+  isLoggedIn: (state) => !!state.refresh_token,
+  id: (state) => state.user_id,
+  accessToken: (state) => state.access_token,
+  refreshToken: (state) => state.refresh_token,
 }
 
 export default {
@@ -159,5 +160,5 @@ export default {
   state,
   mutations,
   actions,
-  getters
+  getters,
 }

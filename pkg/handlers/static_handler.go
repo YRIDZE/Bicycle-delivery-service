@@ -12,5 +12,5 @@ func NewStaticHandler() *StaticHandler {
 }
 
 func (h *StaticHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
-	r.Handle("/", http.FileServer(http.Dir("./public/bicycle/dist")))
+	r.Handle("/", http.StripPrefix("/", FileServerWith404(http.Dir("./public/bicycle/dist/"), FileSystem404)))
 }

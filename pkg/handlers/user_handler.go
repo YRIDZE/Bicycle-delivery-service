@@ -34,9 +34,9 @@ func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 
 	r.Handle("/login", meth(Methods{post: http.HandlerFunc(h.Login)}))
 	r.Handle("/refresh", meth(Methods{get: http.HandlerFunc(h.Refresh)}))
-	r.Handle("/logout", auth(meth(Methods{get: http.HandlerFunc(h.Logout)})))
+	r.Handle("/logout", auth(meth(Methods{post: http.HandlerFunc(h.Logout)})))
 
-	r.Handle("/createUser", meth(Methods{get: http.HandlerFunc(h.Create)}))
+	r.Handle("/createUser", meth(Methods{post: http.HandlerFunc(h.Create)}))
 	r.Handle("/getUser", auth(meth(Methods{get: http.HandlerFunc(h.GetProfile)})))
 }
 
@@ -56,10 +56,17 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	exist, err := h.userService.EmailExist(user.Email)
+	if err != nil || exist == 1 {
+		h.logger.Error(err.Error())
+		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
 	u, err := h.userService.Create(user)
 	if err != nil {
 		h.logger.Error(err.Error())
-		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		http.Error(w, "invalid credentials", http.StatusBadRequest)
 		return
 	}
 
@@ -69,7 +76,6 @@ func (h *UserHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *UserHandler) GetProfile(w http.ResponseWriter, req *http.Request) {
-
 	user := req.Context().Value("user").(*models.User)
 
 	w.WriteHeader(http.StatusOK)

@@ -6,7 +6,8 @@
          style="font-family: 'Montserrat', sans-serif;">
       <div class="col-md-12">
         <h2>Food
-          <go-back></go-back>
+          <go-back
+              v-if="this.$router.currentRoute.fullPath !== '/' && this.$router.currentRoute.fullPath !== '/all'"></go-back>
         </h2>
         <p class="-mb-0">...is any substance consumed to provide nutritional support for an
           organism. Food is usually of plant, animal
@@ -20,7 +21,7 @@
 
         <div class="d-flex align-items-center justify-content-center flex-grow-1 "
              v-if="this.$store.state.supp.loading">
-          <pulse-loader class="flex-grow-1" :color="'#e97d56'" style="position: absolute"></pulse-loader>
+          <pulse-loader class="flex-grow-1 absolute" :color="'#e97d56'"></pulse-loader>
         </div>
 
         <section id="services" class="services flex-shrink-1 pb-2.5"
@@ -35,6 +36,7 @@
                    :item="this.$store.getters['cart/getCurrentItem']"></product-popup>
 
     <go-top></go-top>
+    <notifications group="log-reg" position="bottom center" :max="3"/>
     <bottom-footer></bottom-footer>
   </div>
 </template>
@@ -53,13 +55,13 @@ export default {
   methods: {
     async fetchedSupplierProducts() {
       this.$store.state.supp.loading = true
-      await fetch("http://localhost:8081/getSuppliers",)
+      await fetch("getSuppliers",)
           .then(response => response.json())
           .then(async data => {
             await this.$store.dispatch('supp/setSuppliers', data)
             await this.$store.dispatch('supp/getSupplierTypes');
 
-            await fetch("http://localhost:8081/getProducts",)
+            await fetch("getProducts",)
                 .then(response => response.json())
                 .then(data => {
                   this.$store.dispatch('prod/setProduct', data)
@@ -80,7 +82,6 @@ export default {
         this.$store.commit("user/logout");
       }
     }
-
   },
   created() {
     this.fetchedSupplierProducts()
