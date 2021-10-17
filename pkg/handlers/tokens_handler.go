@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/YRIDZE/Bicycle-delivery-service/pkg/models"
@@ -157,4 +158,30 @@ func (h *UserHandler) Login(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 	h.logger.Infof("user %d successfully logged in", user.ID)
+}
+
+func (h *UserHandler) IsValid(w http.ResponseWriter, req *http.Request) {
+	var r struct {
+		AccessToken string `json:"access_token"`
+	}
+
+	if err := json.NewDecoder(req.Body).Decode(&r); err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, "something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	claims, err := h.tokenService.ValidateAccessToken(r.AccessToken)
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, fmt.Sprint("bad token: ", err.Error()), http.StatusUnauthorized)
+		return
+	}
+
+	if cachedTokens, ok := h.tokenService.GetUidByID(claims); ok != nil || cachedTokens.AccessUID != claims.UID {
+		http.Error(w, "invalid token", http.StatusUnauthorized)
+		fmt.Println("tyt2")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

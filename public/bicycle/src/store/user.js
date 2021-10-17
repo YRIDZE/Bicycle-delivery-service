@@ -146,6 +146,20 @@ const actions = {
       });
     }
   },
+
+  isValid(context) {
+    if (state.refresh_token) {
+      return new Promise(() => {
+        axios.post("IsValid", {access_token: context.state.access_token})
+          .catch(error => {
+            if (error.response.status === 401) {
+              context.commit("logout");
+              context.commit("cancelTask");
+            }
+          })
+      });
+    }
+  },
 }
 
 const getters = {
