@@ -12,7 +12,7 @@ const state = {
   logoutTask: null,
 
   status: "",
-}
+};
 
 const mutations = {
   reg_success(state) {
@@ -46,10 +46,10 @@ const mutations = {
     state.logoutTask = task;
   },
   cancelTask(state) {
-    clearTimeout(state.logoutTask)
+    clearTimeout(state.logoutTask);
     clearTimeout(state.refreshTask);
   },
-}
+};
 
 export function getTokenTimeUntilRefresh(t) {
   let token = jwt_decode(t);
@@ -115,7 +115,7 @@ const actions = {
 
           resolve(response);
         })
-        .catch(error => {
+        .catch((error) => {
           context.commit('auth_error');
           localStorage.removeItem("access_token");
           reject(error);
@@ -127,12 +127,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios
         .post("createUser", user)
-        .then(response => {
+        .then((response) => {
           state.user_id = response.data.id;
           context.commit("reg_success");
           resolve(response);
         })
-        .catch(error => reject(error));
+        .catch((error) => reject(error));
     });
   },
 
@@ -146,14 +146,28 @@ const actions = {
       });
     }
   },
-}
+
+  isValid(context) {
+    if (state.refresh_token) {
+      return new Promise(() => {
+        axios.post("IsValid", {access_token: context.state.access_token})
+          .catch((error) => {
+            if (error.response.status === 401) {
+              context.commit("logout");
+              context.commit("cancelTask");
+            }
+          });
+      });
+    }
+  },
+};
 
 const getters = {
   isLoggedIn: (state) => !!state.refresh_token,
   id: (state) => state.user_id,
   accessToken: (state) => state.access_token,
   refreshToken: (state) => state.refresh_token,
-}
+};
 
 export default {
   namespaced: true,
@@ -161,4 +175,4 @@ export default {
   mutations,
   actions,
   getters,
-}
+};

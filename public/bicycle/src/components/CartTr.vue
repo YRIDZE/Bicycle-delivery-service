@@ -1,10 +1,10 @@
 <template>
   <tr>
-    <td>{{ index + 1 }}</td>
-    <td>{{ i.name }}</td>
-    <td>{{ f.name }}</td>
-    <td>{{ i.price }}$</td>
-    <td>
+    <td class="text-lg">{{ index + 1 }}</td>
+    <td class="text-lg">{{ i.name }}</td>
+    <td class="text-lg">{{ f.name }}</td>
+    <td class="text-lg">{{ i.price }}$</td>
+    <td class="text-lg">
       <a style="color: #3b3b3b" @click="addItem({product_id: i.id, quantity: -1})"
          :disable="item.quantity === 1">
         <font-awesome-icon :icon="['fas', 'minus-circle']"/>
@@ -15,7 +15,7 @@
       </a>
     </td>
     <td></td>
-    <td>
+    <td class="text-lg">
       <a @click="removeItem(item)">
         <font-awesome-icon :icon="['fas', 'trash']"/>
       </a>

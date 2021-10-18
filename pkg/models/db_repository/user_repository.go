@@ -62,11 +62,12 @@ func (u *UserRepository) GetByEmail(email string) (*models.User, error) {
 
 func (u *UserRepository) EmailExist(email string) (int, error) {
 	var exist int
-	query := fmt.Sprintf("select 1 from %s where email = ? and deleted is null", UsersTable)
+	query := fmt.Sprintf("select exists(select 1 from %s where email = ? and deleted is null)", UsersTable)
 
 	err := u.db.QueryRow(query, email).Scan(&exist)
 	if err != nil {
 		return 0, err
 	}
+
 	return exist, nil
 }

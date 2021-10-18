@@ -1,7 +1,7 @@
 <template>
-  <li class="d-flex bd-highlight">
-    <p class="bd-highlight">{{ "&nbsp;" }} {{ product.name }}</p>
-    <p class="ms-auto bd-highlight">{{ item.quantity }}х{{ item.price }}$</p>
+  <li class="d-flex bd-highlight text-lg py-1">
+    <p>{{ "&nbsp;" }} {{ product.name }}</p>
+    <p class="ms-auto">{{ item.quantity }}х{{ item.price }}$</p>
   </li>
 </template>
 

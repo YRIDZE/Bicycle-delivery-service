@@ -7,13 +7,15 @@
           :item="item"
       ></product>
     </div>
-    <div class="clearfix btn-group offset-md-5 py-4 text-center" v-if="pageCount > 1">
-      <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(-1)"
-              :disabled="this.$store.getters['prod/getPage'] === 0"> Previous
-      </button>
-      <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(1)"
-              :disabled="this.$store.getters['prod/getPage'] >= pageCount-1"> Next
-      </button>
+    <div class="d-flex bd-highlight">
+      <div class="clearfix btn-group m-auto mt-8" v-if="pageCount > 1">
+        <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(-1)"
+                :disabled="this.$store.getters['prod/getPage'] === 0"> Previous
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" @click="changePageNumber(1)"
+                :disabled="this.$store.getters['prod/getPage'] >= pageCount-1"> Next
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -62,7 +64,7 @@ export default {
   },
   mounted() {
     let path = this.$router.currentRoute.fullPath;
-    this.$store.dispatch('prod/getProductTypesBySupp', path[path.length-1]);
+    this.$store.dispatch('prod/getProductTypesBySupp', path[path.length - 1]);
   }
 };
 </script>

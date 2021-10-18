@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-4">
     <vue-final-modal
         v-model="$store.state.cart.showCart"
         classes="modal-container"
@@ -8,16 +8,16 @@
         :esc-to-close="true"
         @before-open="hide"
     >
-      <div class="modal-body">
+      <div class="modal-body m-2">
         <div class="table-responsive">
-          <table class="table table-striped custom-table m-0">
+          <table class="table table-striped custom-table">
             <thead>
             <tr>
-              <th>#</th>
-              <th>Product Name</th>
-              <th>From</th>
-              <th>Price</th>
-              <th>Quantity</th>
+              <th class="text-sm">#</th>
+              <th class="text-sm">Product Name</th>
+              <th class="text-sm">From</th>
+              <th class="text-sm">Price</th>
+              <th class="text-sm">Quantity</th>
             </tr>
             </thead>
             <tbody>
@@ -31,9 +31,9 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row-reverse my-2" v-if="this.$store.getters['cart/getCartList'].length !== 0">
-        <button class="cart-btn font-black mr-3" @click="showCartInfo = true">Order</button>
-        <p class="mx-2">Total <strong>{{ total }}</strong>$</p>
+      <div class="d-flex flex-row-reverse mb-2" v-if="this.$store.getters['cart/getCartList'].length !== 0">
+        <button class="cart-btn font-black text-lg mr-3" @click="showCartInfo = true">Order</button>
+        <p class="mx-4 text-lg">Total <strong>{{ total }}</strong>$</p>
       </div>
     </vue-final-modal>
 
@@ -44,7 +44,7 @@
         content-class="modal-content"
         :esc-to-close="true"
     >
-      <div class="modal-body">
+      <div class="modal-body m-2">
         <form v-on:submit.prevent="showCartOrder = true">
           <div class="row g-3 m-px" style="width: 800px !important;">
             <div class="col-sm-12 fields">
@@ -69,7 +69,7 @@
                 <option>Cash</option>
               </select>
             </div>
-            <button class="cart-btn font-black my-2" type="submit" style="font-size: 16px">Confirm</button>
+            <button class="cart-btn font-black text-lg mt-2" type="submit">Confirm</button>
           </div>
         </form>
       </div>
@@ -81,21 +81,19 @@
         content-class="modal-content"
         :esc-to-close="true"
     >
-      <div class="modal-body">
-
-        <div class="row g-3 m-px" style="width: 800px !important;">
-          <p>{{ orderForm.customer_lastname }} {{ orderForm.customer_name }}: {{ orderForm.address }}</p>
-          <small class="m-0">{{ orderForm.phone_number }}</small>
-          <ol class="list-group list-group-numbered px-2">
+      <div class="modal-body m-2">
+        <div class="row g-3 m-px" style="width: 800px !important">
+          <p class="text-xl">{{ orderForm.customer_lastname }} {{ orderForm.customer_name }}, {{
+              orderForm.address
+            }}</p>
+          <small class="text-md m-0">{{ orderForm.phone_number }}</small>
+          <ol class="list-group list-group-numbered px-2 text-md">
             <order-list-products v-for="(i) in this.$store.getters['cart/getCartList']" :key="i"
                                  :item="i"></order-list-products>
           </ol>
-          <p class="text-right font-black mt-2">by {{ orderForm.payment_method }} <strong>{{ total }}</strong>$</p>
-          <button class="cart-btn font-black my-2" @click="createOrder" type="submit" style="font-size: 16px">
-            ORDER
-          </button>
+          <p class="text-right font-black text-lg mt-2">by {{ orderForm.payment_method }} <strong>{{ total }}</strong>$</p>
+          <button class="cart-btn font-black text-lg mt-2" @click="createOrder" type="submit">ORDER</button>
         </div>
-
       </div>
     </vue-final-modal>
 
@@ -135,7 +133,7 @@ export default {
       this.orderForm.phone_number = this.orderForm.phone_number.replace(/[^0-9]/g, '');
 
       axios
-          .post("http://localhost:8081/createOrder", JSON.stringify(this.orderForm))
+          .post("createOrder", JSON.stringify(this.orderForm))
           .then(() => {
             this.$store.dispatch("cart/deleteAllFromCart");
             this.$store.state.cart.cart.products = [];
@@ -164,10 +162,8 @@ export default {
 </script>
 
 <style scoped>
-
 .fields {
   display: flex;
   justify-content: space-between;
 }
-
 </style>

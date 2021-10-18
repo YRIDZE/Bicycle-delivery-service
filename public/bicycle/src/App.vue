@@ -51,24 +51,23 @@ import {getTokenTimeUntilRefresh} from "@/store/user";
 
 export default {
   name: "App",
-
   methods: {
     async fetchedSupplierProducts() {
-      this.$store.state.supp.loading = true
+      this.$store.state.supp.loading = true;
       await fetch("getSuppliers",)
           .then(response => response.json())
           .then(async data => {
-            await this.$store.dispatch('supp/setSuppliers', data)
+            await this.$store.dispatch('supp/setSuppliers', data);
             await this.$store.dispatch('supp/getSupplierTypes');
 
             await fetch("getProducts",)
                 .then(response => response.json())
                 .then(data => {
-                  this.$store.dispatch('prod/setProduct', data)
+                  this.$store.dispatch('prod/setProduct', data);
                   this.$store.dispatch('prod/getProductTypes');
                 });
           })
-      this.$store.state.supp.loading = false
+      this.$store.state.supp.loading = false;
     },
   },
   async mounted() {
@@ -81,10 +80,11 @@ export default {
       } else {
         this.$store.commit("user/logout");
       }
+      await this.$store.dispatch("user/isValid");
     }
   },
   created() {
-    this.fetchedSupplierProducts()
+    this.fetchedSupplierProducts();
   },
 };
 

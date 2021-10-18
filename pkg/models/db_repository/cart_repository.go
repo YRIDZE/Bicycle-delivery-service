@@ -44,12 +44,27 @@ func (c CartRepository) CreateProduct(cart *models.Cart) (*models.Cart, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	var exist int8 = 0
+
+	existQuery := fmt.Sprintf("select exists(select 1 from %s where product_id = ?)", CartProductsTable)
 	query := fmt.Sprintf("insert into %s (cart_id, product_id, quantity, price) value (?, ?, ?, ?)", CartProductsTable)
 
 	for _, x := range cart.Products {
-		_, err := c.db.ExecContext(ctx, query, x.CartID, x.ProductID, x.Quantity, x.Price)
+
+		err := c.db.QueryRow(existQuery, x.ProductID).Scan(&exist)
 		if err != nil {
 			return nil, err
+		}
+		if exist == 0 {
+			_, err = c.db.ExecContext(ctx, query, x.CartID, x.ProductID, x.Quantity, x.Price)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			cart, err = c.Update(cart)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return cart, nil
