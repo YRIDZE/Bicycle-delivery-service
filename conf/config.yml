@@ -1,0 +1,13 @@
+port: "8081"
+
+db:
+  username: "laktionova"
+  host: "localhost"
+  port: "3306"
+  dbname: "delivery_db"
+
+parser:
+  url: "http://foodapi.true-tech.php.nixdev.co/suppliers"
+  delay: 10
+
+# username -> name for user who will use db. In .env file set DB_PASSWORD as password for this user
