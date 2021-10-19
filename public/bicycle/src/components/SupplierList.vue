@@ -39,8 +39,10 @@ export default {
       let time2 = str2.split(':');
       if (time1[0] === "00" || time2[0] === "00" || time1[0] === "24" || time2[0] === "24")
         return true
+      if (time1[0] > time2[0])
+        return true
 
-      return time1[0] >= time2[0] && time1[1] >= time2[1];
+      return time1[0] = time2[0] && time1[1] >= time2[1];
     },
   },
 };

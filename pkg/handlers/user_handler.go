@@ -34,7 +34,7 @@ func (h *UserHandler) RegisterRoutes(r *http.ServeMux, appH *AppHandlers) {
 
 	r.Handle("/login", meth(Methods{post: http.HandlerFunc(h.Login)}))
 	r.Handle("/refresh", meth(Methods{get: http.HandlerFunc(h.Refresh)}))
-	r.Handle("/IsValid", meth(Methods{post: http.HandlerFunc(h.IsValid)}))
+	r.Handle("/IsValid", auth(meth(Methods{post: http.HandlerFunc(h.IsValid)})))
 	r.Handle("/logout", auth(meth(Methods{post: http.HandlerFunc(h.Logout)})))
 
 	r.Handle("/createUser", meth(Methods{post: http.HandlerFunc(h.Create)}))

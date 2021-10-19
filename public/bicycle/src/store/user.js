@@ -150,7 +150,7 @@ const actions = {
   isValid(context) {
     if (state.refresh_token) {
       return new Promise(() => {
-        axios.post("IsValid", {access_token: context.state.access_token})
+        axios.post("IsValid")
           .catch((error) => {
             if (error.response.status === 401) {
               context.commit("logout");
